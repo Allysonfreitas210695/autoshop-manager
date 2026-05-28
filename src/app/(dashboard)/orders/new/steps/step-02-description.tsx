@@ -106,7 +106,7 @@ export function Step02Description({ defaultValues, onNext }: Step2Props) {
           rows={3}
           placeholder="O que o cliente descreveu sobre o problema..."
           aria-invalid={!!errors.customerReport}
-          className="border-outline-variant bg-surface-container text-body-md text-on-surface placeholder:text-on-surface-variant/40 focus:ring-secondary aria-[invalid=true]:border-error w-full resize-none rounded-md border px-3 py-2 focus:ring-1 focus:outline-none"
+          className="border-outline-variant bg-surface-container text-body-md text-on-surface placeholder:text-on-surface-variant/40 focus:ring-secondary aria-invalid:border-error w-full resize-none rounded-md border px-3 py-2 focus:ring-1 focus:outline-none"
           {...register("customerReport")}
         />
         {errors.customerReport && (
