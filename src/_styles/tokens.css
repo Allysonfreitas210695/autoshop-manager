@@ -1,0 +1,142 @@
+/*
+ * Industrial Precision — design tokens
+ * Dark mode is the canonical theme; light values are provided for parity.
+ * Raw values live on :root / .dark; @theme maps them to Tailwind utilities.
+ */
+
+:root {
+  /* Surfaces */
+  --surface: #f7f9fc;
+  --surface-dim: #d8dde6;
+  --surface-bright: #ffffff;
+  --surface-container-lowest: #ffffff;
+  --surface-container-low: #f1f4f9;
+  --surface-container: #eceff5;
+  --surface-container-high: #e6e9f0;
+  --surface-container-highest: #e0e4ec;
+  --on-surface: #1a1c20;
+  --on-surface-variant: #43474e;
+  --outline: #73777f;
+  --outline-variant: #c3c7cf;
+
+  /* Roles */
+  --primary: #41484d;
+  --on-primary: #ffffff;
+  --primary-container: #e6e9f0;
+  --on-primary-container: #41484d;
+  --secondary: #0566d9;
+  --on-secondary: #ffffff;
+  --secondary-container: #d8e2ff;
+  --on-secondary-container: #001a42;
+  --tertiary: #964900;
+  --on-tertiary: #ffffff;
+  --tertiary-container: #ffdbca;
+  --on-tertiary-container: #341100;
+  --error: #ba1a1a;
+  --on-error: #ffffff;
+  --error-container: #ffdad6;
+  --on-error-container: #410002;
+
+  /* Status */
+  --status-pending: #475569;
+  --status-progress: #3b82f6;
+  --status-completed: #22c55e;
+  --status-delayed: #f97316;
+}
+
+.dark {
+  --surface: #051424;
+  --surface-dim: #051424;
+  --surface-bright: #2c3a4c;
+  --surface-container-lowest: #010f1f;
+  --surface-container-low: #0d1c2d;
+  --surface-container: #122131;
+  --surface-container-high: #1c2b3c;
+  --surface-container-highest: #273647;
+  --on-surface: #d4e4fa;
+  --on-surface-variant: #c4c7c7;
+  --outline: #8e9192;
+  --outline-variant: #444748;
+
+  --primary: #c8c6c5;
+  --on-primary: #313030;
+  --primary-container: #121212;
+  --on-primary-container: #7e7d7d;
+  --secondary: #adc6ff;
+  --on-secondary: #002e6a;
+  --secondary-container: #0566d9;
+  --on-secondary-container: #e6ecff;
+  --tertiary: #ffb690;
+  --on-tertiary: #552100;
+  --tertiary-container: #250a00;
+  --on-tertiary-container: #cf5b00;
+  --error: #ffb4ab;
+  --on-error: #690005;
+  --error-container: #93000a;
+  --on-error-container: #ffdad6;
+
+  --status-pending: #475569;
+  --status-progress: #3b82f6;
+  --status-completed: #22c55e;
+  --status-delayed: #f97316;
+}
+
+@theme inline {
+  /* Industrial color utilities (bg-surface, text-on-surface, border-outline-variant, ...) */
+  --color-surface: var(--surface);
+  --color-surface-dim: var(--surface-dim);
+  --color-surface-bright: var(--surface-bright);
+  --color-surface-container-lowest: var(--surface-container-lowest);
+  --color-surface-container-low: var(--surface-container-low);
+  --color-surface-container: var(--surface-container);
+  --color-surface-container-high: var(--surface-container-high);
+  --color-surface-container-highest: var(--surface-container-highest);
+  --color-on-surface: var(--on-surface);
+  --color-on-surface-variant: var(--on-surface-variant);
+  --color-outline: var(--outline);
+  --color-outline-variant: var(--outline-variant);
+
+  --color-on-primary: var(--on-primary);
+  --color-primary-container: var(--primary-container);
+  --color-on-primary-container: var(--on-primary-container);
+  --color-on-secondary: var(--on-secondary);
+  --color-secondary-container: var(--secondary-container);
+  --color-on-secondary-container: var(--on-secondary-container);
+  --color-tertiary: var(--tertiary);
+  --color-on-tertiary: var(--on-tertiary);
+  --color-tertiary-container: var(--tertiary-container);
+  --color-on-tertiary-container: var(--on-tertiary-container);
+  --color-on-error: var(--on-error);
+  --color-error-container: var(--error-container);
+  --color-on-error-container: var(--on-error-container);
+
+  --color-status-pending: var(--status-pending);
+  --color-status-progress: var(--status-progress);
+  --color-status-completed: var(--status-completed);
+  --color-status-delayed: var(--status-delayed);
+
+  /* Typography scale (text-headline-xl, text-label-md, ...) */
+  --text-headline-xl: 32px;
+  --text-headline-xl--line-height: 40px;
+  --text-headline-xl--letter-spacing: -0.02em;
+  --text-headline-xl--font-weight: 700;
+  --text-headline-lg: 24px;
+  --text-headline-lg--line-height: 32px;
+  --text-headline-lg--letter-spacing: -0.01em;
+  --text-headline-lg--font-weight: 600;
+  --text-headline-md: 20px;
+  --text-headline-md--line-height: 28px;
+  --text-headline-md--font-weight: 600;
+  --text-body-lg: 16px;
+  --text-body-lg--line-height: 24px;
+  --text-body-md: 14px;
+  --text-body-md--line-height: 20px;
+  --text-label-md: 12px;
+  --text-label-md--line-height: 16px;
+  --text-label-md--letter-spacing: 0.05em;
+  --text-label-md--font-weight: 500;
+  --text-label-sm: 10px;
+  --text-label-sm--line-height: 14px;
+  --text-label-sm--letter-spacing: 0.05em;
+  --text-label-sm--font-weight: 500;
+}
