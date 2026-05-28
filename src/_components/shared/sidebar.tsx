@@ -15,9 +15,19 @@ function isActive(pathname: string, href: string) {
 export function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname();
 
+  const groups = navItems.reduce<Record<string, typeof navItems>>(
+    (acc, item) => {
+      const g = item.group ?? "Outros";
+      if (!acc[g]) acc[g] = [];
+      acc[g].push(item);
+      return acc;
+    },
+    {},
+  );
+
   return (
     <div className="flex h-full flex-col py-6">
-      <div className="mb-8 flex items-center gap-2 px-6">
+      <div className="mb-6 flex items-center gap-2 px-6">
         <span className="bg-secondary-container text-on-secondary-container flex size-9 items-center justify-center rounded-lg">
           <Wrench className="size-5" />
         </span>
@@ -31,31 +41,40 @@ export function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
         </div>
       </div>
 
-      <nav className="flex-1 space-y-1 px-4">
-        {navItems.map((item) => {
-          const active = isActive(pathname, item.href);
-          const Icon = item.icon;
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              onClick={onNavigate}
-              aria-current={active ? "page" : undefined}
-              className={cn(
-                "text-label-md flex items-center gap-3 rounded-lg px-4 py-2.5 font-mono transition-colors",
-                active
-                  ? "bg-secondary-container text-on-secondary-container"
-                  : "text-on-surface-variant hover:bg-surface-container-highest",
-              )}
-            >
-              <Icon className="size-5 shrink-0" />
-              <span>{item.label}</span>
-            </Link>
-          );
-        })}
+      <nav className="flex-1 space-y-4 overflow-y-auto px-4">
+        {Object.entries(groups).map(([group, items]) => (
+          <div key={group}>
+            <p className="text-label-xs text-on-surface-variant/40 mb-1 px-4 font-mono tracking-widest uppercase">
+              {group}
+            </p>
+            <div className="space-y-0.5">
+              {items.map((item) => {
+                const active = isActive(pathname, item.href);
+                const Icon = item.icon;
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={onNavigate}
+                    aria-current={active ? "page" : undefined}
+                    className={cn(
+                      "text-label-md flex items-center gap-3 rounded-lg px-4 py-2.5 font-mono transition-colors",
+                      active
+                        ? "bg-secondary-container text-on-secondary-container"
+                        : "text-on-surface-variant hover:bg-surface-container-highest",
+                    )}
+                  >
+                    <Icon className="size-4 shrink-0" />
+                    <span>{item.label}</span>
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        ))}
       </nav>
 
-      <div className="mt-auto px-6 pt-6">
+      <div className="mt-auto px-6 pt-4">
         <button className="bg-surface-container-highest text-label-md text-on-surface hover:bg-outline-variant flex w-full items-center justify-center gap-2 rounded-lg px-4 py-2.5 font-mono transition-colors">
           <Headset className="size-4" />
           Suporte Técnico

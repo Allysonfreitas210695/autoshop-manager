@@ -1135,3 +1135,539 @@ export const mockOrderDetails: MockOrderDetail[] = [
 export function getMockOrderById(id: string): MockOrderDetail | undefined {
   return mockOrderDetails.find((o) => o.id === id);
 }
+
+// ─── Appointments ────────────────────────────────────────────────────────────
+
+export type AppointmentStatus =
+  | "confirmed"
+  | "pending"
+  | "cancelled"
+  | "completed";
+
+export type AppointmentServiceType =
+  | "Revisão"
+  | "Troca de Óleo"
+  | "Freios"
+  | "Suspensão"
+  | "Elétrica"
+  | "Diagnóstico"
+  | "Funilaria"
+  | "Alinhamento";
+
+export type MockAppointment = {
+  id: string;
+  customer: string;
+  phone: string;
+  vehicle: string;
+  plate: string;
+  serviceType: AppointmentServiceType;
+  mechanic: string;
+  date: string; // ISO date string YYYY-MM-DD
+  time: string; // HH:mm
+  duration: number; // minutes
+  status: AppointmentStatus;
+  notes: string;
+};
+
+export const mockAppointments: MockAppointment[] = [
+  {
+    id: "AGD-001",
+    customer: "Ricardo Almeida",
+    phone: "(11) 98765-4321",
+    vehicle: "Toyota Corolla 2020",
+    plate: "ABC-1234",
+    serviceType: "Revisão",
+    mechanic: "Bruno Dias",
+    date: "2026-05-28",
+    time: "08:00",
+    duration: 120,
+    status: "confirmed",
+    notes: "Revisão completa dos 30.000 km.",
+  },
+  {
+    id: "AGD-002",
+    customer: "Mariana Silva",
+    phone: "(11) 97654-3210",
+    vehicle: "Honda Civic EXL 2021",
+    plate: "XYZ-9876",
+    serviceType: "Troca de Óleo",
+    mechanic: "Carla Souza",
+    date: "2026-05-28",
+    time: "09:30",
+    duration: 60,
+    status: "confirmed",
+    notes: "",
+  },
+  {
+    id: "AGD-003",
+    customer: "Fernando Costa",
+    phone: "(11) 96543-2109",
+    vehicle: "VW Golf GTI 2022",
+    plate: "KLS-4422",
+    serviceType: "Diagnóstico",
+    mechanic: "Bruno Dias",
+    date: "2026-05-28",
+    time: "11:00",
+    duration: 90,
+    status: "pending",
+    notes: "Cliente relata barulho no motor ao acelerar.",
+  },
+  {
+    id: "AGD-004",
+    customer: "Lucia Ramos",
+    phone: "(11) 95432-1098",
+    vehicle: "Fiat Pulse 2023",
+    plate: "JPM-2210",
+    serviceType: "Alinhamento",
+    mechanic: "Carlos Melo",
+    date: "2026-05-28",
+    time: "14:00",
+    duration: 45,
+    status: "confirmed",
+    notes: "",
+  },
+  {
+    id: "AGD-005",
+    customer: "Auto Rent Ltda",
+    phone: "(11) 94321-0987",
+    vehicle: "Jeep Renegade 2021",
+    plate: "OSC-5521",
+    serviceType: "Freios",
+    mechanic: "Carla Souza",
+    date: "2026-05-28",
+    time: "15:30",
+    duration: 120,
+    status: "pending",
+    notes: "Substituição de pastilhas e discos dianteiros.",
+  },
+  {
+    id: "AGD-006",
+    customer: "Paulo Mendes",
+    phone: "(11) 93210-9876",
+    vehicle: "Chevrolet Onix 2022",
+    plate: "MNO-3344",
+    serviceType: "Elétrica",
+    mechanic: "Bruno Dias",
+    date: "2026-05-29",
+    time: "08:00",
+    duration: 90,
+    status: "confirmed",
+    notes: "Problemas na central elétrica.",
+  },
+  {
+    id: "AGD-007",
+    customer: "Ana Oliveira",
+    phone: "(11) 92109-8765",
+    vehicle: "Hyundai HB20 2020",
+    plate: "PQR-5566",
+    serviceType: "Suspensão",
+    mechanic: "Carlos Melo",
+    date: "2026-05-29",
+    time: "10:00",
+    duration: 120,
+    status: "confirmed",
+    notes: "Troca de amortecedores traseiros.",
+  },
+  {
+    id: "AGD-008",
+    customer: "Rodrigo Lima",
+    phone: "(11) 91098-7654",
+    vehicle: "Ford Ka 2019",
+    plate: "STU-7788",
+    serviceType: "Troca de Óleo",
+    mechanic: "Carla Souza",
+    date: "2026-05-29",
+    time: "13:00",
+    duration: 60,
+    status: "cancelled",
+    notes: "Cliente cancelou por motivo pessoal.",
+  },
+  {
+    id: "AGD-009",
+    customer: "Camila Torres",
+    phone: "(11) 90987-6543",
+    vehicle: "Renault Kwid 2023",
+    plate: "VWX-9900",
+    serviceType: "Revisão",
+    mechanic: "Bruno Dias",
+    date: "2026-05-30",
+    time: "09:00",
+    duration: 180,
+    status: "confirmed",
+    notes: "Revisão de 10.000 km.",
+  },
+  {
+    id: "AGD-010",
+    customer: "Jorge Ferreira",
+    phone: "(11) 89876-5432",
+    vehicle: "Nissan Kicks 2022",
+    plate: "YZA-1122",
+    serviceType: "Funilaria",
+    mechanic: "Carlos Melo",
+    date: "2026-05-30",
+    time: "14:00",
+    duration: 240,
+    status: "pending",
+    notes: "Reparo de amassado na porta traseira esquerda.",
+  },
+  {
+    id: "AGD-011",
+    customer: "Sandra Vieira",
+    phone: "(11) 88765-4321",
+    vehicle: "Peugeot 208 2021",
+    plate: "BCD-3344",
+    serviceType: "Freios",
+    mechanic: "Carla Souza",
+    date: "2026-06-02",
+    time: "08:30",
+    duration: 90,
+    status: "confirmed",
+    notes: "",
+  },
+  {
+    id: "AGD-012",
+    customer: "Marcos Antônio",
+    phone: "(11) 87654-3210",
+    vehicle: "Toyota Hilux 2023",
+    plate: "EFG-5566",
+    serviceType: "Revisão",
+    mechanic: "Bruno Dias",
+    date: "2026-06-03",
+    time: "10:00",
+    duration: 150,
+    status: "pending",
+    notes: "Revisão pré-viagem.",
+  },
+  {
+    id: "AGD-013",
+    customer: "Beatriz Nunes",
+    phone: "(11) 86543-2109",
+    vehicle: "Honda HR-V 2022",
+    plate: "HIJ-7788",
+    serviceType: "Diagnóstico",
+    mechanic: "Carlos Melo",
+    date: "2026-06-04",
+    time: "11:00",
+    duration: 60,
+    status: "confirmed",
+    notes: "Verificar luz de check engine.",
+  },
+];
+
+export const appointmentStatusLabels: Record<AppointmentStatus, string> = {
+  confirmed: "Confirmado",
+  pending: "Pendente",
+  cancelled: "Cancelado",
+  completed: "Concluído",
+};
+
+export const mechanics = [
+  "Bruno Dias",
+  "Carla Souza",
+  "Carlos Melo",
+  "Ana Paula",
+];
+
+export const appointmentServiceTypes: AppointmentServiceType[] = [
+  "Revisão",
+  "Troca de Óleo",
+  "Freios",
+  "Suspensão",
+  "Elétrica",
+  "Diagnóstico",
+  "Funilaria",
+  "Alinhamento",
+];
+
+// ─── Purchase Orders ─────────────────────────────────────────────────────────
+
+export type PurchaseOrderStatus =
+  | "draft"
+  | "sent"
+  | "confirmed"
+  | "received"
+  | "cancelled";
+
+export type MockPurchaseOrderItem = {
+  partId: string;
+  name: string;
+  sku: string;
+  quantity: number;
+  unitPrice: number;
+};
+
+export type MockPurchaseOrder = {
+  id: string;
+  supplier: string;
+  supplierContact: string;
+  createdAt: string;
+  expectedDelivery: string;
+  status: PurchaseOrderStatus;
+  items: MockPurchaseOrderItem[];
+  notes: string;
+};
+
+export const mockPurchaseOrders: MockPurchaseOrder[] = [
+  {
+    id: "OC-0023",
+    supplier: "AutoPeças Brasil Ltda",
+    supplierContact: "(11) 3344-5566",
+    createdAt: "2026-05-25",
+    expectedDelivery: "2026-05-30",
+    status: "confirmed",
+    items: [
+      {
+        partId: "P001",
+        name: "Filtro de Óleo Honda",
+        sku: "FO-HND-001",
+        quantity: 10,
+        unitPrice: 28.5,
+      },
+      {
+        partId: "P002",
+        name: "Filtro de Ar Universal",
+        sku: "FA-UNV-002",
+        quantity: 8,
+        unitPrice: 35.0,
+      },
+    ],
+    notes: "Entrega prioritária.",
+  },
+  {
+    id: "OC-0022",
+    supplier: "Distribuidora FreiMax",
+    supplierContact: "(11) 4455-6677",
+    createdAt: "2026-05-22",
+    expectedDelivery: "2026-05-27",
+    status: "received",
+    items: [
+      {
+        partId: "P010",
+        name: "Pastilha de Freio Dianteira",
+        sku: "PF-DIA-010",
+        quantity: 12,
+        unitPrice: 89.0,
+      },
+    ],
+    notes: "",
+  },
+  {
+    id: "OC-0021",
+    supplier: "MotoForce Distribuidora",
+    supplierContact: "(11) 5566-7788",
+    createdAt: "2026-05-20",
+    expectedDelivery: "2026-06-05",
+    status: "sent",
+    items: [
+      {
+        partId: "P005",
+        name: "Correia Dentada Gates",
+        sku: "CD-GAT-005",
+        quantity: 5,
+        unitPrice: 145.0,
+      },
+      {
+        partId: "P006",
+        name: "Vela de Ignição NGK",
+        sku: "VI-NGK-006",
+        quantity: 20,
+        unitPrice: 22.5,
+      },
+    ],
+    notes: "Aguardando confirmação do fornecedor.",
+  },
+  {
+    id: "OC-0020",
+    supplier: "AutoPeças Brasil Ltda",
+    supplierContact: "(11) 3344-5566",
+    createdAt: "2026-05-15",
+    expectedDelivery: "2026-05-20",
+    status: "received",
+    items: [
+      {
+        partId: "P003",
+        name: "Óleo Motor 5W30 Sintético",
+        sku: "OM-5W30-003",
+        quantity: 24,
+        unitPrice: 38.0,
+      },
+    ],
+    notes: "",
+  },
+];
+
+export const purchaseOrderStatusLabels: Record<PurchaseOrderStatus, string> = {
+  draft: "Rascunho",
+  sent: "Enviado",
+  confirmed: "Confirmado",
+  received: "Recebido",
+  cancelled: "Cancelado",
+};
+
+// ─── Analytics / Strategic Dashboard ────────────────────────────────────────
+
+export type MockMonthlyRevenue = {
+  month: string;
+  revenue: number;
+  expenses: number;
+  profit: number;
+  orders: number;
+};
+
+export const mockMonthlyRevenue: MockMonthlyRevenue[] = [
+  {
+    month: "Mai/25",
+    revenue: 48200,
+    expenses: 31400,
+    profit: 16800,
+    orders: 52,
+  },
+  {
+    month: "Jun/25",
+    revenue: 51300,
+    expenses: 33200,
+    profit: 18100,
+    orders: 57,
+  },
+  {
+    month: "Jul/25",
+    revenue: 45900,
+    expenses: 29800,
+    profit: 16100,
+    orders: 49,
+  },
+  {
+    month: "Ago/25",
+    revenue: 53700,
+    expenses: 35100,
+    profit: 18600,
+    orders: 61,
+  },
+  {
+    month: "Set/25",
+    revenue: 58400,
+    expenses: 37800,
+    profit: 20600,
+    orders: 65,
+  },
+  {
+    month: "Out/25",
+    revenue: 62100,
+    expenses: 40200,
+    profit: 21900,
+    orders: 70,
+  },
+  {
+    month: "Nov/25",
+    revenue: 59800,
+    expenses: 38700,
+    profit: 21100,
+    orders: 67,
+  },
+  {
+    month: "Dez/25",
+    revenue: 71500,
+    expenses: 46300,
+    profit: 25200,
+    orders: 80,
+  },
+  {
+    month: "Jan/26",
+    revenue: 44300,
+    expenses: 28900,
+    profit: 15400,
+    orders: 48,
+  },
+  {
+    month: "Fev/26",
+    revenue: 47800,
+    expenses: 31100,
+    profit: 16700,
+    orders: 53,
+  },
+  {
+    month: "Mar/26",
+    revenue: 55200,
+    expenses: 35800,
+    profit: 19400,
+    orders: 62,
+  },
+  {
+    month: "Abr/26",
+    revenue: 60400,
+    expenses: 39100,
+    profit: 21300,
+    orders: 68,
+  },
+];
+
+export type MockMechanicPerformance = {
+  name: string;
+  orders: number;
+  revenue: number;
+  avgRating: number;
+  completionRate: number;
+};
+
+export const mockMechanicPerformance: MockMechanicPerformance[] = [
+  {
+    name: "Bruno Dias",
+    orders: 128,
+    revenue: 95400,
+    avgRating: 4.8,
+    completionRate: 96,
+  },
+  {
+    name: "Carla Souza",
+    orders: 112,
+    revenue: 83200,
+    avgRating: 4.9,
+    completionRate: 98,
+  },
+  {
+    name: "Carlos Melo",
+    orders: 98,
+    revenue: 72100,
+    avgRating: 4.6,
+    completionRate: 93,
+  },
+  {
+    name: "Ana Paula",
+    orders: 84,
+    revenue: 61800,
+    avgRating: 4.7,
+    completionRate: 95,
+  },
+];
+
+export type MockServiceCategory = {
+  category: string;
+  orders: number;
+  revenue: number;
+  percentage: number;
+};
+
+export const mockServiceCategories: MockServiceCategory[] = [
+  {
+    category: "Revisão Preventiva",
+    orders: 186,
+    revenue: 142300,
+    percentage: 35,
+  },
+  { category: "Freios", orders: 124, revenue: 98700, percentage: 24 },
+  { category: "Motor", orders: 87, revenue: 76400, percentage: 17 },
+  { category: "Suspensão", orders: 65, revenue: 53200, percentage: 12 },
+  { category: "Elétrica", orders: 48, revenue: 39100, percentage: 9 },
+  { category: "Outros", orders: 12, revenue: 9800, percentage: 3 },
+];
+
+export const mockAnalyticsKpis = {
+  totalRevenue12m: 658600,
+  totalOrders12m: 732,
+  avgTicket: 899,
+  netMargin: 32,
+  returnRate: 68,
+  nps: 87,
+  newCustomers: 143,
+  activeCustomers: 312,
+};

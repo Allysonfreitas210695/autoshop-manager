@@ -1,22 +1,28 @@
 # PLAN.md — AutoShop Manager (Precision Auto)
 
-> Gerado em: 2026-05-27 | Status: Em progresso
+> Atualizado em: 2026-05-28 | Status: Fases 6–10 concluídas
 
 ---
 
 ## Estado atual
 
-| Rota            | Status            | Tela de referência                                  |
-| --------------- | ----------------- | --------------------------------------------------- |
-| `/`             | ✅ Implementado   | `dashboard_precision_auto`                          |
-| `/orders`       | ✅ Implementado   | `gest_o_de_o.s._precision_auto`                     |
-| `/login`        | ✅ Implementado   | —                                                   |
-| `/register`     | ✅ Implementado   | —                                                   |
-| `/orders/new`   | ⚠️ Só redireciona | `nova_ordem_de_servi_o_precision_auto` + passos 2–4 |
-| `/customers`    | ⚠️ Placeholder    | `base_de_clientes_precision_auto`                   |
-| `/inventory`    | ⚠️ Placeholder    | `controle_de_estoque_precision_auto`                |
-| `/finance`      | ⚠️ Placeholder    | `gest_o_financeira_precision_auto`                  |
-| `/appointments` | ⚠️ Placeholder    | —                                                   |
+| Rota                  | Status          | Tela de referência                                   |
+| --------------------- | --------------- | ---------------------------------------------------- |
+| `/`                   | ✅ Implementado | `dashboard_precision_auto`                           |
+| `/orders`             | ✅ Implementado | `gest_o_de_o.s._precision_auto`                      |
+| `/orders/new`         | ✅ Implementado | `nova_ordem_de_servi_o_precision_auto` + passos 2–4  |
+| `/orders/[id]/budget` | ✅ Implementado | `aprova_o_de_or_amento_precision_auto`               |
+| `/orders/[id]/print`  | ✅ Implementado | `impress_o_da_o.s._com_pagamento_pix_precision_auto` |
+| `/customers`          | ✅ Implementado | `base_de_clientes_precision_auto`                    |
+| `/customers/[id]`     | ✅ Implementado | `perfil_do_cliente_hist_rico_precision_auto`         |
+| `/inventory`          | ✅ Implementado | `controle_de_estoque_precision_auto`                 |
+| `/inventory/new`      | ✅ Implementado | `adicionar_novo_item_ao_estoque_precision_auto`      |
+| `/finance`            | ✅ Implementado | `gest_o_financeira_precision_auto`                   |
+| `/finance/reports`    | ✅ Implementado | `relat_rios_financeiros_precision_auto`              |
+| `/login`              | ✅ Implementado | —                                                    |
+| `/register`           | ✅ Implementado | —                                                    |
+| `/appointments`       | ⚠️ Placeholder  | —                                                    |
+| `/track/[id]`         | ⚠️ Placeholder  | —                                                    |
 
 ---
 
@@ -24,314 +30,301 @@
 
 Pasta base: `stitch_oficina_mecanica/`
 
-| Pasta                                                    | Descrição                                              |
-| -------------------------------------------------------- | ------------------------------------------------------ |
-| `dashboard_precision_auto`                               | ✅ Dashboard operacional                               |
-| `dashboard_estrat_gico_precision_auto`                   | Dashboard estratégico (métricas avançadas)             |
-| `gest_o_de_o.s._precision_auto`                          | ✅ Listagem de O.S.                                    |
-| `nova_ordem_de_servi_o_precision_auto`                   | Nova O.S. — Passo 01: Cliente & Veículo                |
-| `nova_o.s._passo_02_descri_o_precision_auto`             | Nova O.S. — Passo 02: Descrição e diagnóstico          |
-| `nova_o.s._passo_03_pe_as_estoque_precision_auto`        | Nova O.S. — Passo 03: Peças & Estoque + Mão de Obra    |
-| `nova_o.s._passo_04_assinatura_precision_auto`           | Nova O.S. — Passo 04: Resumo + Assinatura digital      |
-| `nova_ordem_de_servi_o_com_checklist_precision_auto`     | Nova O.S. com checklist de entrada                     |
-| `aprova_o_de_or_amento_precision_auto`                   | Aprovação de orçamento pelo cliente                    |
-| `impress_o_da_ordem_de_servi_o_precision_auto`           | Impressão / PDF da O.S.                                |
-| `impress_o_da_o.s._com_pagamento_pix_precision_auto`     | Impressão da O.S. com QR Code PIX                      |
-| `base_de_clientes_precision_auto`                        | Listagem de clientes com painel lateral de detalhes    |
-| `perfil_do_cliente_hist_rico_precision_auto`             | Ficha técnica do cliente: veículos + histórico de O.S. |
-| `controle_de_estoque_precision_auto`                     | Listagem de peças e insumos (tabs por categoria)       |
-| `adicionar_novo_item_ao_estoque_precision_auto`          | Formulário de cadastro de novo item                    |
-| `estoque_alerta_de_itens_baixos_precision_auto`          | Alertas de estoque crítico                             |
-| `gerar_ordem_de_compra_precision_auto`                   | Geração de ordem de compra                             |
-| `ordem_de_compra_com_previs_o_de_entrega_precision_auto` | Ordem de compra com previsão de entrega                |
-| `gest_o_financeira_precision_auto`                       | Visão geral financeira: contas, fluxo de caixa         |
-| `relat_rios_financeiros_precision_auto`                  | Relatório de lucratividade com gráficos                |
-| `industrial_precision`                                   | Design System de referência                            |
+| Pasta                                                    | Descrição                                              | Status          |
+| -------------------------------------------------------- | ------------------------------------------------------ | --------------- |
+| `dashboard_precision_auto`                               | Dashboard operacional                                  | ✅ Implementado |
+| `dashboard_estrat_gico_precision_auto`                   | Dashboard estratégico (métricas avançadas)             | ⏳ Pendente     |
+| `gest_o_de_o.s._precision_auto`                          | Listagem de O.S.                                       | ✅ Implementado |
+| `nova_ordem_de_servi_o_precision_auto`                   | Nova O.S. — Passo 01: Cliente & Veículo                | ✅ Implementado |
+| `nova_o.s._passo_02_descri_o_precision_auto`             | Nova O.S. — Passo 02: Descrição e diagnóstico          | ✅ Implementado |
+| `nova_o.s._passo_03_pe_as_estoque_precision_auto`        | Nova O.S. — Passo 03: Peças & Estoque + Mão de Obra    | ✅ Implementado |
+| `nova_o.s._passo_04_assinatura_precision_auto`           | Nova O.S. — Passo 04: Resumo + Assinatura digital      | ✅ Implementado |
+| `nova_ordem_de_servi_o_com_checklist_precision_auto`     | Nova O.S. com checklist de entrada                     | ⏳ Pendente     |
+| `aprova_o_de_or_amento_precision_auto`                   | Aprovação de orçamento pelo cliente                    | ✅ Implementado |
+| `impress_o_da_ordem_de_servi_o_precision_auto`           | Impressão / PDF da O.S.                                | ✅ Implementado |
+| `impress_o_da_o.s._com_pagamento_pix_precision_auto`     | Impressão da O.S. com QR Code PIX                      | ✅ Implementado |
+| `base_de_clientes_precision_auto`                        | Listagem de clientes com painel lateral de detalhes    | ✅ Implementado |
+| `perfil_do_cliente_hist_rico_precision_auto`             | Ficha técnica do cliente: veículos + histórico de O.S. | ✅ Implementado |
+| `controle_de_estoque_precision_auto`                     | Listagem de peças e insumos (tabs por categoria)       | ✅ Implementado |
+| `adicionar_novo_item_ao_estoque_precision_auto`          | Formulário de cadastro de novo item                    | ✅ Implementado |
+| `estoque_alerta_de_itens_baixos_precision_auto`          | Alertas de estoque crítico                             | ⏳ Pendente     |
+| `gerar_ordem_de_compra_precision_auto`                   | Geração de ordem de compra                             | ⏳ Pendente     |
+| `ordem_de_compra_com_previs_o_de_entrega_precision_auto` | Ordem de compra com previsão de entrega                | ⏳ Pendente     |
+| `gest_o_financeira_precision_auto`                       | Visão geral financeira: contas, fluxo de caixa         | ✅ Implementado |
+| `relat_rios_financeiros_precision_auto`                  | Relatório de lucratividade com gráficos                | ✅ Implementado |
+| `industrial_precision`                                   | Design System de referência                            | ✅ Aplicado     |
 
 ---
 
-## Roadmap de fases restantes
+## Fases concluídas
 
----
-
-### FASE 6 — Nova O.S. Multi-Step (Wizard completo)
+### ✅ FASE 6 — Nova O.S. Multi-Step (Wizard completo)
 
 **Rota:** `/orders/new`
-**Prioridade:** Alta — é o fluxo mais crítico do sistema
+**Commit:** parte do commit `104debf`
 
-#### O que implementar
-
-O wizard substitui o simples redirect atual e implementa os 4 passos completos.
-
-**Layout base:**
-
-- Barra de progresso superior (4 passos com indicador visual de step ativo/concluído)
-- Footer fixo com botões "← Anterior" | "Salvar Rascunho" | "Próximo Passo →"
-- Rodapé com contexto da O.S. (cliente, veículo, data de entrada)
-- Status chip "AGUARDANDO DIAGNÓSTICO" no topo direito
-
-**Passo 01 — Cliente & Veículo** (`nova_ordem_de_servi_o_precision_auto`)
-
-- Campo de busca de cliente (por CPF ou nome)
-- Bloco "Nenhum cliente selecionado" com link "Novo Cadastro Rápido"
-- Campos do veículo: Placa, KM Atual, Modelo/Versão
-
-**Passo 02 — Descrição** (`nova_o.s._passo_02_descri_o_precision_auto`)
-
-- Textarea "Relato do Cliente" (o que o cliente descreveu)
-- Textarea "Diagnóstico Inicial" (observações técnicas, códigos OBD-II)
-- Seletor de tipo de serviço: Preventiva | Corretiva | Garantia | Estética (radio cards com ícone)
-- Select de Prioridade: Normal | Alta | Urgente
-
-**Passo 03 — Peças & Estoque** (`nova_o.s._passo_03_pe_as_estoque_precision_auto`)
-
-- Campo de busca de peças do estoque
-- Tabela de "Itens Adicionados": peça, categoria, qtd, valor unit., subtotal, ações
-- Linha especial "Adicionar Mão de Obra Personalizada"
-- Painel lateral "Resumo do Pedido": subtotal peças, mão de obra, descontos, total
-- Badge "Disponibilidade: X itens em estoque" | "Baixo Estoque: Y itens"
-
-**Passo 04 — Mão de Obra & Assinatura** (`nova_o.s._passo_04_assinatura_precision_auto`)
-
-- Seção "Resumo Financeiro": total peças, total mão de obra, valor total
-- Canvas de assinatura digital (captura por mouse/touch) — lib `react-signature-canvas` ou `signature_pad`
-- Checkbox de declaração de concordância com orçamento
-- Botão "Gerar O.S." (primary, orange) em vez de "Próximo Passo"
-- Barra de progresso: "Preenchimento: 100%"
-
-**Arquivos a criar:**
+**Arquivos implementados:**
 
 ```
 src/app/(dashboard)/orders/new/
-├── page.tsx                    # Server component wrapper + layout do wizard
-├── order-wizard.tsx            # Client component: estado global dos 4 passos
-├── step-indicator.tsx          # Barra de progresso visual dos passos
-├── steps/
-│   ├── step-01-client.tsx      # Busca de cliente + dados do veículo
-│   ├── step-02-description.tsx # Relato + diagnóstico + tipo + prioridade
-│   ├── step-03-parts.tsx       # Busca de peças + tabela + resumo
-│   └── step-04-signature.tsx   # Resumo financeiro + canvas de assinatura
-└── order-wizard-schema.ts      # Zod schema multi-step (objeto por passo)
+├── page.tsx                    ✅ Server Component wrapper
+├── order-wizard.tsx            ✅ Client component: estado global dos 4 passos
+├── step-indicator.tsx          ✅ Barra de progresso visual
+└── steps/
+    ├── step-01-client.tsx      ✅ Busca de cliente + dados do veículo
+    ├── step-02-description.tsx ✅ Relato + diagnóstico + tipo + prioridade
+    ├── step-03-parts.tsx       ✅ Busca de peças + tabela + resumo
+    └── step-04-signature.tsx   ✅ Resumo financeiro + canvas de assinatura
 ```
-
-**Padrões de código:**
-
-- `"use client"` apenas nos `step-*.tsx` e `order-wizard.tsx`
-- `page.tsx` é Server Component
-- Estado do wizard via `useReducer` ou `useState` objeto com campos dos 4 passos
-- Validação Zod por passo (não valida tudo de uma vez)
-- `useForm` do react-hook-form por passo com `zodResolver` por step schema
 
 ---
 
-### FASE 7 — Módulo de Clientes
+### ✅ FASE 7 — Módulo de Clientes
 
 **Rotas:** `/customers`, `/customers/[id]`
+**Commit:** parte do commit `104debf`
+
+**Arquivos implementados:**
+
+```
+src/app/(dashboard)/customers/
+├── page.tsx                    ✅ Lista de clientes (Server Component)
+├── customers-client.tsx        ✅ Client: busca, filtro, painel lateral
+├── customer-detail-panel.tsx   ✅ Sheet lateral com histórico
+└── [id]/
+    └── page.tsx                ✅ Ficha técnica (Server Component com mock data)
+```
+
+---
+
+### ✅ FASE 8 — Módulo de Estoque
+
+**Rotas:** `/inventory`, `/inventory/new`
+**Commit:** parte do commit `104debf`
+
+**Arquivos implementados:**
+
+```
+src/app/(dashboard)/inventory/
+├── page.tsx                    ✅ Listagem com tabs de categoria
+├── inventory-client.tsx        ✅ Client component com filtros e tabs
+└── new/
+    ├── page.tsx                ✅ Server Component wrapper
+    └── _components/
+        └── NewPartForm.tsx     ✅ Formulário react-hook-form + Zod
+```
+
+---
+
+### ✅ FASE 9 — Módulo Financeiro
+
+**Rotas:** `/finance`, `/finance/reports`
+**Commit:** `240b01e`
+
+**Arquivos implementados:**
+
+```
+src/app/(dashboard)/finance/
+├── page.tsx                    ✅ Visão geral financeira (KPIs + fluxo de caixa + transações)
+├── reports/
+│   └── page.tsx                ✅ Relatório de lucratividade com gráficos
+└── finance-charts.tsx          ✅ Client component com Recharts (BarChart + LineChart)
+```
+
+---
+
+### ✅ FASE 10 — Aprovação de Orçamento e Impressão de O.S.
+
+**Rotas:** `/orders/[id]/budget`, `/orders/[id]/print`
+**Commit:** `a7bdec8`
+
+**Arquivos implementados:**
+
+```
+src/app/(dashboard)/orders/[id]/
+├── budget/
+│   └── page.tsx                ✅ Aprovação de orçamento com checklist por item
+└── print/
+    └── page.tsx                ✅ Layout de impressão com QR Code PIX
+```
+
+---
+
+### ✅ REFATORAÇÃO — Extração de Client Components
+
+**Commit:** `8500953`
+
+Seguindo o padrão Next.js 16 (Server Component por padrão, `"use client"` só quando necessário):
+
+```
+src/app/(auth)/login/_components/LoginForm.tsx       ✅ Extraído de page.tsx
+src/app/(auth)/register/_components/RegisterForm.tsx ✅ Extraído de page.tsx
+src/app/(dashboard)/orders/_components/OrdersClient.tsx ✅ Extraído de page.tsx
+src/app/(dashboard)/inventory/new/_components/NewPartForm.tsx ✅ Extraído de page.tsx
+```
+
+---
+
+## Estrutura atual do projeto
+
+```
+src/
+├── _actions/          # Server actions (Next.js 16 private folder)
+├── _components/       # Componentes globais reutilizáveis
+│   ├── dashboard/     # Componentes específicos do dashboard
+│   ├── shared/        # Componentes compartilhados entre módulos
+│   └── ui/            # Design system (DataTable, StatusChip, MetricCard, etc.)
+├── _db/               # Drizzle ORM: schema e migrations
+│   ├── schema/
+│   └── migrations/
+├── _hooks/            # Custom React hooks
+├── _lib/              # Utilitários, mock-data, helpers
+├── _schemas/          # Schemas Zod globais
+├── _styles/           # Estilos globais
+└── app/
+    ├── (auth)/        # Login e Register
+    ├── (dashboard)/   # Módulos principais (protegidos)
+    └── (public)/      # Rotas públicas (track de O.S.)
+```
+
+---
+
+## Roadmap de fases pendentes
+
+---
+
+### FASE 11 — Agendamentos
+
+**Rota:** `/appointments`
 **Prioridade:** Alta
 
 #### O que implementar
 
-**`/customers` — Lista de Clientes** (`base_de_clientes_precision_auto`)
-
-- Header: "Gestão de Clientes" + botão "Cadastrar Novo Cliente" (primary)
-- Barra de busca global (por nome, placa ou CPF)
-- Botões "Filtros" e "Exportar"
-- `DataTable` com colunas: Nome do Cliente | CPF/CNPJ | Telefone | Veículo Principal | Última Visita | Ações (menu de 3 pontos)
-- Painel lateral deslizante (Sheet) ao clicar no cliente:
-  - Cabeçalho: Nome, CPF, dados de contato
-  - Cards: "Total Gasto" e "Visitas" com valores animados
-  - "Histórico de Manutenções": lista de O.S. com status chip e valor
-  - Botão "Abrir Nova O.S. para este Cliente"
-
-**`/customers/[id]` — Ficha Técnica** (`perfil_do_cliente_hist_rico_precision_auto`)
-
-- Breadcrumb: "← Voltar para Clientes"
-- Título: "Ficha Técnica do Cliente" + botões "Editar Cadastro" e "Nova Ordem de Serviço"
-- Card do cliente: avatar, nome, CPF, e-mail, telefone, endereço
-- Seção "Frota de Veículos": cards horizontais por veículo (modelo, placa, ano, km)
-- Seção "Histórico de Ordens de Serviço": `DataTable` com O.S., data, serviço realizado, total, status
-- Seção "Próximas Manutenções Programadas": `ServiceTimeline` horizontal com alertas preditivos
+- Calendário mensal/semanal de agendamentos
+- Criação de novo agendamento (cliente, veículo, serviço, data/hora, mecânico)
+- Integração com lista de O.S. (converter agendamento em O.S. aberta)
+- Status de agendamento: Confirmado | Pendente | Cancelado | Concluído
 
 **Arquivos a criar:**
 
 ```
-src/app/(dashboard)/customers/
-├── page.tsx                    # Lista de clientes (Server Component)
-├── customers-client.tsx        # Client: busca, filtro, painel lateral
-├── customer-detail-panel.tsx   # Sheet lateral com histórico
-└── [id]/
-    └── page.tsx                # Ficha técnica (Server Component com mock data)
-```
-
-**Mock data a adicionar em `src/lib/mock-data.ts`:**
-
-```ts
-MockCustomer: {
-  (id,
-    name,
-    cpf,
-    phone,
-    email,
-    address,
-    lastVisit,
-    totalSpent,
-    visits,
-    vehicles);
-}
-MockCustomerOrder: {
-  (id, vehicle, date, service, total, status);
-}
+src/app/(dashboard)/appointments/
+├── page.tsx                    # Server Component wrapper
+├── appointments-client.tsx     # Client: calendário interativo
+├── appointment-form.tsx        # Form de novo agendamento
+└── appointment-card.tsx        # Card de agendamento no calendário
 ```
 
 ---
 
-### FASE 8 — Módulo de Estoque
+### FASE 12 — Alertas de Estoque e Ordens de Compra
 
-**Rotas:** `/inventory`, `/inventory/new`
+**Rotas:** `/inventory/alerts`, `/inventory/purchase-orders`
 **Prioridade:** Média-Alta
 
 #### O que implementar
 
-**`/inventory` — Controle de Estoque** (`controle_de_estoque_precision_auto`)
-
-- Header: "Controle de Estoque" + botões "Entrada (+)" e "Adicionar Item"
-- Cards de métricas: Total de Itens | Unidades em Alerta | Valor Total em Estoque
-- Tabs de categoria: Todos | Motor | Freios | Filtros | Suspensão | Ignição
-- `DataTable` com colunas: Código SKU | Peça/Descrição | Categoria | Fornecedor | Qtd. Atual | Estoque Mínimo | Preço de Custo | Valor Total | Ações
-- Status chips de estoque: "CRÍTICO" (red), "ATENÇÃO" (orange), (normal sem chip)
-- Paginação
-
-**`/inventory/new` — Adicionar Item** (`adicionar_novo_item_ao_estoque_precision_auto`)
-
-- Título: "Ficha Técnica do Item" + botões "Cancelar" e "Salvar Item"
-- Seção "Informações Gerais": Nome do Item, SKU/Código de Referência, Categoria (select), Fabricante/Marca, Fornecedor Principal
-- Seção "Controle de Estoque": Unidade de Medida (select), Qtd. Atual, Estoque Mínimo (input com borda vermelha se 0), Localização no Depósito
-- Textarea: Notas Técnicas / Descrição
-- Painel lateral direito "Financeiro": Preço de Custo, Preço de Venda, Markup Automático (%)
-- Upload de foto do produto
-
-**Alertas de Estoque** (widget no dashboard e página dedicada):
+**`/inventory/alerts`** (`estoque_alerta_de_itens_baixos_precision_auto`)
 
 - Lista de itens com estoque < mínimo
-- Botão "PEDIR" para cada item (abre modal de ordem de compra rápida)
+- Destaque visual: CRÍTICO (vermelho) | ATENÇÃO (laranja)
+- Botão "PEDIR" com modal de ordem de compra rápida
+
+**`/inventory/purchase-orders/new`** (`gerar_ordem_de_compra_precision_auto`)
+
+- Formulário de geração de ordem de compra
+- Seleção de fornecedor e itens
+- Previsão de entrega (`ordem_de_compra_com_previs_o_de_entrega_precision_auto`)
 
 **Arquivos a criar:**
 
 ```
 src/app/(dashboard)/inventory/
-├── page.tsx                    # Listagem (pode ser Client Component para tabs)
-├── new/
-│   └── page.tsx                # Formulário de cadastro
-└── inventory-form.tsx          # Form react-hook-form + zod para o item
-```
-
-**Schema Zod a criar em `src/schemas/inventory.ts`:**
-
-```ts
-inventoryItemSchema: {
-  (name,
-    sku,
-    category,
-    brand,
-    supplier,
-    unit,
-    quantity,
-    minQuantity,
-    location,
-    costPrice,
-    sellPrice,
-    notes);
-}
+├── alerts/
+│   └── page.tsx                # Alertas de estoque baixo
+└── purchase-orders/
+    ├── page.tsx                # Lista de ordens de compra
+    └── new/
+        └── page.tsx            # Formulário de nova ordem de compra
 ```
 
 ---
 
-### FASE 9 — Módulo Financeiro
+### FASE 13 — Dashboard Estratégico
 
-**Rotas:** `/finance`, `/finance/reports`
+**Rota:** `/` (tab alternativa) ou `/analytics`
 **Prioridade:** Média
 
 #### O que implementar
 
-**`/finance` — Visão Geral** (`gest_o_financeira_precision_auto`)
+**Dashboard Estratégico** (`dashboard_estrat_gico_precision_auto`)
 
-- Header: "Financeiro" + barra de busca de transações + botão "Quick Actions"
-- Filtros de período: Mensal | Trimestral | Anual | data custom
-- Cards de métricas (verticais, com ícone e cor):
-  - "Contas a Receber" (verde ↑) — valor total pendente
-  - "Faturamento Mensal" (azul ↑) — total faturado no mês
-  - "Despesas Pendentes" (laranja !) — total de despesas em aberto
-- Gráfico "Fluxo de Caixa" (BarChart com Recharts): Receitas vs Despesas por semana/mês
-- Tabela "Transações Recentes": data | descrição | categoria | tipo (Serviço/Estoque) | valor | status chip
-
-**`/finance/reports` — Relatório de Lucratividade** (`relat_rios_financeiros_precision_auto`)
-
-- Período header: "Relatório de Lucratividade — Outubro 2023" + filtros + "Exportar PDF"
-- Cards horizontais de KPIs: Ticket Médio O.S. | Margem Líquida % | Volume O.S. | Lucro Líquido
-- Gráfico "Fluxo de Caixa Mensal" (LineChart: Receitas vs Despesas)
-- Gráfico "Custos Fixos vs Variáveis" (pizza/donut)
-- Tabela "Detalhamento de Fluxo": categoria | faturamento bruto | custo peças | mão de obra | lucro líquido | status
-- Cards de resumo: "Alocação de Tempo vs Receita" e "Alertas Financeiros"
-
-**Arquivos a criar:**
-
-```
-src/app/(dashboard)/finance/
-├── page.tsx                    # Visão geral financeira
-├── reports/
-│   └── page.tsx                # Relatório de lucratividade
-└── finance-charts.tsx          # Client component com Recharts (BarChart + LineChart)
-```
-
-**Mock data a adicionar:**
-
-```ts
-MockTransaction: {
-  (id, date, description, category, type, amount, status);
-}
-MockFinancialReport: {
-  (period, kpis, cashFlow, costBreakdown, serviceDetails);
-}
-```
+- Métricas avançadas: NPS de clientes, taxa de retorno, lifetime value
+- Gráficos de tendência histórica (12 meses)
+- Top mecânicos por performance
+- Alertas preditivos de manutenção preventiva
+- Integração com módulo financeiro
 
 ---
 
-### FASE 10 — Aprovação de Orçamento e Impressão de O.S.
+### FASE 14 — Rastreamento Público de O.S.
 
-**Rotas:** `/orders/[id]/budget`, `/orders/[id]/print`
+**Rota:** `/track/[id]`
 **Prioridade:** Média-Baixa
 
 #### O que implementar
 
-**Aprovação de Orçamento** (`aprova_o_de_or_amento_precision_auto`)
-
-- Tela full-page (sem sidebar, pode ser rota pública `(public)/`)
-- Cabeçalho com logo, número da O.S. e dados do cliente
-- Card do veículo: foto, placa, km, mecânico responsável
-- Tabela "Itens do Orçamento": serviço/peça | valor | aprovação (checkbox por item)
-- Painel direito "Resumo Financeiro": subtotal aprovado, taxas/impostos, total
-- Nota técnica do mecânico
-- Botões: "Confirmar Aprovação" (primary) | "Baixar PDF do Orçamento"
-- Data de previsão de entrega
-
-**Impressão / PDF** (`impress_o_da_ordem_de_servi_o_precision_auto`)
-
-- Layout otimizado para impressão (`@media print`)
-- Cabeçalho da oficina + número da O.S.
-- Todos os dados do veículo e cliente
-- Tabela de serviços e peças
-- Assinatura do cliente (se houver)
-- Versão com QR Code PIX para pagamento (`impress_o_da_o.s._com_pagamento_pix_precision_auto`)
+- Página pública (sem autenticação) para cliente rastrear status da O.S.
+- Exibe: status atual, etapas concluídas, previsão de entrega, mecânico responsável
+- QR Code gerado na impressão da O.S. aponta para esta rota
+- Possibilidade de aprovação de orçamento inline (integrar com `/orders/[id]/budget`)
 
 **Arquivos a criar:**
 
 ```
-src/app/(dashboard)/orders/[id]/
-├── budget/
-│   └── page.tsx                # Aprovação de orçamento
-└── print/
-    └── page.tsx                # Layout de impressão da O.S.
+src/app/(public)/track/
+└── [id]/
+    └── page.tsx                # Página pública de rastreamento
 ```
+
+---
+
+### FASE 15 — O.S. com Checklist de Entrada
+
+**Rota:** `/orders/new` (extensão do wizard)
+**Prioridade:** Baixa
+
+#### O que implementar
+
+**Checklist de entrada veicular** (`nova_ordem_de_servi_o_com_checklist_precision_auto`)
+
+- Passo adicional (Passo 1.5 ou passo separado) após dados do veículo
+- Checklist visual: lataria, pneus, faróis, espelhos, combustível, etc.
+- Observações por item (campo de texto rápido)
+- Assinatura ou confirmação do cliente no check-in
+
+---
+
+### FASE 16 — Integração com Banco de Dados (Drizzle ORM + Supabase)
+
+**Prioridade:** Alta (quando MVP for validado)
+
+#### O que implementar
+
+- Substituir todos os mock data por queries Drizzle reais
+- Schema do banco já existe em `src/_db/schema/`
+- Migrations já configuradas em `src/_db/migrations/`
+- Server Actions em `src/_actions/` para cada módulo
+- Conectar autenticação (Better Auth / Supabase Auth) ao banco
+- Implementar CRUD completo para: Clientes, Veículos, O.S., Peças, Transações
+
+**Sequência recomendada:**
+
+1. Clientes e Veículos (`/customers`)
+2. Ordens de Serviço (`/orders`)
+3. Estoque (`/inventory`)
+4. Financeiro (`/finance`)
+5. Agendamentos (`/appointments`)
 
 ---
 
@@ -376,8 +369,8 @@ Headers de tabela:   font-mono uppercase tracking-wider text-on-surface-variant/
 
 - Sem `any`, sem `as unknown`
 - Server Components por padrão — `"use client"` só quando interatividade necessária
-- Mock data em `src/lib/mock-data.ts` com tipos exportados
-- Schemas Zod em `src/schemas/` — sem `.default()` quando for form (usar `defaultValues` do react-hook-form)
+- Mock data em `src/_lib/mock-data.ts` com tipos exportados
+- Schemas Zod em `src/_schemas/` — sem `.default()` quando for form (usar `defaultValues` do react-hook-form)
 - Para Select controlado: sempre usar `<Controller>` do react-hook-form (não `watch()`)
 - Para Base UI components (`@base-ui/react`): usar `render` prop em vez de `asChild`
 
@@ -385,9 +378,10 @@ Headers de tabela:   font-mono uppercase tracking-wider text-on-surface-variant/
 
 ```
 src/app/(dashboard)/[module]/
-├── page.tsx           # Server Component (lógica de dados/redirect)
-├── [module]-client.tsx # Client Component (estado, interatividade)
-└── [module]-schema.ts  # Zod schema específico (se houver form)
+├── page.tsx              # Server Component (lógica de dados/redirect)
+├── [module]-client.tsx   # Client Component (estado, interatividade)
+└── _components/          # Sub-componentes específicos do módulo
+    └── [ComponentName].tsx
 ```
 
 ### ESLint
@@ -414,23 +408,25 @@ Para cada fase, antes de marcar como concluída:
 
 ## Dependências adicionais necessárias
 
-| Pacote                   | Fase   | Uso                                              |
-| ------------------------ | ------ | ------------------------------------------------ |
-| `signature_pad`          | Fase 6 | Canvas de assinatura digital no Passo 04 da O.S. |
-| `react-signature-canvas` | Fase 6 | Alternativa React-friendly ao signature_pad      |
-| Recharts (já instalado)  | Fase 9 | BarChart e LineChart para Finance                |
+| Pacote               | Fase    | Uso                                       |
+| -------------------- | ------- | ----------------------------------------- |
+| `react-big-calendar` | Fase 11 | Calendário de agendamentos                |
+| `date-fns`           | Fase 11 | Formatação de datas no calendário         |
+| `qrcode.react`       | Fase 14 | QR Code para rastreamento público de O.S. |
 
 ---
 
 ## Notas de arquitetura
 
-1. **Mock data first:** Todas as fases usam dados mock em `src/lib/mock-data.ts`. Não conectar ao banco ainda — a integração com Drizzle ORM vem em fase posterior.
+1. **Mock data first:** Todas as fases usam dados mock em `src/_lib/mock-data.ts`. A integração com Drizzle ORM vem na Fase 16, após validação do MVP.
 
 2. **Base UI vs Radix UI:** Este projeto usa `@base-ui/react` (não Radix). Diferenças críticas:
    - `asChild` **não existe** → usar `render={<Component />}` prop
    - `SheetTrigger render={<Button />}` em vez de `<SheetTrigger asChild><Button>`
-   - Verificar API de cada componente em `src/components/ui/*.tsx` antes de usar
+   - Verificar API de cada componente em `src/_components/ui/*.tsx` antes de usar
 
-3. **Next.js 16:** Este projeto roda Next.js 16 (Turbopack). O arquivo `middleware.ts` está deprecado — renomear para `proxy.ts` em atualização futura.
+3. **Next.js 16 (Turbopack):** Convenção de pastas privadas (`_lib`, `_hooks`, `_schemas`, `_components`, `_db`, `_actions`). O arquivo `middleware.ts` está deprecado — foi renomeado para `proxy.ts`.
 
 4. **React Compiler:** O projeto usa React Compiler (babel plugin). Evitar `watch()` do react-hook-form diretamente em JSX — usar `Controller` ou `useWatch`.
+
+5. **Padrão de extração de componentes:** `page.tsx` é sempre Server Component. Lógica interativa vai em `[module]-client.tsx` ou em `_components/[ComponentName].tsx` com `"use client"`.
