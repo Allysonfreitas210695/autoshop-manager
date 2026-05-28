@@ -118,7 +118,7 @@ export function OrdersClient() {
       <div
         role="tablist"
         aria-label="Filtrar por status"
-        className="-mx-4 flex [scrollbar-width:none] gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:flex-wrap sm:px-0 [&::-webkit-scrollbar]:hidden"
+        className="-mx-4 flex scrollbar-none gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:flex-wrap sm:px-0 [&::-webkit-scrollbar]:hidden"
       >
         {STATUS_FILTER_TABS.map((tab) => {
           const isActive = activeFilter === tab.value;
