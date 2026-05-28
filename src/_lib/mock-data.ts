@@ -699,3 +699,259 @@ export const mockInventoryMetrics = {
   criticalCount: mockParts.filter((p) => p.stock < p.minStock).length,
   totalValue: mockParts.reduce((sum, p) => sum + p.stock * p.unitPrice, 0),
 };
+
+// ─── Finance ────────────────────────────────────────────────────────────────
+
+export type TransactionType = "income" | "expense";
+export type TransactionStatus = "paid" | "pending" | "overdue";
+export type TransactionCategory =
+  | "Serviço"
+  | "Peças"
+  | "Mão de Obra"
+  | "Fornecedor"
+  | "Despesa Fixa"
+  | "Imposto"
+  | "Outros";
+
+export type MockTransaction = {
+  id: string;
+  date: string;
+  description: string;
+  category: TransactionCategory;
+  type: TransactionType;
+  amount: number;
+  status: TransactionStatus;
+};
+
+export const mockTransactions: MockTransaction[] = [
+  {
+    id: "T001",
+    date: "2023-10-28",
+    description: "O.S. #0042 — Revisão Completa",
+    category: "Serviço",
+    type: "income",
+    amount: 1850.0,
+    status: "paid",
+  },
+  {
+    id: "T002",
+    date: "2023-10-27",
+    description: "Compra de filtros — Bosch Brasil",
+    category: "Fornecedor",
+    type: "expense",
+    amount: 640.0,
+    status: "paid",
+  },
+  {
+    id: "T003",
+    date: "2023-10-27",
+    description: "O.S. #0041 — Troca de pastilhas",
+    category: "Mão de Obra",
+    type: "income",
+    amount: 520.0,
+    status: "paid",
+  },
+  {
+    id: "T004",
+    date: "2023-10-26",
+    description: "O.S. #0040 — Alinhamento e balanceamento",
+    category: "Serviço",
+    type: "income",
+    amount: 280.0,
+    status: "paid",
+  },
+  {
+    id: "T005",
+    date: "2023-10-25",
+    description: "Aluguel do espaço — Outubro",
+    category: "Despesa Fixa",
+    type: "expense",
+    amount: 3200.0,
+    status: "paid",
+  },
+  {
+    id: "T006",
+    date: "2023-10-24",
+    description: "O.S. #0039 — Diagnóstico eletrônico",
+    category: "Serviço",
+    type: "income",
+    amount: 380.0,
+    status: "pending",
+  },
+  {
+    id: "T007",
+    date: "2023-10-23",
+    description: "Compra de amortecedores — Monroe",
+    category: "Peças",
+    type: "expense",
+    amount: 1120.0,
+    status: "paid",
+  },
+  {
+    id: "T008",
+    date: "2023-10-22",
+    description: "O.S. #0038 — Troca de óleo",
+    category: "Mão de Obra",
+    type: "income",
+    amount: 180.0,
+    status: "paid",
+  },
+  {
+    id: "T009",
+    date: "2023-10-21",
+    description: "Simples Nacional — Set/2023",
+    category: "Imposto",
+    type: "expense",
+    amount: 890.0,
+    status: "overdue",
+  },
+  {
+    id: "T010",
+    date: "2023-10-20",
+    description: "O.S. #0037 — Suspensão dianteira",
+    category: "Serviço",
+    type: "income",
+    amount: 2100.0,
+    status: "paid",
+  },
+  {
+    id: "T011",
+    date: "2023-10-19",
+    description: "Energia elétrica — Outubro",
+    category: "Despesa Fixa",
+    type: "expense",
+    amount: 480.0,
+    status: "pending",
+  },
+  {
+    id: "T012",
+    date: "2023-10-18",
+    description: "O.S. #0036 — Injeção eletrônica",
+    category: "Serviço",
+    type: "income",
+    amount: 760.0,
+    status: "paid",
+  },
+];
+
+export type MockCashFlow = {
+  week: string;
+  receitas: number;
+  despesas: number;
+};
+
+export const mockCashFlow: MockCashFlow[] = [
+  { week: "Sem 1", receitas: 8400, despesas: 4200 },
+  { week: "Sem 2", receitas: 6800, despesas: 5100 },
+  { week: "Sem 3", receitas: 9200, despesas: 3800 },
+  { week: "Sem 4", receitas: 11500, despesas: 6300 },
+];
+
+export const mockFinanceMetrics = {
+  receivable: 12840.0,
+  monthlyRevenue: 35900.0,
+  pendingExpenses: 4570.0,
+  monthlyProfit: 18320.0,
+};
+
+// ─── Finance Reports ─────────────────────────────────────────────────────────
+
+export type MockReportKpi = {
+  label: string;
+  value: string;
+  hint?: string;
+};
+
+export type MockMonthlyCashFlow = {
+  month: string;
+  receitas: number;
+  despesas: number;
+  lucro: number;
+};
+
+export type MockCostBreakdown = {
+  name: string;
+  value: number;
+  fill: string;
+};
+
+export type MockServiceDetail = {
+  id: string;
+  category: string;
+  grossRevenue: number;
+  partsCost: number;
+  laborCost: number;
+  netProfit: number;
+  status: "positive" | "neutral" | "negative";
+};
+
+export const mockReportKpis: MockReportKpi[] = [
+  { label: "Ticket Médio O.S.", value: "R$ 892,50", hint: "↑ 8% vs set." },
+  { label: "Margem Líquida", value: "51,0%", hint: "↑ 3pp vs set." },
+  { label: "Volume O.S.", value: "42", hint: "↑ 5 vs set." },
+  { label: "Lucro Líquido", value: "R$ 18.320", hint: "↑ 14% vs set." },
+];
+
+export const mockMonthlyCashFlow: MockMonthlyCashFlow[] = [
+  { month: "Mai", receitas: 28400, despesas: 16200, lucro: 12200 },
+  { month: "Jun", receitas: 31200, despesas: 17800, lucro: 13400 },
+  { month: "Jul", receitas: 29800, despesas: 15600, lucro: 14200 },
+  { month: "Ago", receitas: 33500, despesas: 18900, lucro: 14600 },
+  { month: "Set", receitas: 30100, despesas: 14200, lucro: 15900 },
+  { month: "Out", receitas: 35900, despesas: 17580, lucro: 18320 },
+];
+
+export const mockCostBreakdown: MockCostBreakdown[] = [
+  { name: "Peças", value: 7840, fill: "#adc6ff" },
+  { name: "Mão de Obra", value: 4320, fill: "#ffb690" },
+  { name: "Despesas Fixas", value: 3680, fill: "#94a3b8" },
+  { name: "Impostos", value: 1740, fill: "#475569" },
+];
+
+export const mockServiceDetails: MockServiceDetail[] = [
+  {
+    id: "SD001",
+    category: "Revisão / Preventiva",
+    grossRevenue: 14200,
+    partsCost: 4100,
+    laborCost: 1800,
+    netProfit: 8300,
+    status: "positive",
+  },
+  {
+    id: "SD002",
+    category: "Freios & Suspensão",
+    grossRevenue: 9800,
+    partsCost: 3200,
+    laborCost: 1400,
+    netProfit: 5200,
+    status: "positive",
+  },
+  {
+    id: "SD003",
+    category: "Diagnóstico Eletrônico",
+    grossRevenue: 5400,
+    partsCost: 420,
+    laborCost: 2100,
+    netProfit: 2880,
+    status: "positive",
+  },
+  {
+    id: "SD004",
+    category: "Motor & Transmissão",
+    grossRevenue: 4200,
+    partsCost: 1980,
+    laborCost: 980,
+    netProfit: 1240,
+    status: "neutral",
+  },
+  {
+    id: "SD005",
+    category: "Elétrica Automotiva",
+    grossRevenue: 2300,
+    partsCost: 140,
+    laborCost: 1800,
+    netProfit: 360,
+    status: "negative",
+  },
+];

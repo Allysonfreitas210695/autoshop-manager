@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useCallback, useRef } from "react";
+import { type FormEvent, useCallback, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import SignatureCanvas from "react-signature-canvas";
 
@@ -86,17 +86,20 @@ export function Step04Signature({
     [onSubmit],
   );
 
+  const onFormSubmit = useCallback(
+    (e: FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      void handleSubmit(handleFormSubmit)(e);
+    },
+    [handleSubmit, handleFormSubmit],
+  );
+
   const parts: PartItem[] = (step3.parts as PartItem[] | undefined) ?? [];
   const laborItems: LaborItem[] =
     (step3.laborItems as LaborItem[] | undefined) ?? [];
 
   return (
-    // eslint-disable-next-line react-hooks/refs
-    <form
-      id="wizard-step-form"
-      onSubmit={handleSubmit(handleFormSubmit)}
-      className="space-y-6"
-    >
+    <form id="wizard-step-form" onSubmit={onFormSubmit} className="space-y-6">
       {/* Resumo da O.S. */}
       <div className="border-outline-variant bg-surface-container/50 space-y-3 rounded-md border p-4">
         <h3 className="text-label-sm text-on-surface-variant font-mono tracking-wider uppercase">
