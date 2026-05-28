@@ -955,3 +955,183 @@ export const mockServiceDetails: MockServiceDetail[] = [
     status: "negative",
   },
 ];
+
+// ─── Order Detail (Budget + Print) ──────────────────────────────────────────
+
+export type MockOrderItem = {
+  id: string;
+  description: string;
+  type: "part" | "labor";
+  quantity: number;
+  unitPrice: number;
+  approved: boolean;
+};
+
+export type MockOrderDetail = {
+  id: string;
+  plate: string;
+  customer: string;
+  customerCpf: string;
+  customerPhone: string;
+  vehicle: string;
+  vehicleYear: number;
+  vehicleColor: string;
+  mileage: number;
+  mechanic: string;
+  status: OrderStatus;
+  serviceType: string;
+  priority: string;
+  entryDate: string;
+  estimatedDelivery: string;
+  clientReport: string;
+  diagnosis: string;
+  items: MockOrderItem[];
+  notes: string;
+  signatureDataUrl: string | null;
+};
+
+export const mockOrderDetails: MockOrderDetail[] = [
+  {
+    id: "OSC-5521",
+    plate: "ABC-1234",
+    customer: "Ricardo Almeida",
+    customerCpf: "123.456.789-00",
+    customerPhone: "(11) 99999-0001",
+    vehicle: "Toyota Corolla XEi",
+    vehicleYear: 2022,
+    vehicleColor: "Prata",
+    mileage: 45200,
+    mechanic: "Bruno Dias",
+    status: "in_progress",
+    serviceType: "Preventiva",
+    priority: "Normal",
+    entryDate: "2023-10-24",
+    estimatedDelivery: "2023-10-25",
+    clientReport:
+      "Veículo apresenta ruído ao frear e luz do motor acesa. Solicita revisão dos 45.000 km.",
+    diagnosis:
+      "Pastilhas dianteiras desgastadas (3mm restantes). Filtro de óleo saturado. Código OBD: P0420 — catalisador abaixo da eficiência.",
+    items: [
+      {
+        id: "I001",
+        description: "Troca de óleo 5W30 sintético (5L)",
+        type: "part",
+        quantity: 1,
+        unitPrice: 180.0,
+        approved: true,
+      },
+      {
+        id: "I002",
+        description: "Filtro de óleo Bosch",
+        type: "part",
+        quantity: 1,
+        unitPrice: 45.0,
+        approved: true,
+      },
+      {
+        id: "I003",
+        description: "Filtro de ar K&N",
+        type: "part",
+        quantity: 1,
+        unitPrice: 120.0,
+        approved: true,
+      },
+      {
+        id: "I004",
+        description: "Pastilhas de freio dianteiras Brembo",
+        type: "part",
+        quantity: 1,
+        unitPrice: 280.0,
+        approved: true,
+      },
+      {
+        id: "I005",
+        description: "Velas de ignição NGK (jogo 4)",
+        type: "part",
+        quantity: 1,
+        unitPrice: 220.0,
+        approved: false,
+      },
+      {
+        id: "I006",
+        description: "Mão de obra — revisão completa",
+        type: "labor",
+        quantity: 1,
+        unitPrice: 650.0,
+        approved: true,
+      },
+      {
+        id: "I007",
+        description: "Mão de obra — diagnóstico eletrônico",
+        type: "labor",
+        quantity: 1,
+        unitPrice: 150.0,
+        approved: true,
+      },
+    ],
+    notes:
+      "Cliente autorizou revisão completa. Verificar catalisador após limpeza do sistema. Retornar caso código OBD persista.",
+    signatureDataUrl: null,
+  },
+  {
+    id: "OSC-5520",
+    plate: "XYZ-9876",
+    customer: "Mariana Silva",
+    customerCpf: "234.567.890-11",
+    customerPhone: "(11) 99999-0002",
+    vehicle: "Honda Civic EXL",
+    vehicleYear: 2021,
+    vehicleColor: "Branco",
+    mileage: 32100,
+    mechanic: "Carla Souza",
+    status: "completed",
+    serviceType: "Preventiva",
+    priority: "Normal",
+    entryDate: "2023-10-24",
+    estimatedDelivery: "2023-10-24",
+    clientReport:
+      "Troca de óleo e revisão de filtros conforme programação de manutenção.",
+    diagnosis:
+      "Veículo em bom estado geral. Óleo com coloração escura — troca necessária. Filtro de ar com acúmulo de poeira.",
+    items: [
+      {
+        id: "I008",
+        description: "Óleo 5W30 sintético (4L)",
+        type: "part",
+        quantity: 1,
+        unitPrice: 145.0,
+        approved: true,
+      },
+      {
+        id: "I009",
+        description: "Filtro de óleo Honda original",
+        type: "part",
+        quantity: 1,
+        unitPrice: 55.0,
+        approved: true,
+      },
+      {
+        id: "I010",
+        description: "Filtro de ar Honda original",
+        type: "part",
+        quantity: 1,
+        unitPrice: 80.0,
+        approved: true,
+      },
+      {
+        id: "I011",
+        description: "Mão de obra — troca de óleo e filtros",
+        type: "labor",
+        quantity: 1,
+        unitPrice: 140.0,
+        approved: true,
+      },
+    ],
+    notes: "Serviço concluído sem intercorrências.",
+    signatureDataUrl: null,
+  },
+];
+
+export function getMockOrderById(id: string): MockOrderDetail | undefined {
+  return mockOrderDetails.find((o) => o.id === id);
+}
