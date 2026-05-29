@@ -14,7 +14,10 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { ServiceTimeline } from "@/_components/ui/service-timeline";
-import { getMockOrderById, type OrderStatus } from "@/_lib/mock-data";
+import type { serviceOrderStatus } from "@/_db/schema";
+import { getOrderById } from "@/_lib/queries/orders";
+
+type OrderStatus = (typeof serviceOrderStatus.enumValues)[number];
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -94,14 +97,14 @@ export async function generateMetadata({ params }: Props) {
 
 export default async function TrackPage({ params }: Props) {
   const { id } = await params;
-  const order = getMockOrderById(id);
+  const order = await getOrderById(id);
   if (!order) notFound();
 
   const timelineNodes = getTimelineNodes(order.status);
   const approvedItems = order.items.filter((i) => i.approved);
   const pendingItems = order.items.filter((i) => !i.approved);
   const approvedTotal = approvedItems.reduce(
-    (s, i) => s + i.quantity * i.unitPrice,
+    (s, i) => s + i.quantity * Number(i.unitPrice),
     0,
   );
 
@@ -110,16 +113,14 @@ export default async function TrackPage({ params }: Props) {
   }
 
   const entryDateFormatted = format(
-    new Date(order.entryDate + "T00:00:00"),
+    new Date(order.openedAt),
     "dd 'de' MMMM 'de' yyyy",
     { locale: ptBR },
   );
 
-  const deliveryDateFormatted = format(
-    new Date(order.estimatedDelivery + "T00:00:00"),
-    "dd 'de' MMMM 'de' yyyy",
-    { locale: ptBR },
-  );
+  const deliveryDateFormatted = order.dueAt
+    ? format(new Date(order.dueAt), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })
+    : "A definir";
 
   return (
     <div className="space-y-6">
@@ -277,12 +278,12 @@ export default async function TrackPage({ params }: Props) {
                     {item.description}
                   </p>
                   <p className="text-label-xs text-on-surface-variant font-mono">
-                    {item.type === "part" ? "Peça" : "Mão de obra"} · Qtd:{" "}
+                    {item.itemType === "part" ? "Peça" : "Mão de obra"} · Qtd:{" "}
                     {item.quantity}
                   </p>
                 </div>
                 <span className="text-body-sm text-on-surface shrink-0 font-mono font-medium">
-                  {brl(item.quantity * item.unitPrice)}
+                  {brl(item.quantity * Number(item.unitPrice))}
                 </span>
               </div>
             ))}

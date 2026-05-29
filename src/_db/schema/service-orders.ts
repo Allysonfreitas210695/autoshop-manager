@@ -1,5 +1,6 @@
 import { relations } from "drizzle-orm";
 import {
+  boolean,
   integer,
   numeric,
   pgEnum,
@@ -21,6 +22,8 @@ export const serviceOrderStatus = pgEnum("service_order_status", [
   "delayed",
 ]);
 
+export const serviceItemType = pgEnum("service_item_type", ["part", "labor"]);
+
 export const serviceOrders = pgTable("service_orders", {
   id: uuid("id").primaryKey().defaultRandom(),
   orderNumber: serial("order_number").notNull(),
@@ -34,7 +37,11 @@ export const serviceOrders = pgTable("service_orders", {
     onDelete: "set null",
   }),
   status: serviceOrderStatus("status").default("pending").notNull(),
+  clientReport: text("client_report"),
+  diagnosis: text("diagnosis"),
   description: text("description"),
+  serviceType: text("service_type"),
+  priority: text("priority").default("normal").notNull(),
   totalAmount: numeric("total_amount", { precision: 12, scale: 2 })
     .default("0")
     .notNull(),
@@ -60,10 +67,12 @@ export const serviceOrderItems = pgTable("service_order_items", {
     onDelete: "set null",
   }),
   description: text("description").notNull(),
+  itemType: serviceItemType("item_type").default("part").notNull(),
   quantity: integer("quantity").default(1).notNull(),
   unitPrice: numeric("unit_price", { precision: 12, scale: 2 })
     .default("0")
     .notNull(),
+  approved: boolean("approved").default(true).notNull(),
 });
 
 export const serviceOrdersRelations = relations(

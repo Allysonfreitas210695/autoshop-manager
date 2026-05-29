@@ -12,6 +12,8 @@ export const user = pgTable("user", {
   image: text("image"),
   role: userRole("role").default("customer").notNull(),
   phone: text("phone"),
+  cpf: text("cpf"),
+  address: text("address"),
   createdAt: timestamp("created_at")
     .$defaultFn(() => new Date())
     .notNull(),

@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 
-import { getMockOrderById } from "@/_lib/mock-data";
+import { getOrderById } from "@/_lib/queries/orders";
 
 function brl(v: number) {
   return v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -10,13 +10,19 @@ type Props = { params: Promise<{ id: string }> };
 
 export default async function PrintPage({ params }: Props) {
   const { id } = await params;
-  const order = getMockOrderById(id);
+  const order = await getOrderById(id);
   if (!order) notFound();
 
-  const parts = order.items.filter((i) => i.type === "part");
-  const labor = order.items.filter((i) => i.type === "labor");
-  const subtotalParts = parts.reduce((s, i) => s + i.quantity * i.unitPrice, 0);
-  const subtotalLabor = labor.reduce((s, i) => s + i.quantity * i.unitPrice, 0);
+  const parts = order.items.filter((i) => i.itemType === "part");
+  const labor = order.items.filter((i) => i.itemType === "labor");
+  const subtotalParts = parts.reduce(
+    (s, i) => s + i.quantity * Number(i.unitPrice),
+    0,
+  );
+  const subtotalLabor = labor.reduce(
+    (s, i) => s + i.quantity * Number(i.unitPrice),
+    0,
+  );
   const total = subtotalParts + subtotalLabor;
 
   const pixKey = "12.345.678/0001-99";
@@ -59,7 +65,7 @@ export default async function PrintPage({ params }: Props) {
             </p>
             <p className="text-2xl font-bold text-gray-800">{order.id}</p>
             <p className="font-mono text-xs text-gray-500">
-              Entrada: {new Date(order.entryDate).toLocaleDateString("pt-BR")}
+              Entrada: {new Date(order.openedAt).toLocaleDateString("pt-BR")}
             </p>
           </div>
         </div>
@@ -87,7 +93,7 @@ export default async function PrintPage({ params }: Props) {
               {order.vehicleYear} · {order.vehicleColor}
             </p>
             <p className="font-mono text-xs font-bold text-gray-700">
-              {order.plate} · {order.mileage.toLocaleString("pt-BR")} km
+              {order.plate} · {(order.mileage ?? 0).toLocaleString("pt-BR")} km
             </p>
           </div>
         </div>
@@ -163,10 +169,10 @@ export default async function PrintPage({ params }: Props) {
                       {item.quantity}
                     </td>
                     <td className="px-2 py-1.5 text-right font-mono text-gray-600">
-                      {brl(item.unitPrice)}
+                      {brl(Number(item.unitPrice))}
                     </td>
                     <td className="px-2 py-1.5 text-right font-mono font-bold text-gray-800">
-                      {brl(item.quantity * item.unitPrice)}
+                      {brl(item.quantity * Number(item.unitPrice))}
                     </td>
                   </tr>
                 ))}
@@ -189,7 +195,7 @@ export default async function PrintPage({ params }: Props) {
                 >
                   <p className="text-sm text-gray-700">{item.description}</p>
                   <p className="font-mono text-sm font-bold text-gray-800">
-                    {brl(item.unitPrice)}
+                    {brl(Number(item.unitPrice))}
                   </p>
                 </div>
               ))}
@@ -249,12 +255,12 @@ export default async function PrintPage({ params }: Props) {
         </div>
 
         {/* Notas */}
-        {order.notes && (
+        {order.description && (
           <div className="rounded-md border border-gray-200 p-3">
             <p className="mb-1 font-mono text-[10px] tracking-wider text-gray-400 uppercase">
               Observações Técnicas
             </p>
-            <p className="text-sm text-gray-700">{order.notes}</p>
+            <p className="text-sm text-gray-700">{order.description}</p>
           </div>
         )}
 

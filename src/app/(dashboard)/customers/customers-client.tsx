@@ -7,11 +7,15 @@ import { useState } from "react";
 import { Button } from "@/_components/ui/button";
 import { DataTable, type DataTableColumn } from "@/_components/ui/data-table";
 import { Input } from "@/_components/ui/input";
-import { type MockCustomerDetail, mockCustomerDetails } from "@/_lib/mock-data";
+import type { CustomerRow } from "@/_lib/queries/customers";
 
 import { CustomerDetailPanel } from "./customer-detail-panel";
 
-const columns: DataTableColumn<MockCustomerDetail>[] = [
+function brl(v: number) {
+  return v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+}
+
+const columns: DataTableColumn<CustomerRow>[] = [
   {
     id: "name",
     header: "Cliente",
@@ -35,7 +39,7 @@ const columns: DataTableColumn<MockCustomerDetail>[] = [
     className: "hidden sm:table-cell",
     cell: (row) => (
       <span className="text-label-sm text-on-surface-variant font-mono">
-        {row.cpf}
+        {row.cpf ?? "—"}
       </span>
     ),
   },
@@ -45,7 +49,7 @@ const columns: DataTableColumn<MockCustomerDetail>[] = [
     className: "hidden md:table-cell",
     cell: (row) => (
       <span className="text-label-sm text-on-surface-variant font-mono">
-        {row.phone}
+        {row.phone ?? "—"}
       </span>
     ),
   },
@@ -55,11 +59,9 @@ const columns: DataTableColumn<MockCustomerDetail>[] = [
     className: "hidden lg:table-cell",
     cell: (row) => (
       <div>
-        <p className="text-body-sm text-on-surface">
-          {row.vehicles[0]?.model ?? "—"}
-        </p>
+        <p className="text-body-sm text-on-surface">{row.lastVehicle ?? "—"}</p>
         <p className="text-label-sm text-secondary font-mono">
-          {row.vehicles[0]?.plate ?? "—"}
+          {row.lastPlate ?? ""}
         </p>
       </div>
     ),
@@ -70,7 +72,9 @@ const columns: DataTableColumn<MockCustomerDetail>[] = [
     className: "hidden md:table-cell",
     cell: (row) => (
       <span className="text-label-sm text-on-surface-variant font-mono">
-        {new Date(row.lastVisit).toLocaleDateString("pt-BR")}
+        {row.lastVisit
+          ? new Date(row.lastVisit).toLocaleDateString("pt-BR")
+          : "—"}
       </span>
     ),
   },
@@ -80,35 +84,33 @@ const columns: DataTableColumn<MockCustomerDetail>[] = [
     align: "right",
     cell: (row) => (
       <span className="text-label-md text-on-surface font-mono font-semibold">
-        {row.totalSpent.toLocaleString("pt-BR", {
-          style: "currency",
-          currency: "BRL",
-        })}
+        {brl(row.totalSpent)}
       </span>
     ),
   },
 ];
 
-export function CustomersClient() {
+type Props = { customers: CustomerRow[] };
+
+export function CustomersClient({ customers }: Props) {
   const router = useRouter();
   const [search, setSearch] = useState("");
-  const [selectedCustomer, setSelectedCustomer] =
-    useState<MockCustomerDetail | null>(null);
+  const [selectedCustomer, setSelectedCustomer] = useState<CustomerRow | null>(
+    null,
+  );
   const [panelOpen, setPanelOpen] = useState(false);
 
   const filtered =
     search.trim().length >= 2
-      ? mockCustomerDetails.filter(
+      ? customers.filter(
           (c) =>
             c.name.toLowerCase().includes(search.toLowerCase()) ||
-            c.cpf.includes(search) ||
-            c.vehicles.some((v) =>
-              v.plate.toLowerCase().includes(search.toLowerCase()),
-            ),
+            (c.cpf ?? "").includes(search) ||
+            (c.lastPlate ?? "").toLowerCase().includes(search.toLowerCase()),
         )
-      : mockCustomerDetails;
+      : customers;
 
-  function openPanel(customer: MockCustomerDetail) {
+  function openPanel(customer: CustomerRow) {
     setSelectedCustomer(customer);
     setPanelOpen(true);
   }
@@ -116,7 +118,6 @@ export function CustomersClient() {
   return (
     <>
       <div className="space-y-6">
-        {/* Header */}
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-headline-lg text-on-surface font-bold">
@@ -133,7 +134,6 @@ export function CustomersClient() {
           </Button>
         </div>
 
-        {/* Barra de busca + filtros */}
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
           <div className="relative flex-1">
             <Search className="text-on-surface-variant absolute top-1/2 left-3 size-4 -translate-y-1/2" />
@@ -165,7 +165,6 @@ export function CustomersClient() {
           </div>
         </div>
 
-        {/* Tabela */}
         <div className="border-outline-variant overflow-hidden rounded-lg border">
           <DataTable
             columns={columns}
@@ -176,10 +175,9 @@ export function CustomersClient() {
           />
         </div>
 
-        {/* Paginação estática */}
         <div className="border-outline-variant flex flex-col gap-3 border-t pt-4 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-label-sm text-on-surface-variant font-mono">
-            Exibindo {filtered.length} de {mockCustomerDetails.length} clientes
+            Exibindo {filtered.length} de {customers.length} clientes
           </p>
           <div className="flex items-center gap-2">
             <button

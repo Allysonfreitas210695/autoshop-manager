@@ -4,9 +4,11 @@ import { useState } from "react";
 
 import { DataTable, type DataTableColumn } from "@/_components/ui/data-table";
 import { StatusChip } from "@/_components/ui/status-chip";
-import { type MockOrder, mockOrders, type OrderStatus } from "@/_lib/mock-data";
+import type { OrderRow } from "@/_lib/queries/orders";
 
 import { NewOrderDrawer } from "../new-order-drawer";
+
+type OrderStatus = OrderRow["status"];
 
 const STATUS_FILTER_TABS: { label: string; value: OrderStatus | "all" }[] = [
   { label: "Todas", value: "all" },
@@ -16,12 +18,18 @@ const STATUS_FILTER_TABS: { label: string; value: OrderStatus | "all" }[] = [
   { label: "Atrasado", value: "delayed" },
 ];
 
-const columns: DataTableColumn<MockOrder>[] = [
+function brl(v: number) {
+  return v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+}
+
+const columns: DataTableColumn<OrderRow>[] = [
   {
-    id: "id",
+    id: "orderNumber",
     header: "O.S.",
     cell: (row) => (
-      <span className="text-label-md text-secondary font-mono">{row.id}</span>
+      <span className="text-label-md text-secondary font-mono">
+        #{row.orderNumber}
+      </span>
     ),
   },
   {
@@ -40,7 +48,7 @@ const columns: DataTableColumn<MockOrder>[] = [
     cell: (row) => (
       <div>
         <p className="text-body-md text-on-surface font-medium">
-          {row.customer}
+          {row.customer ?? "—"}
         </p>
         <p className="text-label-sm text-on-surface-variant">{row.vehicle}</p>
       </div>
@@ -52,7 +60,7 @@ const columns: DataTableColumn<MockOrder>[] = [
     className: "hidden md:table-cell",
     cell: (row) => (
       <span className="text-body-md text-on-surface-variant">
-        {row.mechanic}
+        {row.mechanic ?? "Não atribuído"}
       </span>
     ),
   },
@@ -62,15 +70,12 @@ const columns: DataTableColumn<MockOrder>[] = [
     cell: (row) => <StatusChip status={row.status} />,
   },
   {
-    id: "total",
+    id: "totalAmount",
     header: "Total",
     align: "right",
     cell: (row) => (
       <span className="text-label-md text-on-surface font-mono font-semibold">
-        {row.total.toLocaleString("pt-BR", {
-          style: "currency",
-          currency: "BRL",
-        })}
+        {brl(Number(row.totalAmount))}
       </span>
     ),
   },
@@ -92,13 +97,15 @@ const columns: DataTableColumn<MockOrder>[] = [
   },
 ];
 
-export function OrdersClient() {
+type Props = { orders: OrderRow[] };
+
+export function OrdersClient({ orders }: Props) {
   const [activeFilter, setActiveFilter] = useState<OrderStatus | "all">("all");
 
   const filtered =
     activeFilter === "all"
-      ? mockOrders
-      : mockOrders.filter((o) => o.status === activeFilter);
+      ? orders
+      : orders.filter((o) => o.status === activeFilter);
 
   return (
     <div className="space-y-6">
@@ -124,8 +131,8 @@ export function OrdersClient() {
           const isActive = activeFilter === tab.value;
           const count =
             tab.value === "all"
-              ? mockOrders.length
-              : mockOrders.filter((o) => o.status === tab.value).length;
+              ? orders.length
+              : orders.filter((o) => o.status === tab.value).length;
           return (
             <button
               key={tab.value}
@@ -164,7 +171,7 @@ export function OrdersClient() {
 
       <div className="border-outline-variant flex flex-col gap-3 border-t pt-4 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-label-sm text-on-surface-variant font-mono">
-          Exibindo {filtered.length} de {mockOrders.length} resultados
+          Exibindo {filtered.length} de {orders.length} resultados
         </p>
         <div className="flex items-center gap-2">
           <button

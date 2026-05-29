@@ -2,7 +2,7 @@ import { CheckCircle, Download, FileText } from "lucide-react";
 import { notFound } from "next/navigation";
 
 import { Card } from "@/_components/ui/card";
-import { getMockOrderById } from "@/_lib/mock-data";
+import { getOrderById } from "@/_lib/queries/orders";
 
 function brl(v: number) {
   return v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -12,17 +12,17 @@ type Props = { params: Promise<{ id: string }> };
 
 export default async function BudgetPage({ params }: Props) {
   const { id } = await params;
-  const order = getMockOrderById(id);
+  const order = await getOrderById(id);
   if (!order) notFound();
 
   const approvedItems = order.items.filter((i) => i.approved);
   const pendingItems = order.items.filter((i) => !i.approved);
   const approvedTotal = approvedItems.reduce(
-    (s, i) => s + i.quantity * i.unitPrice,
+    (s, i) => s + i.quantity * Number(i.unitPrice),
     0,
   );
   const pendingTotal = pendingItems.reduce(
-    (s, i) => s + i.quantity * i.unitPrice,
+    (s, i) => s + i.quantity * Number(i.unitPrice),
     0,
   );
   const grandTotal = approvedTotal + pendingTotal;
@@ -61,7 +61,7 @@ export default async function BudgetPage({ params }: Props) {
             </p>
             <div className="flex items-center gap-3">
               <div className="bg-secondary/15 text-label-lg text-secondary flex size-10 shrink-0 items-center justify-center rounded-full font-mono font-bold">
-                {order.customer[0]}
+                {order.customer?.[0] ?? "?"}
               </div>
               <div>
                 <p className="text-on-surface font-medium">{order.customer}</p>
@@ -87,7 +87,8 @@ export default async function BudgetPage({ params }: Props) {
               {order.plate}
             </p>
             <p className="text-label-sm text-on-surface-variant mt-1 font-mono">
-              {order.mileage.toLocaleString("pt-BR")} km · Mec. {order.mechanic}
+              {(order.mileage ?? 0).toLocaleString("pt-BR")} km · Mec.{" "}
+              {order.mechanic ?? "—"}
             </p>
           </Card>
         </div>
@@ -135,13 +136,13 @@ export default async function BudgetPage({ params }: Props) {
                     {item.description}
                   </p>
                   <p className="text-label-sm text-on-surface-variant font-mono">
-                    {item.type === "part" ? "Peça" : "Mão de obra"} · Qtd:{" "}
+                    {item.itemType === "part" ? "Peça" : "Mão de obra"} · Qtd:{" "}
                     {item.quantity}
                   </p>
                 </div>
                 <div className="shrink-0 text-right">
                   <p className="text-label-md text-on-surface font-mono font-bold">
-                    {brl(item.quantity * item.unitPrice)}
+                    {brl(item.quantity * Number(item.unitPrice))}
                   </p>
                   {!item.approved && (
                     <p className="text-tertiary font-mono text-[10px] uppercase">
@@ -187,7 +188,7 @@ export default async function BudgetPage({ params }: Props) {
                 Previsão de entrega
               </p>
               <p className="text-label-md text-on-surface font-mono font-bold">
-                {new Date(order.estimatedDelivery).toLocaleDateString("pt-BR")}
+                {order.dueAt?.toLocaleDateString("pt-BR") ?? "A definir"}
               </p>
             </div>
           </Card>
@@ -196,9 +197,9 @@ export default async function BudgetPage({ params }: Props) {
             <h2 className="text-label-lg text-on-surface font-mono font-semibold tracking-wider uppercase">
               Ação do Cliente
             </h2>
-            {order.notes && (
+            {order.description && (
               <p className="text-body-sm text-on-surface-variant">
-                {order.notes}
+                {order.description}
               </p>
             )}
             <div className="mt-auto space-y-2">

@@ -10,19 +10,23 @@ import {
 } from "@/_components/ui/service-timeline";
 import { StatusChip } from "@/_components/ui/status-chip";
 import {
-  mockMetrics,
-  type MockOrder,
-  mockOrders,
-  mockStatusDistribution,
-  mockUpcomingDeliveries,
-} from "@/_lib/mock-data";
+  getDashboardMetrics,
+  getStatusDistribution,
+} from "@/_lib/queries/dashboard";
+import { listOrders, type OrderRow } from "@/_lib/queries/orders";
 
-const orderColumns: DataTableColumn<MockOrder>[] = [
+function brl(v: number) {
+  return v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+}
+
+const orderColumns: DataTableColumn<OrderRow>[] = [
   {
     id: "id",
     header: "O.S.",
     cell: (row) => (
-      <span className="text-label-md text-secondary font-mono">{row.id}</span>
+      <span className="text-label-md text-secondary font-mono">
+        #{row.orderNumber}
+      </span>
     ),
   },
   {
@@ -40,7 +44,7 @@ const orderColumns: DataTableColumn<MockOrder>[] = [
     header: "Cliente",
     cell: (row) => (
       <div>
-        <p className="text-body-md text-on-surface">{row.customer}</p>
+        <p className="text-body-md text-on-surface">{row.customer ?? "—"}</p>
         <p className="text-label-sm text-on-surface-variant">{row.vehicle}</p>
       </div>
     ),
@@ -51,7 +55,7 @@ const orderColumns: DataTableColumn<MockOrder>[] = [
     className: "hidden md:table-cell",
     cell: (row) => (
       <span className="text-body-md text-on-surface-variant">
-        {row.mechanic}
+        {row.mechanic ?? "Não atribuído"}
       </span>
     ),
   },
@@ -61,21 +65,47 @@ const orderColumns: DataTableColumn<MockOrder>[] = [
     cell: (row) => <StatusChip status={row.status} />,
   },
   {
-    id: "total",
+    id: "totalAmount",
     header: "Total",
     align: "right",
     cell: (row) => (
       <span className="text-label-md text-on-surface font-mono">
-        {row.total.toLocaleString("pt-BR", {
-          style: "currency",
-          currency: "BRL",
-        })}
+        {brl(Number(row.totalAmount))}
       </span>
     ),
   },
 ];
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+  const [metrics, orders, statusDist] = await Promise.all([
+    getDashboardMetrics(),
+    listOrders(),
+    getStatusDistribution(),
+  ]);
+
+  const statusChartData = statusDist.map((s) => ({
+    status: s.status,
+    label:
+      s.status === "in_progress"
+        ? "Em Progresso"
+        : s.status === "completed"
+          ? "Concluído"
+          : s.status === "delayed"
+            ? "Atrasado"
+            : "Pendente",
+    value: s.count,
+  }));
+
+  const upcomingDeliveries: TimelineNode[] = orders
+    .filter((o) => o.status !== "completed")
+    .slice(0, 4)
+    .map((o, i) => ({
+      id: o.id,
+      title: o.plate,
+      subtitle: o.customer ?? o.vehicle,
+      state: i === 0 ? "active" : "upcoming",
+    }));
+
   return (
     <div className="space-y-6">
       <div>
@@ -89,34 +119,32 @@ export default function DashboardPage() {
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <MetricCard
-          label="Faturamento do dia"
-          value={mockMetrics.revenueToday}
-          icon={DollarSign}
-          format="currency"
-          hint="↑ 12% ontem"
-          hintTone="positive"
+          label="Ordens Abertas"
+          value={metrics.openOrders}
+          icon={ClipboardList}
+          hint="Em andamento"
           accent="secondary"
         />
         <MetricCard
-          label="Ordens Abertas"
-          value={mockMetrics.openOrders}
-          icon={ClipboardList}
-          hint="4 atrasadas"
-          accent="tertiary"
-        />
-        <MetricCard
           label="Veículos Prontos"
-          value={mockMetrics.readyVehicles}
+          value={metrics.readyVehicles}
           icon={Wrench}
           hint="Aguardando retirada"
           accent="completed"
         />
         <MetricCard
-          label="Agendamentos"
-          value={mockMetrics.appointments}
+          label="Agendamentos Hoje"
+          value={metrics.todayAppointments}
           icon={CalendarClock}
-          hint="Próximos 3 dias"
+          hint="No dia de hoje"
           accent="secondary"
+        />
+        <MetricCard
+          label="Total de O.S."
+          value={orders.length}
+          icon={DollarSign}
+          hint="Todas as ordens"
+          accent="tertiary"
         />
       </div>
 
@@ -135,7 +163,7 @@ export default function DashboardPage() {
           </div>
           <DataTable
             columns={orderColumns}
-            data={mockOrders.slice(0, 4)}
+            data={orders.slice(0, 4)}
             getRowId={(row) => row.id}
           />
         </Card>
@@ -145,21 +173,14 @@ export default function DashboardPage() {
             <h2 className="text-label-lg text-on-surface mb-4 font-mono font-semibold tracking-wider uppercase">
               Status da Oficina
             </h2>
-            <StatusChart data={mockStatusDistribution} />
+            <StatusChart data={statusChartData} />
           </Card>
 
           <Card className="p-4">
             <h2 className="text-label-lg text-on-surface mb-4 font-mono font-semibold tracking-wider uppercase">
               Próximas Entregas
             </h2>
-            <ServiceTimeline
-              nodes={mockUpcomingDeliveries.map((d) => ({
-                id: d.id,
-                title: d.title,
-                subtitle: d.subtitle,
-                state: d.state as TimelineNode["state"],
-              }))}
-            />
+            <ServiceTimeline nodes={upcomingDeliveries} />
           </Card>
         </div>
       </div>

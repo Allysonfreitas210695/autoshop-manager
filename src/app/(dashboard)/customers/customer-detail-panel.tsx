@@ -9,11 +9,10 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/_components/ui/sheet";
-import { StatusChip } from "@/_components/ui/status-chip";
-import { type MockCustomerDetail } from "@/_lib/mock-data";
+import type { CustomerRow } from "@/_lib/queries/customers";
 
-type CustomerDetailPanelProps = {
-  customer: MockCustomerDetail | null;
+type Props = {
+  customer: CustomerRow | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 };
@@ -22,11 +21,7 @@ function brl(v: number) {
   return v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 }
 
-export function CustomerDetailPanel({
-  customer,
-  open,
-  onOpenChange,
-}: CustomerDetailPanelProps) {
+export function CustomerDetailPanel({ customer, open, onOpenChange }: Props) {
   const router = useRouter();
 
   return (
@@ -47,18 +42,25 @@ export function CustomerDetailPanel({
                     {customer.name}
                   </SheetTitle>
                   <SheetDescription className="text-label-sm text-on-surface-variant font-mono">
-                    {customer.cpf}
+                    {customer.cpf ?? "CPF não informado"}
                   </SheetDescription>
                 </div>
               </div>
 
               <div className="mt-3 space-y-1">
-                <p className="text-label-sm text-on-surface-variant font-mono">
-                  📞 {customer.phone}
-                </p>
+                {customer.phone && (
+                  <p className="text-label-sm text-on-surface-variant font-mono">
+                    📞 {customer.phone}
+                  </p>
+                )}
                 <p className="text-label-sm text-on-surface-variant font-mono">
                   ✉ {customer.email}
                 </p>
+                {customer.address && (
+                  <p className="text-label-sm text-on-surface-variant font-mono">
+                    📍 {customer.address}
+                  </p>
+                )}
               </div>
             </SheetHeader>
 
@@ -83,61 +85,38 @@ export function CustomerDetailPanel({
                 </div>
               </div>
 
-              {/* Veículo principal */}
-              <div className="border-outline-variant border-b p-4">
-                <p className="text-on-surface-variant/60 mb-2 font-mono text-[10px] tracking-wider uppercase">
-                  Veículo(s)
-                </p>
-                {customer.vehicles.map((v) => (
-                  <div
-                    key={v.id}
-                    className="border-outline-variant bg-surface-container mb-2 flex items-center justify-between rounded-md border px-3 py-2"
-                  >
-                    <div>
-                      <p className="text-body-sm text-on-surface font-medium">
-                        {v.model}
-                      </p>
-                      <p className="text-label-sm text-on-surface-variant font-mono">
-                        {v.year} · {v.color}
-                      </p>
-                    </div>
+              {/* Último veículo */}
+              {customer.lastVehicle && (
+                <div className="border-outline-variant border-b p-4">
+                  <p className="text-on-surface-variant/60 mb-2 font-mono text-[10px] tracking-wider uppercase">
+                    Último Veículo
+                  </p>
+                  <div className="border-outline-variant bg-surface-container flex items-center justify-between rounded-md border px-3 py-2">
+                    <p className="text-body-sm text-on-surface font-medium">
+                      {customer.lastVehicle}
+                    </p>
                     <span className="text-label-md text-secondary font-mono font-bold">
-                      {v.plate}
+                      {customer.lastPlate}
                     </span>
                   </div>
-                ))}
-              </div>
-
-              {/* Histórico de manutenções */}
-              <div className="p-4">
-                <p className="text-on-surface-variant/60 mb-3 font-mono text-[10px] tracking-wider uppercase">
-                  Histórico de Manutenções ({customer.orders.length})
-                </p>
-                <div className="space-y-2">
-                  {customer.orders.slice(0, 4).map((order) => (
-                    <div
-                      key={order.id}
-                      className="border-outline-variant bg-surface-container/50 rounded-md border p-3"
-                    >
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="min-w-0">
-                          <p className="text-body-sm text-on-surface truncate font-medium">
-                            {order.service}
-                          </p>
-                          <p className="text-label-sm text-on-surface-variant font-mono">
-                            {new Date(order.date).toLocaleDateString("pt-BR")} ·{" "}
-                            {order.vehicle}
-                          </p>
-                        </div>
-                        <StatusChip status={order.status} />
-                      </div>
-                      <p className="text-label-sm text-on-surface mt-1 text-right font-mono font-bold">
-                        {brl(order.total)}
-                      </p>
-                    </div>
-                  ))}
                 </div>
-              </div>
+              )}
+
+              {/* Última visita */}
+              {customer.lastVisit && (
+                <div className="p-4">
+                  <p className="text-on-surface-variant/60 mb-2 font-mono text-[10px] tracking-wider uppercase">
+                    Última Visita
+                  </p>
+                  <p className="text-body-sm text-on-surface font-mono">
+                    {new Date(customer.lastVisit).toLocaleDateString("pt-BR", {
+                      day: "2-digit",
+                      month: "long",
+                      year: "numeric",
+                    })}
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* Footer */}
