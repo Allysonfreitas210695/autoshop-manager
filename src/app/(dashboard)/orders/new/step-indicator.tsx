@@ -9,9 +9,10 @@ type Step = {
 
 const STEPS: Step[] = [
   { number: 1, label: "Cliente & Veículo" },
-  { number: 2, label: "Diagnóstico" },
-  { number: 3, label: "Peças & Serviços" },
-  { number: 4, label: "Assinatura" },
+  { number: 2, label: "Checklist" },
+  { number: 3, label: "Diagnóstico" },
+  { number: 4, label: "Peças & Serviços" },
+  { number: 5, label: "Assinatura" },
 ];
 
 type StepIndicatorProps = {

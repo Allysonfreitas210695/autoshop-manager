@@ -31,6 +31,24 @@ export const step2Schema = z.object({
   priority: z.enum(priorityValues).default("normal"),
 });
 
+export const checklistItemStateValues = ["ok", "atencao", "dano"] as const;
+
+const checklistItemSchema = z.object({
+  id: z.string(),
+  label: z.string(),
+  state: z.enum(checklistItemStateValues).default("ok"),
+  notes: z.string().optional(),
+});
+
+export const stepChecklistSchema = z.object({
+  items: z.array(checklistItemSchema),
+  generalNotes: z.string().optional(),
+});
+
+export type ChecklistItemState = (typeof checklistItemStateValues)[number];
+export type ChecklistItem = z.infer<typeof checklistItemSchema>;
+export type StepChecklistValues = z.infer<typeof stepChecklistSchema>;
+
 const partItemSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -66,6 +84,7 @@ export type LaborItem = z.infer<typeof laborItemSchema>;
 
 export type WizardData = {
   step1: Partial<Step1Values>;
+  stepChecklist: Partial<StepChecklistValues>;
   step2: Partial<Step2Values>;
   step3: Partial<Step3Values>;
   step4: Partial<Step4Values>;

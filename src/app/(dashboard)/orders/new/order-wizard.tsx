@@ -13,6 +13,7 @@ import type {
   Step2Values,
   Step3Values,
   Step4Values,
+  StepChecklistValues,
 } from "@/_schemas/order-wizard";
 
 import { StepIndicator } from "./step-indicator";
@@ -20,9 +21,11 @@ import { Step01Client } from "./steps/step-01-client";
 import { Step02Description } from "./steps/step-02-description";
 import { Step03Parts } from "./steps/step-03-parts";
 import { Step04Signature } from "./steps/step-04-signature";
+import { StepChecklist } from "./steps/step-checklist";
 
 type WizardState = {
   step1: Partial<Step1Values>;
+  stepChecklist: Partial<StepChecklistValues>;
   step2: Partial<Step2Values>;
   step3: Partial<Step3Values>;
   step4: Partial<Step4Values>;
@@ -30,6 +33,7 @@ type WizardState = {
 
 const INITIAL_STATE: WizardState = {
   step1: {},
+  stepChecklist: {},
   step2: {},
   step3: { parts: [], laborItems: [] },
   step4: {},
@@ -45,14 +49,19 @@ export function OrderWizard() {
     setCurrentStep(2);
   }
 
+  function handleChecklistNext(data: StepChecklistValues) {
+    setWizardData((prev) => ({ ...prev, stepChecklist: data }));
+    setCurrentStep(3);
+  }
+
   function handleStep2Next(data: Step2Values) {
     setWizardData((prev) => ({ ...prev, step2: data }));
-    setCurrentStep(3);
+    setCurrentStep(4);
   }
 
   function handleStep3Next(data: Step3Values) {
     setWizardData((prev) => ({ ...prev, step3: data }));
-    setCurrentStep(4);
+    setCurrentStep(5);
   }
 
   async function handleFinalSubmit(
@@ -91,7 +100,7 @@ export function OrderWizard() {
     total: subtotalParts + subtotalLabor,
   };
 
-  const isFinalStep = currentStep === 4;
+  const isFinalStep = currentStep === 5;
   const contextBar = wizardData.step1.customerName
     ? `${wizardData.step1.customerName} · ${wizardData.step1.plate ?? "Sem placa"} · ${wizardData.step1.vehicleModel ?? ""}`
     : null;
@@ -135,18 +144,24 @@ export function OrderWizard() {
             />
           )}
           {currentStep === 2 && (
+            <StepChecklist
+              defaultValues={wizardData.stepChecklist}
+              onNext={handleChecklistNext}
+            />
+          )}
+          {currentStep === 3 && (
             <Step02Description
               defaultValues={wizardData.step2}
               onNext={handleStep2Next}
             />
           )}
-          {currentStep === 3 && (
+          {currentStep === 4 && (
             <Step03Parts
               defaultValues={wizardData.step3}
               onNext={handleStep3Next}
             />
           )}
-          {currentStep === 4 && (
+          {currentStep === 5 && (
             <Step04Signature
               defaultValues={wizardData.step4}
               summary={financialSummary}
