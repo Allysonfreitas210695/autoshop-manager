@@ -29,19 +29,27 @@ import {
 import { useState } from "react";
 
 import { Button } from "@/_components/ui/button";
-import {
-  type AppointmentStatus,
-  appointmentStatusLabels,
-  type MockAppointment,
-  mockAppointments,
-} from "@/_lib/mock-data";
+import type {
+  AppointmentRow,
+  CustomerOption,
+  MechanicOption,
+} from "@/_lib/queries/appointments";
 
 import { NewAppointmentDrawer } from "./_components/NewAppointmentDrawer";
+
+type AppointmentStatus = AppointmentRow["status"];
+
+const statusLabels: Record<AppointmentStatus, string> = {
+  scheduled: "Agendado",
+  confirmed: "Confirmado",
+  completed: "Concluído",
+  cancelled: "Cancelado",
+};
 
 const statusColor: Record<AppointmentStatus, string> = {
   confirmed:
     "bg-status-completed/20 text-status-completed border-status-completed/30",
-  pending:
+  scheduled:
     "bg-status-pending/20 text-on-surface-variant border-status-pending/30",
   cancelled: "bg-error/20 text-error border-error/30",
   completed: "bg-secondary/20 text-secondary border-secondary/30",
@@ -49,12 +57,16 @@ const statusColor: Record<AppointmentStatus, string> = {
 
 const statusDot: Record<AppointmentStatus, string> = {
   confirmed: "bg-status-completed",
-  pending: "bg-status-pending",
+  scheduled: "bg-status-pending",
   cancelled: "bg-error",
   completed: "bg-secondary",
 };
 
-function AppointmentBadge({ appt }: { appt: MockAppointment }) {
+function apptTime(appt: AppointmentRow) {
+  return format(new Date(appt.scheduledAt), "HH:mm");
+}
+
+function AppointmentBadge({ appt }: { appt: AppointmentRow }) {
   return (
     <div
       className={`flex items-center gap-1 truncate rounded border px-1.5 py-0.5 font-mono text-[10px] font-medium ${statusColor[appt.status]}`}
@@ -63,43 +75,48 @@ function AppointmentBadge({ appt }: { appt: MockAppointment }) {
         className={`size-1.5 shrink-0 rounded-full ${statusDot[appt.status]}`}
       />
       <span className="truncate">
-        {appt.time} {appt.customer.split(" ")[0]}
+        {apptTime(appt)} {(appt.customer ?? "Cliente").split(" ")[0]}
       </span>
     </div>
   );
 }
 
-function AppointmentCard({ appt }: { appt: MockAppointment }) {
+function AppointmentCard({ appt }: { appt: AppointmentRow }) {
   return (
     <div className="bg-surface-container border-outline-variant/30 hover:border-secondary/40 space-y-3 rounded-xl border p-4 transition-colors">
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0 flex-1">
           <p className="text-body-md text-on-surface truncate font-semibold">
-            {appt.customer}
+            {appt.customer ?? "Cliente não informado"}
           </p>
           <p className="text-label-sm text-on-surface-variant mt-0.5 font-mono">
-            {appt.vehicle} · {appt.plate}
+            {appt.vehicle ?? "Veículo não informado"}
+            {appt.plate ? ` · ${appt.plate}` : ""}
           </p>
         </div>
         <span
           className={`shrink-0 rounded-full border px-2 py-1 font-mono text-[10px] font-bold tracking-wider uppercase ${statusColor[appt.status]}`}
         >
-          {appointmentStatusLabels[appt.status]}
+          {statusLabels[appt.status]}
         </span>
       </div>
       <div className="flex flex-wrap gap-x-4 gap-y-1.5">
         <span className="text-label-sm text-on-surface-variant flex items-center gap-1.5">
           <Clock className="text-secondary size-3.5 shrink-0" />
-          {appt.time} · {appt.duration} min
+          {apptTime(appt)}
         </span>
-        <span className="text-label-sm text-on-surface-variant flex items-center gap-1.5">
-          <User className="text-secondary size-3.5 shrink-0" />
-          {appt.mechanic}
-        </span>
-        <span className="text-label-sm text-tertiary flex items-center gap-1.5 font-mono">
-          <CheckCircle2 className="size-3.5 shrink-0" />
-          {appt.serviceType}
-        </span>
+        {appt.mechanic && (
+          <span className="text-label-sm text-on-surface-variant flex items-center gap-1.5">
+            <User className="text-secondary size-3.5 shrink-0" />
+            {appt.mechanic}
+          </span>
+        )}
+        {appt.phone && (
+          <span className="text-label-sm text-tertiary flex items-center gap-1.5 font-mono">
+            <CheckCircle2 className="size-3.5 shrink-0" />
+            {appt.phone}
+          </span>
+        )}
       </div>
       {appt.notes && (
         <p className="text-label-sm text-on-surface-variant/70 border-outline-variant/20 border-t pt-2 italic">
@@ -112,9 +129,20 @@ function AppointmentCard({ appt }: { appt: MockAppointment }) {
 
 type View = "calendar" | "list";
 
-export function AppointmentsClient() {
-  const [currentMonth, setCurrentMonth] = useState(new Date(2026, 4, 1)); // May 2026
-  const [selectedDate, setSelectedDate] = useState(new Date(2026, 4, 28));
+type Props = {
+  initialAppointments: AppointmentRow[];
+  mechanics: MechanicOption[];
+  customers: CustomerOption[];
+};
+
+export function AppointmentsClient({
+  initialAppointments,
+  mechanics,
+  customers,
+}: Props) {
+  const today = new Date();
+  const [currentMonth, setCurrentMonth] = useState(startOfMonth(today));
+  const [selectedDate, setSelectedDate] = useState(today);
   const [view, setView] = useState<View>("calendar");
   const [drawerOpen, setDrawerOpen] = useState(false);
 
@@ -124,32 +152,32 @@ export function AppointmentsClient() {
   const calEnd = endOfWeek(monthEnd, { weekStartsOn: 0 });
   const calDays = eachDayOfInterval({ start: calStart, end: calEnd });
 
-  const selectedDayAppts = mockAppointments
-    .filter((a) => isSameDay(new Date(a.date + "T00:00:00"), selectedDate))
-    .sort((a, b) => a.time.localeCompare(b.time));
+  const byTime = (a: AppointmentRow, b: AppointmentRow) =>
+    new Date(a.scheduledAt).getTime() - new Date(b.scheduledAt).getTime();
+
+  const selectedDayAppts = initialAppointments
+    .filter((a) => isSameDay(new Date(a.scheduledAt), selectedDate))
+    .sort(byTime);
 
   const weekDays = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
 
   const countByDate = (date: Date) =>
-    mockAppointments.filter((a) =>
-      isSameDay(new Date(a.date + "T00:00:00"), date),
-    );
+    initialAppointments.filter((a) => isSameDay(new Date(a.scheduledAt), date));
 
-  const todayTotal = mockAppointments.filter(
+  const todayTotal = initialAppointments.filter(
     (a) =>
-      isSameDay(new Date(a.date + "T00:00:00"), new Date(2026, 4, 28)) &&
-      a.status !== "cancelled",
+      isSameDay(new Date(a.scheduledAt), today) && a.status !== "cancelled",
   ).length;
 
-  const weekTotal = mockAppointments.filter((a) => {
-    const d = new Date(a.date + "T00:00:00");
-    const weekStart = startOfWeek(new Date(2026, 4, 28), { weekStartsOn: 0 });
-    const weekEnd = endOfWeek(new Date(2026, 4, 28), { weekStartsOn: 0 });
+  const weekStart = startOfWeek(today, { weekStartsOn: 0 });
+  const weekEnd = endOfWeek(today, { weekStartsOn: 0 });
+  const weekTotal = initialAppointments.filter((a) => {
+    const d = new Date(a.scheduledAt);
     return d >= weekStart && d <= weekEnd && a.status !== "cancelled";
   }).length;
 
-  const pendingTotal = mockAppointments.filter(
-    (a) => a.status === "pending",
+  const pendingTotal = initialAppointments.filter(
+    (a) => a.status === "scheduled",
   ).length;
 
   return (
@@ -209,7 +237,7 @@ export function AppointmentsClient() {
             value: weekTotal,
             color: "text-status-completed",
           },
-          { label: "Pendentes", value: pendingTotal, color: "text-tertiary" },
+          { label: "Agendados", value: pendingTotal, color: "text-tertiary" },
         ].map((kpi) => (
           <div
             key={kpi.label}
@@ -342,56 +370,51 @@ export function AppointmentsClient() {
       ) : (
         /* List View */
         <div className="space-y-6">
-          {[
-            addDays(new Date(2026, 4, 28), 0),
-            addDays(new Date(2026, 4, 28), 1),
-            addDays(new Date(2026, 4, 28), 2),
-            addDays(new Date(2026, 4, 28), 5),
-            addDays(new Date(2026, 4, 28), 6),
-            addDays(new Date(2026, 4, 28), 7),
-          ].map((day) => {
-            const appts = countByDate(day).sort((a, b) =>
-              a.time.localeCompare(b.time),
-            );
-            if (appts.length === 0) return null;
-            return (
-              <div key={day.toISOString()} className="space-y-3">
-                <div className="flex items-center gap-3">
-                  <div className="flex items-center gap-2">
-                    <span
-                      className={`text-label-sm font-mono font-bold tracking-wider uppercase ${isToday(day) ? "text-secondary" : "text-on-surface-variant"}`}
-                    >
-                      {format(day, "EEE", { locale: ptBR })}
-                    </span>
-                    <span
-                      className={`text-display-xs font-mono font-bold ${isToday(day) ? "text-secondary" : "text-on-surface"}`}
-                    >
-                      {format(day, "dd")}
-                    </span>
-                    <span className="text-label-sm text-on-surface-variant font-mono capitalize">
-                      {format(day, "MMMM", { locale: ptBR })}
+          {Array.from({ length: 14 }, (_, i) => addDays(today, i)).map(
+            (day) => {
+              const appts = countByDate(day).sort(byTime);
+              if (appts.length === 0) return null;
+              return (
+                <div key={day.toISOString()} className="space-y-3">
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2">
+                      <span
+                        className={`text-label-sm font-mono font-bold tracking-wider uppercase ${isToday(day) ? "text-secondary" : "text-on-surface-variant"}`}
+                      >
+                        {format(day, "EEE", { locale: ptBR })}
+                      </span>
+                      <span
+                        className={`text-display-xs font-mono font-bold ${isToday(day) ? "text-secondary" : "text-on-surface"}`}
+                      >
+                        {format(day, "dd")}
+                      </span>
+                      <span className="text-label-sm text-on-surface-variant font-mono capitalize">
+                        {format(day, "MMMM", { locale: ptBR })}
+                      </span>
+                    </div>
+                    <div className="bg-outline-variant/30 h-px flex-1" />
+                    <span className="text-label-xs text-on-surface-variant font-mono">
+                      {appts.filter((a) => a.status !== "cancelled").length}{" "}
+                      agend.
                     </span>
                   </div>
-                  <div className="bg-outline-variant/30 h-px flex-1" />
-                  <span className="text-label-xs text-on-surface-variant font-mono">
-                    {appts.filter((a) => a.status !== "cancelled").length}{" "}
-                    agend.
-                  </span>
+                  <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
+                    {appts.map((appt) => (
+                      <AppointmentCard key={appt.id} appt={appt} />
+                    ))}
+                  </div>
                 </div>
-                <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
-                  {appts.map((appt) => (
-                    <AppointmentCard key={appt.id} appt={appt} />
-                  ))}
-                </div>
-              </div>
-            );
-          })}
+              );
+            },
+          )}
         </div>
       )}
 
       <NewAppointmentDrawer
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
+        mechanics={mechanics}
+        customers={customers}
       />
     </div>
   );

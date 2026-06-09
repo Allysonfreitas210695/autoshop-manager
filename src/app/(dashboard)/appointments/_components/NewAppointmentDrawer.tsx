@@ -2,9 +2,11 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CalendarDays, Clock, User } from "lucide-react";
-import { Controller, useForm } from "react-hook-form";
+import { useAction } from "next-safe-action/hooks";
+import { Controller, useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 
+import { createAppointmentAction } from "@/_actions/appointments";
 import { Button } from "@/_components/ui/button";
 import { Input } from "@/_components/ui/input";
 import { Label } from "@/_components/ui/label";
@@ -17,18 +19,17 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/_components/ui/sheet";
-import { appointmentServiceTypes, mechanics } from "@/_lib/mock-data";
+import type {
+  CustomerOption,
+  MechanicOption,
+} from "@/_lib/queries/appointments";
 
 const schema = z.object({
-  customer: z.string().min(2, "Informe o nome do cliente"),
-  phone: z.string().min(8, "Informe o telefone"),
-  vehicle: z.string().min(2, "Informe o veículo"),
-  plate: z.string().min(6, "Informe a placa"),
-  serviceType: z.string().min(1, "Selecione o tipo de serviço"),
-  mechanic: z.string().min(1, "Selecione o mecânico"),
+  customerId: z.string().min(1, "Selecione o cliente"),
+  vehicleId: z.string().optional(),
+  mechanicId: z.string().optional(),
   date: z.string().min(1, "Informe a data"),
   time: z.string().min(1, "Informe o horário"),
-  duration: z.string().min(1, "Informe a duração"),
   notes: z.string().optional(),
 });
 
@@ -37,23 +38,45 @@ type FormData = z.infer<typeof schema>;
 type Props = {
   open: boolean;
   onClose: () => void;
+  mechanics: MechanicOption[];
+  customers: CustomerOption[];
 };
 
-export function NewAppointmentDrawer({ open, onClose }: Props) {
+export function NewAppointmentDrawer({
+  open,
+  onClose,
+  mechanics,
+  customers,
+}: Props) {
   const {
-    register,
     control,
+    register,
     handleSubmit,
     reset,
     formState: { errors },
   } = useForm<FormData>({
     resolver: zodResolver(schema),
-    defaultValues: { duration: "60" },
+    defaultValues: { customerId: "", vehicleId: "", mechanicId: "" },
   });
 
-  function onSubmit() {
-    reset();
-    onClose();
+  const selectedCustomerId = useWatch({ control, name: "customerId" });
+  const selectedCustomer = customers.find((c) => c.id === selectedCustomerId);
+
+  const { execute, status, result } = useAction(createAppointmentAction, {
+    onSuccess: () => {
+      reset();
+      onClose();
+    },
+  });
+
+  function onSubmit(data: FormData) {
+    execute({
+      customerId: data.customerId,
+      vehicleId: data.vehicleId || undefined,
+      mechanicId: data.mechanicId || undefined,
+      scheduledAt: new Date(`${data.date}T${data.time}:00`).toISOString(),
+      notes: data.notes || undefined,
+    });
   }
 
   return (
@@ -85,58 +108,62 @@ export function NewAppointmentDrawer({ open, onClose }: Props) {
             </h3>
             <div className="grid grid-cols-1 gap-3">
               <div className="space-y-1.5">
-                <Label htmlFor="customer">Nome do Cliente</Label>
-                <Input
-                  id="customer"
-                  placeholder="Ex: Ricardo Almeida"
-                  {...register("customer")}
+                <Label htmlFor="customerId">Cliente</Label>
+                <Controller
+                  name="customerId"
+                  control={control}
+                  render={({ field }) => (
+                    <select
+                      {...field}
+                      id="customerId"
+                      className="bg-surface-container border-outline-variant/50 text-body-sm text-on-surface focus:ring-secondary w-full rounded-lg border px-3 py-2 focus:ring-1 focus:outline-none"
+                    >
+                      <option value="">Selecione...</option>
+                      {customers.map((c) => (
+                        <option key={c.id} value={c.id}>
+                          {c.name}
+                          {c.phone ? ` — ${c.phone}` : ""}
+                        </option>
+                      ))}
+                    </select>
+                  )}
                 />
-                {errors.customer && (
+                {errors.customerId && (
                   <p className="text-label-xs text-error">
-                    {errors.customer.message}
+                    {errors.customerId.message}
+                  </p>
+                )}
+                {customers.length === 0 && (
+                  <p className="text-label-xs text-on-surface-variant">
+                    Nenhum cliente cadastrado ainda.
                   </p>
                 )}
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="phone">Telefone</Label>
-                <Input
-                  id="phone"
-                  placeholder="(11) 99999-0000"
-                  {...register("phone")}
+                <Label htmlFor="vehicleId">Veículo</Label>
+                <Controller
+                  name="vehicleId"
+                  control={control}
+                  render={({ field }) => (
+                    <select
+                      {...field}
+                      id="vehicleId"
+                      disabled={!selectedCustomer}
+                      className="bg-surface-container border-outline-variant/50 text-body-sm text-on-surface focus:ring-secondary w-full rounded-lg border px-3 py-2 focus:ring-1 focus:outline-none disabled:opacity-50"
+                    >
+                      <option value="">
+                        {selectedCustomer
+                          ? "Selecione..."
+                          : "Selecione o cliente primeiro"}
+                      </option>
+                      {selectedCustomer?.vehicles.map((v) => (
+                        <option key={v.id} value={v.id}>
+                          {v.label} · {v.plate}
+                        </option>
+                      ))}
+                    </select>
+                  )}
                 />
-                {errors.phone && (
-                  <p className="text-label-xs text-error">
-                    {errors.phone.message}
-                  </p>
-                )}
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1.5">
-                  <Label htmlFor="vehicle">Veículo</Label>
-                  <Input
-                    id="vehicle"
-                    placeholder="Toyota Corolla 2020"
-                    {...register("vehicle")}
-                  />
-                  {errors.vehicle && (
-                    <p className="text-label-xs text-error">
-                      {errors.vehicle.message}
-                    </p>
-                  )}
-                </div>
-                <div className="space-y-1.5">
-                  <Label htmlFor="plate">Placa</Label>
-                  <Input
-                    id="plate"
-                    placeholder="ABC-1234"
-                    {...register("plate")}
-                  />
-                  {errors.plate && (
-                    <p className="text-label-xs text-error">
-                      {errors.plate.message}
-                    </p>
-                  )}
-                </div>
               </div>
             </div>
           </section>
@@ -144,60 +171,29 @@ export function NewAppointmentDrawer({ open, onClose }: Props) {
           {/* Serviço */}
           <section className="space-y-3">
             <h3 className="text-label-sm text-on-surface-variant/60 flex items-center gap-2 font-mono tracking-wider uppercase">
-              <Clock className="size-3.5" /> Serviço &amp; Agendamento
+              <Clock className="size-3.5" /> Agendamento
             </h3>
             <div className="grid grid-cols-1 gap-3">
               <div className="space-y-1.5">
-                <Label htmlFor="serviceType">Tipo de Serviço</Label>
+                <Label htmlFor="mechanicId">Mecânico Responsável</Label>
                 <Controller
-                  name="serviceType"
+                  name="mechanicId"
                   control={control}
                   render={({ field }) => (
                     <select
                       {...field}
-                      id="serviceType"
-                      className="bg-surface-container border-outline-variant/50 text-body-sm text-on-surface focus:ring-secondary w-full rounded-lg border px-3 py-2 focus:ring-1 focus:outline-none"
-                    >
-                      <option value="">Selecione...</option>
-                      {appointmentServiceTypes.map((t) => (
-                        <option key={t} value={t}>
-                          {t}
-                        </option>
-                      ))}
-                    </select>
-                  )}
-                />
-                {errors.serviceType && (
-                  <p className="text-label-xs text-error">
-                    {errors.serviceType.message}
-                  </p>
-                )}
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="mechanic">Mecânico Responsável</Label>
-                <Controller
-                  name="mechanic"
-                  control={control}
-                  render={({ field }) => (
-                    <select
-                      {...field}
-                      id="mechanic"
+                      id="mechanicId"
                       className="bg-surface-container border-outline-variant/50 text-body-sm text-on-surface focus:ring-secondary w-full rounded-lg border px-3 py-2 focus:ring-1 focus:outline-none"
                     >
                       <option value="">Selecione...</option>
                       {mechanics.map((m) => (
-                        <option key={m} value={m}>
-                          {m}
+                        <option key={m.id} value={m.id}>
+                          {m.name}
                         </option>
                       ))}
                     </select>
                   )}
                 />
-                {errors.mechanic && (
-                  <p className="text-label-xs text-error">
-                    {errors.mechanic.message}
-                  </p>
-                )}
               </div>
               <div className="grid grid-cols-3 gap-3">
                 <div className="col-span-2 space-y-1.5">
@@ -220,32 +216,23 @@ export function NewAppointmentDrawer({ open, onClose }: Props) {
                 </div>
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="duration">Duração (minutos)</Label>
-                <Input
-                  id="duration"
-                  type="number"
-                  min={15}
-                  step={15}
-                  {...register("duration")}
-                />
-                {errors.duration && (
-                  <p className="text-label-xs text-error">
-                    {errors.duration.message}
-                  </p>
-                )}
-              </div>
-              <div className="space-y-1.5">
                 <Label htmlFor="notes">Observações</Label>
                 <textarea
                   id="notes"
                   rows={3}
-                  placeholder="Informações adicionais sobre o serviço..."
+                  placeholder="Tipo de serviço, informações adicionais..."
                   {...register("notes")}
                   className="bg-surface-container border-outline-variant/50 text-body-sm text-on-surface placeholder:text-on-surface-variant/40 focus:ring-secondary w-full resize-none rounded-lg border px-3 py-2 focus:ring-1 focus:outline-none"
                 />
               </div>
             </div>
           </section>
+
+          {result.serverError && (
+            <p className="text-label-sm text-error">
+              Erro ao criar agendamento. Tente novamente.
+            </p>
+          )}
         </form>
 
         <SheetFooter className="border-outline-variant/30 gap-2 border-t pt-4">
@@ -256,8 +243,11 @@ export function NewAppointmentDrawer({ open, onClose }: Props) {
               </Button>
             }
           />
-          <Button onClick={handleSubmit(onSubmit)}>
-            Confirmar Agendamento
+          <Button
+            onClick={handleSubmit(onSubmit)}
+            disabled={status === "executing"}
+          >
+            {status === "executing" ? "Salvando..." : "Confirmar Agendamento"}
           </Button>
         </SheetFooter>
       </SheetContent>

@@ -15,11 +15,11 @@ import {
   YAxis,
 } from "recharts";
 
-import {
-  type MockMechanicPerformance,
-  type MockMonthlyRevenue,
-  type MockServiceCategory,
-} from "@/_lib/mock-data";
+import type {
+  MechanicPerformance,
+  MonthlyRevenue,
+  ServiceCategory,
+} from "@/_lib/queries/analytics";
 
 function shortBrl(v: number) {
   if (v >= 1000) return `R$${(v / 1000).toFixed(0)}k`;
@@ -35,7 +35,7 @@ const COLORS = [
   "#94a3b8",
 ];
 
-export function RevenueLineChart({ data }: { data: MockMonthlyRevenue[] }) {
+export function RevenueLineChart({ data }: { data: MonthlyRevenue[] }) {
   return (
     <ResponsiveContainer width="100%" height={240}>
       <LineChart data={data} margin={{ top: 4, right: 8, bottom: 0, left: 0 }}>
@@ -111,11 +111,7 @@ export function RevenueLineChart({ data }: { data: MockMonthlyRevenue[] }) {
   );
 }
 
-export function MechanicBarChart({
-  data,
-}: {
-  data: MockMechanicPerformance[];
-}) {
+export function MechanicBarChart({ data }: { data: MechanicPerformance[] }) {
   return (
     <ResponsiveContainer width="100%" height={200}>
       <BarChart
@@ -166,7 +162,7 @@ export function MechanicBarChart({
   );
 }
 
-export function ServicePieChart({ data }: { data: MockServiceCategory[] }) {
+export function ServicePieChart({ data }: { data: ServiceCategory[] }) {
   return (
     <ResponsiveContainer width="100%" height={200}>
       <PieChart>

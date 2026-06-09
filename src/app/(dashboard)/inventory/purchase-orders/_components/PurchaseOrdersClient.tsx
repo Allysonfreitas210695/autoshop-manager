@@ -6,35 +6,34 @@ import { FileText, Package, Plus, Truck } from "lucide-react";
 import Link from "next/link";
 
 import { Button } from "@/_components/ui/button";
-import {
-  mockPurchaseOrders,
-  type PurchaseOrderStatus,
-  purchaseOrderStatusLabels,
-} from "@/_lib/mock-data";
+import type { PurchaseOrderRow } from "@/_lib/queries/inventory";
+
+type PurchaseOrderStatus = PurchaseOrderRow["status"];
+
+const statusLabels: Record<PurchaseOrderStatus, string> = {
+  draft: "Rascunho",
+  sent: "Enviada",
+  received: "Recebida",
+  cancelled: "Cancelada",
+};
 
 const statusColor: Record<PurchaseOrderStatus, string> = {
   draft:
     "bg-status-pending/20 text-on-surface-variant border-status-pending/30",
   sent: "bg-secondary/20 text-secondary border-secondary/30",
-  confirmed:
+  received:
     "bg-status-completed/20 text-status-completed border-status-completed/30",
-  received: "bg-secondary/30 text-secondary border-secondary/40",
   cancelled: "bg-error/20 text-error border-error/30",
 };
 
-function totalValue(order: (typeof mockPurchaseOrders)[0]) {
-  return order.items.reduce((s, i) => s + i.quantity * i.unitPrice, 0);
-}
+type Props = { orders: PurchaseOrderRow[] };
 
-export function PurchaseOrdersClient() {
+export function PurchaseOrdersClient({ orders }: Props) {
   const totals = {
-    draft: mockPurchaseOrders.filter((o) => o.status === "draft").length,
-    sent: mockPurchaseOrders.filter((o) => o.status === "sent").length,
-    confirmed: mockPurchaseOrders.filter((o) => o.status === "confirmed")
-      .length,
-    received: mockPurchaseOrders.filter((o) => o.status === "received").length,
-    cancelled: mockPurchaseOrders.filter((o) => o.status === "cancelled")
-      .length,
+    draft: orders.filter((o) => o.status === "draft").length,
+    sent: orders.filter((o) => o.status === "sent").length,
+    received: orders.filter((o) => o.status === "received").length,
+    cancelled: orders.filter((o) => o.status === "cancelled").length,
   };
 
   return (
@@ -68,22 +67,22 @@ export function PurchaseOrdersClient() {
               color: "text-secondary",
             },
             {
-              label: "Confirmadas",
-              key: "confirmed",
-              icon: FileText,
-              color: "text-status-completed",
-            },
-            {
               label: "Recebidas",
               key: "received",
               icon: Package,
-              color: "text-secondary/70",
+              color: "text-status-completed",
             },
             {
               label: "Rascunhos",
               key: "draft",
               icon: FileText,
               color: "text-on-surface-variant",
+            },
+            {
+              label: "Canceladas",
+              key: "cancelled",
+              icon: FileText,
+              color: "text-error",
             },
           ] as const
         ).map(({ label, key, icon: Icon, color }) => (
@@ -117,7 +116,6 @@ export function PurchaseOrdersClient() {
                   "Valor Total",
                   "Prev. Entrega",
                   "Status",
-                  "",
                 ].map((h) => (
                   <th
                     key={h}
@@ -129,33 +127,38 @@ export function PurchaseOrdersClient() {
               </tr>
             </thead>
             <tbody>
-              {mockPurchaseOrders.map((order) => (
+              {orders.length === 0 && (
+                <tr>
+                  <td colSpan={6} className="px-4 py-10 text-center">
+                    <p className="text-body-sm text-on-surface-variant">
+                      Nenhuma ordem de compra registrada.
+                    </p>
+                  </td>
+                </tr>
+              )}
+              {orders.map((order) => (
                 <tr
                   key={order.id}
                   className="border-outline-variant/20 hover:bg-surface/40 border-b transition-colors last:border-0"
                 >
                   <td className="px-4 py-3">
                     <span className="text-label-sm text-secondary font-mono font-bold">
-                      {order.id}
+                      OC-{order.id.slice(0, 8).toUpperCase()}
                     </span>
                   </td>
                   <td className="px-4 py-3">
                     <p className="text-body-sm text-on-surface font-medium">
                       {order.supplier}
                     </p>
-                    <p className="text-label-xs text-on-surface-variant font-mono">
-                      {order.supplierContact}
-                    </p>
                   </td>
                   <td className="px-4 py-3">
                     <span className="text-body-sm text-on-surface-variant">
-                      {order.items.length} iten
-                      {order.items.length !== 1 ? "s" : ""}
+                      {order.itemCount} iten{order.itemCount !== 1 ? "s" : ""}
                     </span>
                   </td>
                   <td className="px-4 py-3">
                     <span className="text-body-sm text-on-surface font-mono font-medium">
-                      {totalValue(order).toLocaleString("pt-BR", {
+                      {order.totalAmount.toLocaleString("pt-BR", {
                         style: "currency",
                         currency: "BRL",
                       })}
@@ -163,24 +166,21 @@ export function PurchaseOrdersClient() {
                   </td>
                   <td className="px-4 py-3">
                     <span className="text-label-sm text-on-surface-variant font-mono">
-                      {format(
-                        new Date(order.expectedDelivery + "T00:00:00"),
-                        "dd MMM yyyy",
-                        { locale: ptBR },
-                      )}
+                      {order.expectedDelivery
+                        ? format(
+                            new Date(order.expectedDelivery),
+                            "dd MMM yyyy",
+                            { locale: ptBR },
+                          )
+                        : "—"}
                     </span>
                   </td>
                   <td className="px-4 py-3">
                     <span
                       className={`rounded-full border px-2 py-1 font-mono text-[10px] font-bold tracking-wider uppercase ${statusColor[order.status]}`}
                     >
-                      {purchaseOrderStatusLabels[order.status]}
+                      {statusLabels[order.status]}
                     </span>
-                  </td>
-                  <td className="px-4 py-3">
-                    <button className="text-label-sm text-secondary font-mono hover:underline">
-                      Ver
-                    </button>
                   </td>
                 </tr>
               ))}

@@ -8,15 +8,16 @@ import { useFieldArray, useForm, useWatch } from "react-hook-form";
 import { Button } from "@/_components/ui/button";
 import { Input } from "@/_components/ui/input";
 import { Label } from "@/_components/ui/label";
-import { mockParts } from "@/_lib/mock-data";
+import type { Part } from "@/_lib/queries/inventory";
 import { step3Schema, type Step3Values } from "@/_schemas/order-wizard";
 
 type Step3Props = {
   defaultValues: Partial<Step3Values>;
+  parts: Part[];
   onNext: (data: Step3Values) => void;
 };
 
-export function Step03Parts({ defaultValues, onNext }: Step3Props) {
+export function Step03Parts({ defaultValues, parts, onNext }: Step3Props) {
   const [partsQuery, setPartsQuery] = useState("");
   const [showLaborForm, setShowLaborForm] = useState(false);
   const [laborDescription, setLaborDescription] = useState("");
@@ -49,10 +50,10 @@ export function Step03Parts({ defaultValues, onNext }: Step3Props) {
 
   const filteredParts =
     partsQuery.length >= 2
-      ? mockParts.filter(
+      ? parts.filter(
           (p) =>
             p.name.toLowerCase().includes(partsQuery.toLowerCase()) ||
-            p.sku.toLowerCase().includes(partsQuery.toLowerCase()) ||
+            (p.sku ?? "").toLowerCase().includes(partsQuery.toLowerCase()) ||
             p.category.toLowerCase().includes(partsQuery.toLowerCase()),
         )
       : [];
@@ -64,7 +65,7 @@ export function Step03Parts({ defaultValues, onNext }: Step3Props) {
   const subtotalLabor = laborValues.reduce((sum, l) => sum + l.price, 0);
   const total = subtotalParts + subtotalLabor;
 
-  function addPart(part: (typeof mockParts)[number]) {
+  function addPart(part: Part) {
     const existingIndex = partFields.findIndex((f) => f.id === part.id);
     if (existingIndex >= 0) {
       const current = partsValues[existingIndex];
@@ -95,7 +96,7 @@ export function Step03Parts({ defaultValues, onNext }: Step3Props) {
     setShowLaborForm(false);
   }
 
-  const lowStockParts = mockParts.filter((p) => p.stock <= p.minStock);
+  const lowStockParts = parts.filter((p) => p.stock <= p.minStock);
 
   return (
     <form
@@ -151,7 +152,7 @@ export function Step03Parts({ defaultValues, onNext }: Step3Props) {
                       {part.name}
                     </p>
                     <p className="text-label-sm text-on-surface-variant font-mono">
-                      {part.sku} · {part.category}
+                      {part.sku ?? "—"} · {part.category}
                     </p>
                   </div>
                   <div className="shrink-0 text-right">

@@ -2,17 +2,19 @@
 
 import { ArrowLeft, Package, Plus, ShoppingCart, Trash2 } from "lucide-react";
 import Link from "next/link";
+import { useAction } from "next-safe-action/hooks";
 import { useState } from "react";
 
+import { createPurchaseOrderAction } from "@/_actions/inventory";
 import { Button } from "@/_components/ui/button";
 import { Input } from "@/_components/ui/input";
 import { Label } from "@/_components/ui/label";
-import { mockParts } from "@/_lib/mock-data";
+import type { Part } from "@/_lib/queries/inventory";
 
 type OrderItem = {
   partId: string;
   name: string;
-  sku: string;
+  sku: string | null;
   quantity: number;
   unitPrice: number;
 };
@@ -24,28 +26,36 @@ const suppliers = [
   "Peças & Cia",
 ];
 
-const criticalParts = mockParts.filter((p) => p.stock < p.minStock).slice(0, 8);
+type Props = { parts: Part[] };
 
-export function NewPurchaseOrderClient() {
+export function NewPurchaseOrderClient({ parts }: Props) {
   const [supplier, setSupplier] = useState("");
   const [deliveryDate, setDeliveryDate] = useState("");
   const [notes, setNotes] = useState("");
   const [items, setItems] = useState<OrderItem[]>([]);
   const [search, setSearch] = useState("");
-  const [submitted, setSubmitted] = useState(false);
+  const [createdId, setCreatedId] = useState<string | null>(null);
+
+  const criticalParts = parts.filter((p) => p.stock < p.minStock).slice(0, 8);
+
+  const { execute, status, result } = useAction(createPurchaseOrderAction, {
+    onSuccess: ({ data }) => {
+      setCreatedId(data?.id ?? "ok");
+    },
+  });
 
   const filteredParts =
     search.length > 1
-      ? mockParts
+      ? parts
           .filter(
             (p) =>
               p.name.toLowerCase().includes(search.toLowerCase()) ||
-              p.sku.toLowerCase().includes(search.toLowerCase()),
+              (p.sku ?? "").toLowerCase().includes(search.toLowerCase()),
           )
           .slice(0, 5)
       : [];
 
-  function addItem(part: (typeof mockParts)[0]) {
+  function addItem(part: Part) {
     if (items.find((i) => i.partId === part.id)) return;
     const shortage = Math.max(part.minStock - part.stock + 5, 1);
     setItems((prev) => [
@@ -73,9 +83,25 @@ export function NewPurchaseOrderClient() {
     );
   }
 
+  function submitOrder() {
+    execute({
+      supplier,
+      expectedDelivery: deliveryDate
+        ? new Date(`${deliveryDate}T00:00:00`).toISOString()
+        : undefined,
+      notes: notes || undefined,
+      items: items.map((i) => ({
+        description: i.name,
+        quantity: i.quantity,
+        unitPrice: i.unitPrice,
+        serviceId: i.partId,
+      })),
+    });
+  }
+
   const total = items.reduce((s, i) => s + i.quantity * i.unitPrice, 0);
 
-  if (submitted) {
+  if (createdId) {
     return (
       <div className="flex flex-col items-center justify-center gap-6 py-24 text-center">
         <div className="bg-status-completed/15 flex size-16 items-center justify-center rounded-2xl">
@@ -86,7 +112,7 @@ export function NewPurchaseOrderClient() {
             Ordem de Compra Criada
           </h2>
           <p className="text-body-sm text-on-surface-variant mt-1">
-            OC-0024 enviada para {supplier || "o fornecedor"}.
+            Pedido registrado para {supplier || "o fornecedor"}.
           </p>
         </div>
         <div className="flex gap-3">
@@ -194,7 +220,7 @@ export function NewPurchaseOrderClient() {
                           {p.name}
                         </p>
                         <p className="text-label-xs text-on-surface-variant font-mono">
-                          {p.sku} · {p.category}
+                          {p.sku ?? "—"} · {p.category}
                         </p>
                       </div>
                       <div className="shrink-0 text-right">
@@ -217,7 +243,7 @@ export function NewPurchaseOrderClient() {
             </div>
 
             {/* Critical parts quick-add */}
-            {items.length === 0 && (
+            {items.length === 0 && criticalParts.length > 0 && (
               <div className="space-y-2">
                 <p className="text-label-sm text-on-surface-variant">
                   Itens críticos sugeridos:
@@ -273,7 +299,7 @@ export function NewPurchaseOrderClient() {
                         </td>
                         <td className="px-3 py-2.5">
                           <span className="text-label-xs text-on-surface-variant font-mono">
-                            {item.sku}
+                            {item.sku ?? "—"}
                           </span>
                         </td>
                         <td className="px-3 py-2.5">
@@ -362,12 +388,21 @@ export function NewPurchaseOrderClient() {
             </div>
             <Button
               className="w-full"
-              disabled={items.length === 0 || !supplier}
-              onClick={() => setSubmitted(true)}
+              disabled={
+                items.length === 0 || !supplier || status === "executing"
+              }
+              onClick={submitOrder}
             >
               <ShoppingCart className="mr-2 size-4" />
-              Enviar Ordem de Compra
+              {status === "executing"
+                ? "Enviando..."
+                : "Enviar Ordem de Compra"}
             </Button>
+            {result.serverError && (
+              <p className="text-label-xs text-error text-center">
+                Erro ao criar a ordem. Tente novamente.
+              </p>
+            )}
             {(!supplier || items.length === 0) && (
               <p className="text-label-xs text-on-surface-variant/60 text-center">
                 {!supplier

@@ -6,6 +6,8 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/_components/ui/button";
+import type { CustomerRow } from "@/_lib/queries/customers";
+import type { Part } from "@/_lib/queries/inventory";
 import type {
   LaborItem,
   PartItem,
@@ -39,7 +41,12 @@ const INITIAL_STATE: WizardState = {
   step4: {},
 };
 
-export function OrderWizard() {
+type OrderWizardProps = {
+  customers: CustomerRow[];
+  parts: Part[];
+};
+
+export function OrderWizard({ customers, parts }: OrderWizardProps) {
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(1);
   const [wizardData, setWizardData] = useState<WizardState>(INITIAL_STATE);
@@ -140,6 +147,7 @@ export function OrderWizard() {
           {currentStep === 1 && (
             <Step01Client
               defaultValues={wizardData.step1}
+              customers={customers}
               onNext={handleStep1Next}
             />
           )}
@@ -158,6 +166,7 @@ export function OrderWizard() {
           {currentStep === 4 && (
             <Step03Parts
               defaultValues={wizardData.step3}
+              parts={parts}
               onNext={handleStep3Next}
             />
           )}

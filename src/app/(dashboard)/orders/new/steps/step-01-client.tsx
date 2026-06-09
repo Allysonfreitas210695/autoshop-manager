@@ -7,17 +7,18 @@ import { useForm } from "react-hook-form";
 
 import { Input } from "@/_components/ui/input";
 import { Label } from "@/_components/ui/label";
-import { type MockCustomer, mockCustomers } from "@/_lib/mock-data";
+import type { CustomerRow } from "@/_lib/queries/customers";
 import { step1Schema, type Step1Values } from "@/_schemas/order-wizard";
 
 type Step1Props = {
   defaultValues: Partial<Step1Values>;
+  customers: CustomerRow[];
   onNext: (data: Step1Values) => void;
 };
 
-export function Step01Client({ defaultValues, onNext }: Step1Props) {
+export function Step01Client({ defaultValues, customers, onNext }: Step1Props) {
   const [query, setQuery] = useState(defaultValues.customerQuery ?? "");
-  const [selectedCustomer, setSelectedCustomer] = useState<MockCustomer | null>(
+  const [selectedCustomer, setSelectedCustomer] = useState<CustomerRow | null>(
     null,
   );
 
@@ -39,20 +40,20 @@ export function Step01Client({ defaultValues, onNext }: Step1Props) {
 
   const filtered =
     query.length >= 2
-      ? mockCustomers.filter(
+      ? customers.filter(
           (c) =>
             c.name.toLowerCase().includes(query.toLowerCase()) ||
-            c.cpf.includes(query),
+            (c.cpf ?? "").includes(query),
         )
       : [];
 
-  function selectCustomer(customer: MockCustomer) {
+  function selectCustomer(customer: CustomerRow) {
     setSelectedCustomer(customer);
     setQuery(customer.name);
     setValue("customerId", customer.id);
     setValue("customerName", customer.name);
-    setValue("plate", customer.lastPlate);
-    setValue("vehicleModel", customer.lastVehicle);
+    setValue("plate", customer.lastPlate ?? "");
+    setValue("vehicleModel", customer.lastVehicle ?? "");
   }
 
   function clearCustomer() {
@@ -116,7 +117,8 @@ export function Step01Client({ defaultValues, onNext }: Step1Props) {
                     {customer.name}
                   </p>
                   <p className="text-label-sm text-on-surface-variant font-mono">
-                    {customer.cpf} · {customer.lastPlate}
+                    {customer.cpf ?? "CPF não cadastrado"}
+                    {customer.lastPlate ? ` · ${customer.lastPlate}` : ""}
                   </p>
                 </div>
               </button>
@@ -150,7 +152,7 @@ export function Step01Client({ defaultValues, onNext }: Step1Props) {
                 {selectedCustomer.name}
               </p>
               <p className="text-label-sm text-on-surface-variant font-mono">
-                {selectedCustomer.cpf}
+                {selectedCustomer.cpf ?? selectedCustomer.email}
               </p>
             </div>
           </div>
