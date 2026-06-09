@@ -10,15 +10,13 @@ import {
 import Link from "next/link";
 
 import { Button } from "@/_components/ui/button";
-import { mockParts } from "@/_lib/mock-data";
+import type { Part } from "@/_lib/queries/inventory";
 
-const criticalParts = mockParts.filter((p) => p.stock < p.minStock);
-const lowParts = mockParts.filter((p) => p.stock === p.minStock);
+type Props = { criticalParts: Part[]; lowParts: Part[] };
 
-export function AlertsClient() {
+export function AlertsClient({ criticalParts, lowParts }: Props) {
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-headline-md text-on-surface font-bold">
@@ -36,7 +34,6 @@ export function AlertsClient() {
         </Link>
       </div>
 
-      {/* Summary KPIs */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
         <div className="bg-error/10 border-error/20 rounded-xl border p-4">
           <div className="mb-2 flex items-center gap-2">
@@ -82,7 +79,6 @@ export function AlertsClient() {
         </div>
       </div>
 
-      {/* Critical section */}
       {criticalParts.length > 0 && (
         <section className="space-y-3">
           <div className="flex items-center gap-2">
@@ -99,7 +95,6 @@ export function AlertsClient() {
         </section>
       )}
 
-      {/* Low stock section */}
       {lowParts.length > 0 && (
         <section className="space-y-3">
           <div className="flex items-center gap-2">
@@ -133,7 +128,7 @@ function AlertRow({
   part,
   severity,
 }: {
-  part: (typeof mockParts)[0];
+  part: Part;
   severity: "critical" | "low";
 }) {
   const isCritical = severity === "critical";
@@ -142,25 +137,20 @@ function AlertRow({
 
   return (
     <div
-      className={`bg-surface-container hover:border-outline-variant/50 flex flex-col gap-4 rounded-xl border p-4 transition-colors sm:flex-row sm:items-center ${
-        isCritical ? "border-error/30" : "border-tertiary/30"
-      }`}
+      className={`bg-surface-container hover:border-outline-variant/50 flex flex-col gap-4 rounded-xl border p-4 transition-colors sm:flex-row sm:items-center ${isCritical ? "border-error/30" : "border-tertiary/30"}`}
     >
-      {/* Info */}
       <div className="min-w-0 flex-1 space-y-1">
         <div className="flex flex-wrap items-center gap-2">
           <span
-            className={`rounded-full border px-2 py-0.5 font-mono text-[10px] font-bold tracking-wider uppercase ${
-              isCritical
-                ? "bg-error/15 text-error border-error/30"
-                : "bg-tertiary/15 text-tertiary border-tertiary/30"
-            }`}
+            className={`rounded-full border px-2 py-0.5 font-mono text-[10px] font-bold tracking-wider uppercase ${isCritical ? "bg-error/15 text-error border-error/30" : "bg-tertiary/15 text-tertiary border-tertiary/30"}`}
           >
             {isCritical ? "CRÍTICO" : "ATENÇÃO"}
           </span>
-          <span className="text-label-xs text-on-surface-variant font-mono">
-            {part.sku}
-          </span>
+          {part.sku && (
+            <span className="text-label-xs text-on-surface-variant font-mono">
+              {part.sku}
+            </span>
+          )}
           <span className="text-label-xs text-on-surface-variant font-mono">
             {part.category}
           </span>
@@ -168,12 +158,6 @@ function AlertRow({
         <p className="text-body-md text-on-surface truncate font-medium">
           {part.name}
         </p>
-        {part.supplier && (
-          <p className="text-label-sm text-on-surface-variant">
-            {part.supplier}
-          </p>
-        )}
-        {/* Stock bar */}
         <div className="flex items-center gap-3 pt-1">
           <div className="bg-outline-variant/30 h-1.5 flex-1 overflow-hidden rounded-full">
             <div
@@ -188,8 +172,6 @@ function AlertRow({
           </span>
         </div>
       </div>
-
-      {/* Shortage info + action */}
       <div className="flex shrink-0 items-center justify-between gap-2 sm:flex-col sm:items-end sm:justify-center">
         <div className="text-center sm:text-right">
           <p

@@ -10,18 +10,19 @@ import Link from "next/link";
 import { Card } from "@/_components/ui/card";
 import { DataTable, type DataTableColumn } from "@/_components/ui/data-table";
 import {
-  mockCashFlow,
-  mockFinanceMetrics,
-  type MockTransaction,
-  mockTransactions,
-  type TransactionStatus,
-} from "@/_lib/mock-data";
+  getFinanceMetrics,
+  getWeeklyCashFlow,
+  listTransactions,
+  type Transaction,
+} from "@/_lib/queries/finance";
 
 import { CashFlowBarChart } from "./finance-charts";
 
 function brl(v: number) {
   return v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 }
+
+type TransactionStatus = Transaction["status"];
 
 const statusLabel: Record<TransactionStatus, string> = {
   paid: "Pago",
@@ -35,7 +36,7 @@ const statusClass: Record<TransactionStatus, string> = {
   overdue: "bg-error/15 text-error",
 };
 
-const columns: DataTableColumn<MockTransaction>[] = [
+const columns: DataTableColumn<Transaction>[] = [
   {
     id: "date",
     header: "Data",
@@ -103,7 +104,13 @@ const columns: DataTableColumn<MockTransaction>[] = [
   },
 ];
 
-export default function FinancePage() {
+export default async function FinancePage() {
+  const [metrics, transactions, cashFlow] = await Promise.all([
+    getFinanceMetrics(),
+    listTransactions(50),
+    getWeeklyCashFlow(),
+  ]);
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -113,7 +120,7 @@ export default function FinancePage() {
             Financeiro
           </h1>
           <p className="text-label-md text-on-surface-variant mt-1 font-mono">
-            Visão geral — Outubro 2023
+            Visão geral consolidada
           </p>
         </div>
         <div className="flex gap-2">
@@ -154,7 +161,7 @@ export default function FinancePage() {
                 Contas a Receber
               </p>
               <p className="text-headline-md text-status-completed mt-2 font-mono font-bold">
-                {brl(mockFinanceMetrics.receivable)}
+                {brl(metrics.receivable)}
               </p>
               <p className="text-label-sm text-on-surface-variant mt-1 font-mono">
                 Pendente de recebimento
@@ -170,13 +177,13 @@ export default function FinancePage() {
           <div className="flex items-start justify-between">
             <div>
               <p className="text-label-sm text-on-surface-variant font-mono tracking-wider uppercase">
-                Faturamento Mensal
+                Faturamento Total
               </p>
               <p className="text-headline-md text-secondary mt-2 font-mono font-bold">
-                {brl(mockFinanceMetrics.monthlyRevenue)}
+                {brl(metrics.monthlyRevenue)}
               </p>
               <p className="text-label-sm text-on-surface-variant mt-1 font-mono">
-                ↑ 19% vs set.
+                Receitas pagas
               </p>
             </div>
             <span className="bg-secondary/10 flex size-10 items-center justify-center rounded-full">
@@ -192,10 +199,10 @@ export default function FinancePage() {
                 Despesas Pendentes
               </p>
               <p className="text-headline-md text-tertiary mt-2 font-mono font-bold">
-                {brl(mockFinanceMetrics.pendingExpenses)}
+                {brl(metrics.pendingExpenses)}
               </p>
               <p className="text-label-sm text-on-surface-variant mt-1 font-mono">
-                ! 1 item vencido
+                A pagar
               </p>
             </div>
             <span className="bg-tertiary/10 flex size-10 items-center justify-center rounded-full">
@@ -205,7 +212,7 @@ export default function FinancePage() {
         </Card>
       </div>
 
-      {/* Gráfico + Tabela */}
+      {/* Gráfico + Resumo */}
       <div className="grid gap-6 lg:grid-cols-3">
         <Card className="lg:col-span-2">
           <div className="border-outline-variant flex items-center justify-between border-b p-4">
@@ -229,31 +236,29 @@ export default function FinancePage() {
             </div>
           </div>
           <div className="p-4">
-            <CashFlowBarChart data={mockCashFlow} />
+            <CashFlowBarChart data={cashFlow} />
           </div>
         </Card>
 
         <Card className="p-4">
           <h2 className="text-label-lg text-on-surface mb-4 font-mono font-semibold tracking-wider uppercase">
-            Resumo do Mês
+            Resumo
           </h2>
           <div className="space-y-3">
             {[
               {
                 label: "Receita Bruta",
-                value: mockFinanceMetrics.monthlyRevenue,
+                value: metrics.monthlyRevenue,
                 color: "text-status-completed",
               },
               {
                 label: "Despesas Totais",
-                value:
-                  mockFinanceMetrics.monthlyRevenue -
-                  mockFinanceMetrics.monthlyProfit,
+                value: metrics.monthlyRevenue - metrics.monthlyProfit,
                 color: "text-error",
               },
               {
                 label: "Lucro Líquido",
-                value: mockFinanceMetrics.monthlyProfit,
+                value: metrics.monthlyProfit,
                 color: "text-secondary",
               },
             ].map((item) => (
@@ -271,19 +276,20 @@ export default function FinancePage() {
                 </span>
               </div>
             ))}
-            <div className="bg-secondary/5 rounded-md px-3 py-2 text-center">
-              <p className="text-label-sm text-on-surface-variant font-mono">
-                Margem Líquida
-              </p>
-              <p className="text-headline-sm text-secondary font-mono font-bold">
-                {(
-                  (mockFinanceMetrics.monthlyProfit /
-                    mockFinanceMetrics.monthlyRevenue) *
-                  100
-                ).toFixed(1)}
-                %
-              </p>
-            </div>
+            {metrics.monthlyRevenue > 0 && (
+              <div className="bg-secondary/5 rounded-md px-3 py-2 text-center">
+                <p className="text-label-sm text-on-surface-variant font-mono">
+                  Margem Líquida
+                </p>
+                <p className="text-headline-sm text-secondary font-mono font-bold">
+                  {(
+                    (metrics.monthlyProfit / metrics.monthlyRevenue) *
+                    100
+                  ).toFixed(1)}
+                  %
+                </p>
+              </div>
+            )}
           </div>
         </Card>
       </div>
@@ -306,7 +312,7 @@ export default function FinancePage() {
         </div>
         <DataTable
           columns={columns}
-          data={mockTransactions}
+          data={transactions}
           getRowId={(row) => row.id}
           emptyMessage="Nenhuma transação encontrada."
         />

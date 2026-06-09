@@ -1,4 +1,4 @@
-import { asc, desc, eq, lte, sql } from "drizzle-orm";
+import { asc, desc, eq, sql } from "drizzle-orm";
 
 import { db } from "@/_db";
 import { purchaseOrderItems, purchaseOrders, services } from "@/_db/schema";

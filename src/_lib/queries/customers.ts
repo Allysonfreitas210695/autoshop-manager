@@ -1,4 +1,4 @@
-import { count, desc, eq, sql, sum } from "drizzle-orm";
+import { count, desc, eq, sql } from "drizzle-orm";
 
 import { db } from "@/_db";
 import { serviceOrders, user, vehicles } from "@/_db/schema";

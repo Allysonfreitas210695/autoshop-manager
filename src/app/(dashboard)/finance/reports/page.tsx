@@ -4,12 +4,12 @@ import Link from "next/link";
 import { Card } from "@/_components/ui/card";
 import { DataTable, type DataTableColumn } from "@/_components/ui/data-table";
 import {
-  mockCostBreakdown,
-  mockMonthlyCashFlow,
-  mockReportKpis,
-  type MockServiceDetail,
-  mockServiceDetails,
-} from "@/_lib/mock-data";
+  getCostBreakdown,
+  getFinanceMetrics,
+  getMonthlyCashFlow,
+  listTransactions,
+  type Transaction,
+} from "@/_lib/queries/finance";
 
 import { CostDonutChart, MonthlyLineChart } from "../finance-charts";
 
@@ -17,22 +17,33 @@ function brl(v: number) {
   return v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 }
 
-const statusClass: Record<MockServiceDetail["status"], string> = {
+type StatusKey = "positive" | "neutral" | "negative";
+
+const statusClass: Record<StatusKey, string> = {
   positive: "bg-status-completed/15 text-status-completed",
   neutral: "bg-secondary/15 text-secondary",
   negative: "bg-error/15 text-error",
 };
 
-const statusLabel: Record<MockServiceDetail["status"], string> = {
+const statusLabel: Record<StatusKey, string> = {
   positive: "Lucrativo",
   neutral: "Neutro",
   negative: "Deficitário",
 };
 
-const columns: DataTableColumn<MockServiceDetail>[] = [
+type CategoryRow = {
+  id: string;
+  category: string;
+  grossRevenue: number;
+  totalExpenses: number;
+  netProfit: number;
+  status: StatusKey;
+};
+
+const columns: DataTableColumn<CategoryRow>[] = [
   {
     id: "category",
-    header: "Categoria de Serviço",
+    header: "Categoria",
     cell: (row) => (
       <span className="text-body-sm text-on-surface font-medium">
         {row.category}
@@ -51,24 +62,13 @@ const columns: DataTableColumn<MockServiceDetail>[] = [
     ),
   },
   {
-    id: "partsCost",
-    header: "Peças",
+    id: "totalExpenses",
+    header: "Despesas",
     className: "hidden md:table-cell",
     align: "right",
     cell: (row) => (
       <span className="text-label-sm text-error font-mono">
-        -{brl(row.partsCost)}
-      </span>
-    ),
-  },
-  {
-    id: "laborCost",
-    header: "M. de Obra",
-    className: "hidden lg:table-cell",
-    align: "right",
-    cell: (row) => (
-      <span className="text-label-sm text-error font-mono">
-        -{brl(row.laborCost)}
+        -{brl(row.totalExpenses)}
       </span>
     ),
   },
@@ -97,13 +97,60 @@ const columns: DataTableColumn<MockServiceDetail>[] = [
   },
 ];
 
-export default function FinanceReportsPage() {
-  const totalRevenue =
-    mockMonthlyCashFlow[mockMonthlyCashFlow.length - 1]?.receitas ?? 0;
-  const totalExpenses =
-    mockMonthlyCashFlow[mockMonthlyCashFlow.length - 1]?.despesas ?? 0;
-  const totalProfit =
-    mockMonthlyCashFlow[mockMonthlyCashFlow.length - 1]?.lucro ?? 0;
+function buildCategoryRows(transactions: Transaction[]): CategoryRow[] {
+  const map = new Map<string, { income: number; expense: number }>();
+  for (const t of transactions) {
+    if (!map.has(t.category)) map.set(t.category, { income: 0, expense: 0 });
+    const e = map.get(t.category)!;
+    if (t.type === "income" && t.status === "paid") e.income += t.amount;
+    else if (t.type === "expense" && t.status === "paid") e.expense += t.amount;
+  }
+  return [...map.entries()]
+    .map(([cat, { income, expense }], i) => {
+      const netProfit = income - expense;
+      return {
+        id: String(i),
+        category: cat,
+        grossRevenue: income,
+        totalExpenses: expense,
+        netProfit,
+        status: (netProfit > 0
+          ? "positive"
+          : netProfit === 0
+            ? "neutral"
+            : "negative") as StatusKey,
+      };
+    })
+    .sort((a, b) => b.grossRevenue - a.grossRevenue);
+}
+
+export default async function FinanceReportsPage() {
+  const [monthlyCashFlow, costBreakdown, metrics, allTransactions] =
+    await Promise.all([
+      getMonthlyCashFlow(6),
+      getCostBreakdown(),
+      getFinanceMetrics(),
+      listTransactions(500),
+    ]);
+
+  const categoryRows = buildCategoryRows(allTransactions);
+  const lastMonth = monthlyCashFlow[monthlyCashFlow.length - 1];
+  const totalRevenue = lastMonth?.receitas ?? metrics.monthlyRevenue;
+  const totalExpenses = lastMonth?.despesas ?? 0;
+  const totalProfit = lastMonth?.lucro ?? metrics.monthlyProfit;
+
+  const totalOrders = categoryRows.length;
+  const avgTicket =
+    totalOrders > 0 ? totalRevenue / Math.max(totalOrders, 1) : 0;
+  const netMargin =
+    totalRevenue > 0 ? ((totalProfit / totalRevenue) * 100).toFixed(1) : "0.0";
+
+  const reportKpis = [
+    { label: "Ticket Médio O.S.", value: brl(avgTicket) },
+    { label: "Margem Líquida", value: `${netMargin}%` },
+    { label: "Categorias", value: String(categoryRows.length) },
+    { label: "Lucro Líquido", value: brl(totalProfit) },
+  ];
 
   return (
     <div className="space-y-6">
@@ -121,7 +168,7 @@ export default function FinanceReportsPage() {
             Relatório de Lucratividade
           </h1>
           <p className="text-label-md text-on-surface-variant mt-1 font-mono">
-            Outubro 2023
+            Últimos 6 meses
           </p>
         </div>
         <button className="border-outline-variant bg-surface-container text-label-sm text-on-surface-variant hover:bg-surface-container-highest flex items-center gap-2 rounded-md border px-4 py-2 font-mono transition-colors">
@@ -132,7 +179,7 @@ export default function FinanceReportsPage() {
 
       {/* KPI Cards */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {mockReportKpis.map((kpi) => (
+        {reportKpis.map((kpi) => (
           <Card key={kpi.label} className="p-4">
             <p className="text-label-sm text-on-surface-variant font-mono tracking-wider uppercase">
               {kpi.label}
@@ -140,11 +187,6 @@ export default function FinanceReportsPage() {
             <p className="text-headline-sm text-secondary mt-2 font-mono font-bold">
               {kpi.value}
             </p>
-            {kpi.hint && (
-              <p className="text-label-sm text-status-completed mt-1 font-mono">
-                {kpi.hint}
-              </p>
-            )}
           </Card>
         ))}
       </div>
@@ -172,27 +214,27 @@ export default function FinanceReportsPage() {
             </div>
           </div>
           <div className="p-4">
-            <MonthlyLineChart data={mockMonthlyCashFlow} />
+            <MonthlyLineChart data={monthlyCashFlow} />
           </div>
         </Card>
 
         <Card className="p-4">
           <h2 className="text-label-lg text-on-surface mb-4 font-mono font-semibold tracking-wider uppercase">
-            Custos Fixos vs Variáveis
+            Custos por Categoria
           </h2>
-          <CostDonutChart data={mockCostBreakdown} />
+          <CostDonutChart data={costBreakdown} />
           <div className="border-outline-variant mt-4 space-y-2 border-t pt-4">
             <div className="text-body-sm text-on-surface-variant flex justify-between">
               <span>Total custos</span>
               <span className="text-error font-mono font-bold">
-                -{brl(mockCostBreakdown.reduce((s, d) => s + d.value, 0))}
+                -{brl(costBreakdown.reduce((s, d) => s + d.value, 0))}
               </span>
             </div>
           </div>
         </Card>
       </div>
 
-      {/* Resumo mensal comparativo */}
+      {/* Resumo mensal */}
       <div className="grid gap-4 sm:grid-cols-3">
         {[
           {
@@ -235,19 +277,19 @@ export default function FinanceReportsPage() {
         ))}
       </div>
 
-      {/* Tabela de detalhamento */}
+      {/* Tabela por categoria */}
       <Card>
         <div className="border-outline-variant border-b p-4">
           <h2 className="text-label-lg text-on-surface font-mono font-semibold tracking-wider uppercase">
             Detalhamento por Categoria
           </h2>
           <p className="text-label-sm text-on-surface-variant font-mono">
-            Lucratividade por tipo de serviço — Outubro 2023
+            Lucratividade por tipo de transação
           </p>
         </div>
         <DataTable
           columns={columns}
-          data={mockServiceDetails}
+          data={categoryRows}
           getRowId={(row) => row.id}
           emptyMessage="Nenhum dado disponível."
         />

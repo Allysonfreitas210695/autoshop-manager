@@ -15,11 +15,11 @@ import {
   YAxis,
 } from "recharts";
 
-import {
-  type MockCashFlow,
-  type MockCostBreakdown,
-  type MockMonthlyCashFlow,
-} from "@/_lib/mock-data";
+import type {
+  CostBreakdownEntry,
+  MonthlyCashFlow,
+  WeeklyCashFlow,
+} from "@/_lib/queries/finance";
 
 function brl(v: number) {
   return v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -30,9 +30,7 @@ function shortBrl(v: number) {
   return brl(v);
 }
 
-type CashFlowBarChartProps = { data: MockCashFlow[] };
-
-export function CashFlowBarChart({ data }: CashFlowBarChartProps) {
+export function CashFlowBarChart({ data }: { data: WeeklyCashFlow[] }) {
   return (
     <ResponsiveContainer width="100%" height={220}>
       <BarChart data={data} barGap={4} barCategoryGap="30%">
@@ -93,9 +91,7 @@ export function CashFlowBarChart({ data }: CashFlowBarChartProps) {
   );
 }
 
-type MonthlyLineChartProps = { data: MockMonthlyCashFlow[] };
-
-export function MonthlyLineChart({ data }: MonthlyLineChartProps) {
+export function MonthlyLineChart({ data }: { data: MonthlyCashFlow[] }) {
   return (
     <ResponsiveContainer width="100%" height={220}>
       <LineChart data={data}>
@@ -169,9 +165,7 @@ export function MonthlyLineChart({ data }: MonthlyLineChartProps) {
   );
 }
 
-type CostDonutChartProps = { data: MockCostBreakdown[] };
-
-export function CostDonutChart({ data }: CostDonutChartProps) {
+export function CostDonutChart({ data }: { data: CostBreakdownEntry[] }) {
   const total = data.reduce((s, d) => s + d.value, 0);
 
   return (
@@ -204,7 +198,7 @@ export function CostDonutChart({ data }: CostDonutChartProps) {
               {entry.name}
             </span>
             <span className="text-label-sm text-on-surface ml-auto font-mono font-bold">
-              {((entry.value / total) * 100).toFixed(0)}%
+              {total > 0 ? ((entry.value / total) * 100).toFixed(0) : 0}%
             </span>
           </div>
         ))}
