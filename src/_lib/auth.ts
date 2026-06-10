@@ -14,6 +14,10 @@ export const auth = betterAuth({
   }),
   emailAndPassword: {
     enabled: true,
+    sendResetPassword: async ({ url }) => {
+      // TODO: integrate email provider (Resend, Nodemailer, etc.) for production
+      console.log("[reset-password] link:", url);
+    },
   },
   socialProviders: {
     google: {

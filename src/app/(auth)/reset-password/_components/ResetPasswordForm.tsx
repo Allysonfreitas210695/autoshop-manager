@@ -1,14 +1,14 @@
 "use client";
 
+import type { ErrorContext } from "@better-fetch/fetch";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Eye, EyeOff } from "lucide-react";
+import { CheckCircle2, Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-import { GoogleButton } from "@/_components/shared/google-button";
 import { Button } from "@/_components/ui/button";
 import {
   Card,
@@ -19,12 +19,15 @@ import {
 } from "@/_components/ui/card";
 import { Input } from "@/_components/ui/input";
 import { Label } from "@/_components/ui/label";
-import { signUp } from "@/_lib/auth-client";
-import { type RegisterInput, registerSchema } from "@/_schemas/auth";
+import { resetPassword } from "@/_lib/auth-client";
+import { type ResetPasswordInput, resetPasswordSchema } from "@/_schemas/auth";
 
-export function RegisterForm() {
+export function ResetPasswordForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const token = searchParams.get("token") ?? "";
   const [pending, setPending] = useState(false);
+  const [done, setDone] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
 
@@ -32,19 +35,21 @@ export function RegisterForm() {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<RegisterInput>({ resolver: zodResolver(registerSchema) });
+  } = useForm<ResetPasswordInput>({
+    resolver: zodResolver(resetPasswordSchema),
+  });
 
-  async function onSubmit(values: RegisterInput) {
+  async function onSubmit(values: ResetPasswordInput) {
+    if (!token) {
+      toast.error("Link inválido ou expirado. Solicite um novo.");
+      return;
+    }
     setPending(true);
-    await signUp.email(
-      { name: values.name, email: values.email, password: values.password },
+    await resetPassword(
+      { newPassword: values.password, token },
       {
-        onSuccess: () => {
-          toast.success("Conta criada!");
-          router.push("/");
-          router.refresh();
-        },
-        onError: ({ error }) => {
+        onSuccess: () => setDone(true),
+        onError: ({ error }: ErrorContext) => {
           toast.error(error.message);
         },
       },
@@ -52,47 +57,60 @@ export function RegisterForm() {
     setPending(false);
   }
 
+  if (done) {
+    return (
+      <Card>
+        <CardContent className="flex flex-col items-center gap-4 py-8 text-center">
+          <span className="bg-secondary/10 flex size-14 items-center justify-center rounded-full">
+            <CheckCircle2 className="text-secondary size-7" />
+          </span>
+          <div>
+            <p className="text-body-lg text-on-surface font-medium">
+              Senha redefinida
+            </p>
+            <p className="text-body-sm text-on-surface-variant mt-1">
+              Sua senha foi atualizada com sucesso.
+            </p>
+          </div>
+          <Button onClick={() => router.push("/login")} className="mt-2">
+            Ir para o login
+          </Button>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (!token) {
+    return (
+      <Card>
+        <CardContent className="py-8 text-center">
+          <p className="text-body-sm text-on-surface-variant">
+            Link inválido ou expirado.{" "}
+            <Link
+              href="/forgot-password"
+              className="text-secondary hover:underline"
+            >
+              Solicitar novo link
+            </Link>
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-headline-md">Criar conta</CardTitle>
-        <CardDescription>Cadastre-se para gerenciar a oficina.</CardDescription>
+        <CardTitle className="text-headline-md">Redefinir senha</CardTitle>
+        <CardDescription>
+          Escolha uma nova senha para sua conta.
+        </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <GoogleButton redirectTo="/" />
-        <div className="flex items-center gap-3">
-          <span className="bg-outline-variant h-px flex-1" />
-          <span className="text-label-sm text-on-surface-variant/60 font-mono">
-            OU
-          </span>
-          <span className="bg-outline-variant h-px flex-1" />
-        </div>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="space-y-1.5">
-            <Label htmlFor="name" className="text-label-md font-mono">
-              Nome
-            </Label>
-            <Input id="name" {...register("name")} />
-            {errors.name ? (
-              <p className="text-label-sm text-destructive">
-                {errors.name.message}
-              </p>
-            ) : null}
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="email" className="text-label-md font-mono">
-              E-mail
-            </Label>
-            <Input id="email" type="email" {...register("email")} />
-            {errors.email ? (
-              <p className="text-label-sm text-destructive">
-                {errors.email.message}
-              </p>
-            ) : null}
-          </div>
-          <div className="space-y-1.5">
             <Label htmlFor="password" className="text-label-md font-mono">
-              Senha
+              Nova senha
             </Label>
             <div className="relative">
               <Input
@@ -125,7 +143,7 @@ export function RegisterForm() {
               htmlFor="confirmPassword"
               className="text-label-md font-mono"
             >
-              Confirmar senha
+              Confirmar nova senha
             </Label>
             <div className="relative">
               <Input
@@ -154,15 +172,9 @@ export function RegisterForm() {
             ) : null}
           </div>
           <Button type="submit" className="w-full" disabled={pending}>
-            {pending ? "Criando..." : "Criar conta"}
+            {pending ? "Salvando..." : "Redefinir senha"}
           </Button>
         </form>
-        <p className="text-body-md text-on-surface-variant text-center">
-          Já tem conta?{" "}
-          <Link href="/login" className="text-secondary hover:underline">
-            Entrar
-          </Link>
-        </p>
       </CardContent>
     </Card>
   );

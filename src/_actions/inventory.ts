@@ -40,7 +40,7 @@ export const createPartAction = authActionClient
 export const updateStockAction = authActionClient
   .schema(
     z.object({
-      id: z.string().uuid(),
+      id: z.uuid(),
       stockQuantity: z.number().int().min(0),
     }),
   )
@@ -64,7 +64,7 @@ export const createPurchaseOrderAction = authActionClient
           description: z.string(),
           quantity: z.number().int().min(1),
           unitPrice: z.number().min(0),
-          serviceId: z.string().uuid().optional(),
+          serviceId: z.uuid().optional(),
         }),
       ),
     }),

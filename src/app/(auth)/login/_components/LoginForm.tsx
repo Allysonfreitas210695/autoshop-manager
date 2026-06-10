@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
@@ -26,6 +27,7 @@ export function LoginForm() {
   const searchParams = useSearchParams();
   const redirectTo = searchParams.get("redirect") ?? "/";
   const [pending, setPending] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const {
     register,
@@ -79,10 +81,37 @@ export function LoginForm() {
             ) : null}
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="password" className="text-label-md font-mono">
-              Senha
-            </Label>
-            <Input id="password" type="password" {...register("password")} />
+            <div className="flex items-center justify-between">
+              <Label htmlFor="password" className="text-label-md font-mono">
+                Senha
+              </Label>
+              <Link
+                href="/forgot-password"
+                className="text-label-sm text-secondary hover:underline"
+              >
+                Esqueci a senha
+              </Link>
+            </div>
+            <div className="relative">
+              <Input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                className="pr-9"
+                {...register("password")}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((v) => !v)}
+                className="text-on-surface-variant/60 hover:text-on-surface absolute top-1/2 right-2.5 -translate-y-1/2 transition-colors"
+                aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
+              >
+                {showPassword ? (
+                  <EyeOff className="size-4" />
+                ) : (
+                  <Eye className="size-4" />
+                )}
+              </button>
+            </div>
             {errors.password ? (
               <p className="text-label-sm text-destructive">
                 {errors.password.message}

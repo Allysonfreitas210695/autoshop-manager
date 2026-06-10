@@ -11,7 +11,7 @@ import { authActionClient } from "@/_lib/safe-action";
 export const createOrderAction = authActionClient
   .schema(
     z.object({
-      vehicleId: z.string().uuid(),
+      vehicleId: z.uuid(),
       customerId: z.string().optional(),
       mechanicId: z.string().optional(),
       clientReport: z.string().optional(),
@@ -26,7 +26,7 @@ export const createOrderAction = authActionClient
             itemType: z.enum(["part", "labor"]),
             quantity: z.number().int().min(1),
             unitPrice: z.number().min(0),
-            serviceId: z.string().uuid().optional(),
+            serviceId: z.uuid().optional(),
           }),
         )
         .default([]),
@@ -77,7 +77,7 @@ export const createOrderAction = authActionClient
 export const updateOrderStatusAction = authActionClient
   .schema(
     z.object({
-      id: z.string().uuid(),
+      id: z.uuid(),
       status: z.enum(["pending", "in_progress", "completed", "delayed"]),
     }),
   )
@@ -98,9 +98,9 @@ export const updateOrderStatusAction = authActionClient
 export const approveOrderItemAction = authActionClient
   .schema(
     z.object({
-      itemId: z.string().uuid(),
+      itemId: z.uuid(),
       approved: z.boolean(),
-      orderId: z.string().uuid(),
+      orderId: z.uuid(),
     }),
   )
   .action(async ({ parsedInput }) => {

@@ -11,7 +11,7 @@ export const createAppointmentAction = authActionClient
   .schema(
     z.object({
       customerId: z.string().optional(),
-      vehicleId: z.string().uuid().optional(),
+      vehicleId: z.uuid().optional(),
       mechanicId: z.string().optional(),
       scheduledAt: z.string().datetime(),
       notes: z.string().optional(),
