@@ -8,7 +8,7 @@ import { useFieldArray, useForm, useWatch } from "react-hook-form";
 import { Button } from "@/_components/ui/button";
 import { Input } from "@/_components/ui/input";
 import { Label } from "@/_components/ui/label";
-import type { Part } from "@/_lib/queries/inventory";
+import type { Part } from "@/_data-access/inventory";
 import { step3Schema, type Step3Values } from "@/_schemas/order-wizard";
 
 type Step3Props = {

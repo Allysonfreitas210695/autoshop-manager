@@ -1,4 +1,4 @@
-import { listCustomers } from "@/_lib/queries/customers";
+import { listCustomers } from "@/_data-access/customers";
 
 import { CustomersClient } from "./customers-client";
 

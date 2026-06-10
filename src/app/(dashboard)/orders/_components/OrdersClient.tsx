@@ -4,7 +4,7 @@ import { useState } from "react";
 
 import { DataTable, type DataTableColumn } from "@/_components/ui/data-table";
 import { StatusChip } from "@/_components/ui/status-chip";
-import type { OrderRow } from "@/_lib/queries/orders";
+import type { OrderRow } from "@/_data-access/orders";
 
 import { NewOrderDrawer } from "../new-order-drawer";
 

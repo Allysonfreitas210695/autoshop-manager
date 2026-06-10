@@ -11,7 +11,7 @@ import {
   getMonthlyCashFlow,
   listTransactions,
   type Transaction,
-} from "@/_lib/queries/finance";
+} from "@/_data-access/finance";
 
 import { CostDonutChart, MonthlyLineChart } from "../finance-charts";
 

@@ -6,7 +6,7 @@ import { FileText, Package, Plus, Truck } from "lucide-react";
 import Link from "next/link";
 
 import { Button } from "@/_components/ui/button";
-import type { PurchaseOrderRow } from "@/_lib/queries/inventory";
+import type { PurchaseOrderRow } from "@/_data-access/inventory";
 
 type PurchaseOrderStatus = PurchaseOrderRow["status"];
 

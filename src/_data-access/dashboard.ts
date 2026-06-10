@@ -1,3 +1,5 @@
+import "server-only";
+
 import { count, eq, sql } from "drizzle-orm";
 
 import { db } from "@/_db";

@@ -9,7 +9,7 @@ import { createPurchaseOrderAction } from "@/_actions/inventory";
 import { Button } from "@/_components/ui/button";
 import { Input } from "@/_components/ui/input";
 import { Label } from "@/_components/ui/label";
-import type { Part } from "@/_lib/queries/inventory";
+import type { Part } from "@/_data-access/inventory";
 
 type OrderItem = {
   partId: string;

@@ -1,4 +1,4 @@
-import { getLowStockParts } from "@/_lib/queries/inventory";
+import { getLowStockParts } from "@/_data-access/inventory";
 
 import { AlertsClient } from "./_components/AlertsClient";
 

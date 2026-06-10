@@ -1,4 +1,4 @@
-import { getInventoryMetrics, listParts } from "@/_lib/queries/inventory";
+import { getInventoryMetrics, listParts } from "@/_data-access/inventory";
 
 import { InventoryClient } from "./inventory-client";
 

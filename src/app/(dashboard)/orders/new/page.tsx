@@ -1,5 +1,5 @@
-import { listCustomers } from "@/_lib/queries/customers";
-import { listParts } from "@/_lib/queries/inventory";
+import { listCustomers } from "@/_data-access/customers";
+import { listParts } from "@/_data-access/inventory";
 
 import { OrderWizard } from "./order-wizard";
 

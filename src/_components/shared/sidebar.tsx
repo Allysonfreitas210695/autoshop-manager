@@ -4,7 +4,7 @@ import { Headset, Wrench } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-import { navItems } from "@/_lib/nav";
+import { navItems } from "@/_helpers/nav";
 import { cn } from "@/_lib/utils";
 
 function isActive(pathname: string, href: string) {

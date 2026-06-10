@@ -16,7 +16,7 @@ import {
   getWeeklyCashFlow,
   listTransactions,
   type Transaction,
-} from "@/_lib/queries/finance";
+} from "@/_data-access/finance";
 
 import { CashFlowBarChart } from "./finance-charts";
 

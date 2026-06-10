@@ -9,7 +9,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/_components/ui/sheet";
-import type { CustomerRow } from "@/_lib/queries/customers";
+import type { CustomerRow } from "@/_data-access/customers";
 
 type Props = {
   customer: CustomerRow | null;

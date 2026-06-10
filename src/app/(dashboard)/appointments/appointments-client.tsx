@@ -33,7 +33,7 @@ import type {
   AppointmentRow,
   CustomerOption,
   MechanicOption,
-} from "@/_lib/queries/appointments";
+} from "@/_data-access/appointments";
 
 import { NewAppointmentDrawer } from "./_components/NewAppointmentDrawer";
 

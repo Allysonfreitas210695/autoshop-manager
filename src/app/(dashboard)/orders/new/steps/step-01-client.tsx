@@ -7,7 +7,7 @@ import { useForm } from "react-hook-form";
 
 import { Input } from "@/_components/ui/input";
 import { Label } from "@/_components/ui/label";
-import type { CustomerRow } from "@/_lib/queries/customers";
+import type { CustomerRow } from "@/_data-access/customers";
 import { step1Schema, type Step1Values } from "@/_schemas/order-wizard";
 
 type Step1Props = {

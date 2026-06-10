@@ -19,7 +19,7 @@ import type {
   MechanicPerformance,
   MonthlyRevenue,
   ServiceCategory,
-} from "@/_lib/queries/analytics";
+} from "@/_data-access/analytics";
 
 function shortBrl(v: number) {
   if (v >= 1000) return `R$${(v / 1000).toFixed(0)}k`;

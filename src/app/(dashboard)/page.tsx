@@ -14,8 +14,8 @@ import { StatusChip } from "@/_components/ui/status-chip";
 import {
   getDashboardMetrics,
   getStatusDistribution,
-} from "@/_lib/queries/dashboard";
-import { listOrders, type OrderRow } from "@/_lib/queries/orders";
+} from "@/_data-access/dashboard";
+import { listOrders, type OrderRow } from "@/_data-access/orders";
 
 function brl(v: number) {
   return v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });

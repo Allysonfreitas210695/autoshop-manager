@@ -14,7 +14,7 @@ import { useState } from "react";
 import { buttonVariants } from "@/_components/ui/button";
 import { DataTable, type DataTableColumn } from "@/_components/ui/data-table";
 import { Input } from "@/_components/ui/input";
-import type { InventoryMetrics, Part } from "@/_lib/queries/inventory";
+import type { InventoryMetrics, Part } from "@/_data-access/inventory";
 
 function brl(v: number) {
   return v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });

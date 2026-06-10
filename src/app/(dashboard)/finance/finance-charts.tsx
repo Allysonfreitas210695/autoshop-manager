@@ -19,7 +19,7 @@ import type {
   CostBreakdownEntry,
   MonthlyCashFlow,
   WeeklyCashFlow,
-} from "@/_lib/queries/finance";
+} from "@/_data-access/finance";
 
 function brl(v: number) {
   return v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });

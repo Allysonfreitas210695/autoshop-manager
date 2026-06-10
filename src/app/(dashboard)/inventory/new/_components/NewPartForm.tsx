@@ -10,7 +10,7 @@ import { z } from "zod";
 
 import { Button } from "@/_components/ui/button";
 import { Input } from "@/_components/ui/input";
-import { inventoryCategories } from "@/_lib/mock-data";
+import { inventoryCategories } from "@/_helpers/mock-data";
 
 const newPartSchema = z.object({
   name: z.string().min(2, { message: "Nome deve ter ao menos 2 caracteres." }),

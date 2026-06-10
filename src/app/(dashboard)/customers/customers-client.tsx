@@ -7,7 +7,7 @@ import { useState } from "react";
 import { Button } from "@/_components/ui/button";
 import { DataTable, type DataTableColumn } from "@/_components/ui/data-table";
 import { Input } from "@/_components/ui/input";
-import type { CustomerRow } from "@/_lib/queries/customers";
+import type { CustomerRow } from "@/_data-access/customers";
 
 import { CustomerDetailPanel } from "./customer-detail-panel";
 

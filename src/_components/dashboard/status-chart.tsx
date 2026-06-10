@@ -2,7 +2,7 @@
 
 import { Cell, Pie, PieChart, ResponsiveContainer } from "recharts";
 
-import type { OrderStatus } from "@/_lib/mock-data";
+import type { OrderStatus } from "@/_helpers/mock-data";
 
 const STATUS_COLOR: Record<OrderStatus, string> = {
   in_progress: "var(--status-progress)",

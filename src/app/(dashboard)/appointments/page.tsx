@@ -2,7 +2,7 @@ import {
   listAppointments,
   listCustomerOptions,
   listMechanics,
-} from "@/_lib/queries/appointments";
+} from "@/_data-access/appointments";
 
 import { AppointmentsClient } from "./appointments-client";
 

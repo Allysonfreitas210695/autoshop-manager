@@ -1,4 +1,4 @@
-import { listParts } from "@/_lib/queries/inventory";
+import { listParts } from "@/_data-access/inventory";
 
 import { NewPurchaseOrderClient } from "./_components/NewPurchaseOrderClient";
 

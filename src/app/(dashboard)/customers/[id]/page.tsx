@@ -12,8 +12,8 @@ import { notFound } from "next/navigation";
 
 import { DataTable, type DataTableColumn } from "@/_components/ui/data-table";
 import { StatusChip } from "@/_components/ui/status-chip";
-import { getCustomerById } from "@/_lib/queries/customers";
-import { getOrdersByCustomer } from "@/_lib/queries/orders";
+import { getCustomerById } from "@/_data-access/customers";
+import { getOrdersByCustomer } from "@/_data-access/orders";
 
 type Props = { params: Promise<{ id: string }> };
 

@@ -3,7 +3,7 @@ import {
   getMechanicPerformance,
   getMonthlyRevenue,
   getServiceCategories,
-} from "@/_lib/queries/analytics";
+} from "@/_data-access/analytics";
 
 import { AnalyticsClient } from "./_components/AnalyticsClient";
 

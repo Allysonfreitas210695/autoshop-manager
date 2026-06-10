@@ -10,7 +10,7 @@ import {
 import Link from "next/link";
 
 import { Button } from "@/_components/ui/button";
-import type { Part } from "@/_lib/queries/inventory";
+import type { Part } from "@/_data-access/inventory";
 
 type Props = { criticalParts: Part[]; lowParts: Part[] };
 

@@ -7,7 +7,7 @@ import type {
   MechanicPerformance,
   MonthlyRevenue,
   ServiceCategory,
-} from "@/_lib/queries/analytics";
+} from "@/_data-access/analytics";
 
 import {
   MechanicBarChart,

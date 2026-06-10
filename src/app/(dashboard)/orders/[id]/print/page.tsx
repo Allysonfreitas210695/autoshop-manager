@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 
-import { getOrderById } from "@/_lib/queries/orders";
+import { getOrderById } from "@/_data-access/orders";
 
 function brl(v: number) {
   return v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });

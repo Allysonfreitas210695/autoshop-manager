@@ -2,7 +2,7 @@
 
 import { usePathname } from "next/navigation";
 
-import { navItems } from "@/_lib/nav";
+import { navItems } from "@/_helpers/nav";
 
 const LABELS: Record<string, string> = {
   orders: "Ordens de Serviço",

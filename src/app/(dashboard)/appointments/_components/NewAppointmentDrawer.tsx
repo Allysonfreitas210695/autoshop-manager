@@ -22,7 +22,7 @@ import {
 import type {
   CustomerOption,
   MechanicOption,
-} from "@/_lib/queries/appointments";
+} from "@/_data-access/appointments";
 
 const schema = z.object({
   customerId: z.string().min(1, "Selecione o cliente"),

@@ -6,8 +6,8 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/_components/ui/button";
-import type { CustomerRow } from "@/_lib/queries/customers";
-import type { Part } from "@/_lib/queries/inventory";
+import type { CustomerRow } from "@/_data-access/customers";
+import type { Part } from "@/_data-access/inventory";
 import type {
   LaborItem,
   PartItem,

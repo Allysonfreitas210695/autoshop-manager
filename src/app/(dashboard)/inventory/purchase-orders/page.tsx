@@ -1,4 +1,4 @@
-import { listPurchaseOrders } from "@/_lib/queries/inventory";
+import { listPurchaseOrders } from "@/_data-access/inventory";
 
 import { PurchaseOrdersClient } from "./_components/PurchaseOrdersClient";
 

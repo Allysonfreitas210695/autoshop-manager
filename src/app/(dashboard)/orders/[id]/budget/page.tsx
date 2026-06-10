@@ -2,7 +2,7 @@ import { CheckCircle, Download, FileText } from "lucide-react";
 import { notFound } from "next/navigation";
 
 import { Card } from "@/_components/ui/card";
-import { getOrderById } from "@/_lib/queries/orders";
+import { getOrderById } from "@/_data-access/orders";
 
 function brl(v: number) {
   return v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });

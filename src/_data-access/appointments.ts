@@ -1,3 +1,5 @@
+import "server-only";
+
 import { and, asc, desc, eq, gte, lte } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 

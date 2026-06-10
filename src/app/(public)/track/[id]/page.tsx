@@ -14,8 +14,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { ServiceTimeline } from "@/_components/ui/service-timeline";
+import { getOrderById } from "@/_data-access/orders";
 import type { serviceOrderStatus } from "@/_db/schema";
-import { getOrderById } from "@/_lib/queries/orders";
 
 type OrderStatus = (typeof serviceOrderStatus.enumValues)[number];
 
