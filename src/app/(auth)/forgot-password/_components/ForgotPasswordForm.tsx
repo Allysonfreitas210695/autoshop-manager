@@ -1,11 +1,7 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
 import { CheckCircle2 } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { toast } from "sonner";
 
 import { Button } from "@/_components/ui/button";
 import {
@@ -17,38 +13,11 @@ import {
 } from "@/_components/ui/card";
 import { Input } from "@/_components/ui/input";
 import { Label } from "@/_components/ui/label";
-import { requestPasswordReset } from "@/_lib/auth-client";
-import {
-  type ForgotPasswordInput,
-  forgotPasswordSchema,
-} from "@/_schemas/auth";
+import { useForgotPasswordForm } from "@/_hooks/use-forgot-password-form";
 
 export function ForgotPasswordForm() {
-  const [pending, setPending] = useState(false);
-  const [sent, setSent] = useState(false);
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<ForgotPasswordInput>({
-    resolver: zodResolver(forgotPasswordSchema),
-  });
-
-  async function onSubmit(values: ForgotPasswordInput) {
-    setPending(true);
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? window.location.origin;
-    await requestPasswordReset(
-      { email: values.email, redirectTo: `${appUrl}/reset-password` },
-      {
-        onSuccess: () => setSent(true),
-        onError: ({ error }: { error: { message: string } }) => {
-          toast.error(error.message);
-        },
-      },
-    );
-    setPending(false);
-  }
+  const { register, handleSubmit, errors, pending, sent, onSubmit } =
+    useForgotPasswordForm();
 
   if (sent) {
     return (

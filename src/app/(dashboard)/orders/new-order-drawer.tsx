@@ -1,11 +1,7 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus } from "lucide-react";
-import { useState } from "react";
-import { Controller, useForm } from "react-hook-form";
-import { toast } from "sonner";
-import { z } from "zod";
+import { Controller } from "react-hook-form";
 
 import { Button } from "@/_components/ui/button";
 import { Input } from "@/_components/ui/input";
@@ -26,13 +22,8 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/_components/ui/sheet";
-import {
-  createServiceOrderSchema,
-  serviceOrderStatusValues,
-} from "@/_schemas/service-order";
-
-// Use input type (pre-transform) to align with zodResolver's resolver output
-type OrderFormValues = z.input<typeof createServiceOrderSchema>;
+import { useNewOrderForm } from "@/_hooks/use-new-order-form";
+import { serviceOrderStatusValues } from "@/_schemas/service-order";
 
 const STATUS_LABELS: Record<(typeof serviceOrderStatusValues)[number], string> =
   {
@@ -43,25 +34,17 @@ const STATUS_LABELS: Record<(typeof serviceOrderStatusValues)[number], string> =
   };
 
 export function NewOrderDrawer() {
-  const [open, setOpen] = useState(false);
-
   const {
+    open,
+    setOpen,
     register,
     handleSubmit,
-    reset,
     control,
-    formState: { errors, isSubmitting },
-  } = useForm<OrderFormValues>({
-    resolver: zodResolver(createServiceOrderSchema),
-    defaultValues: { status: "pending", totalAmount: 0 },
-  });
-
-  async function onSubmit(data: OrderFormValues) {
-    await new Promise((r) => setTimeout(r, 600));
-    toast.success(`O.S. criada — Placa ${data.plate}`);
-    reset();
-    setOpen(false);
-  }
+    errors,
+    isSubmitting,
+    onSubmit,
+    handleCancel,
+  } = useNewOrderForm(() => {});
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -233,10 +216,7 @@ export function NewOrderDrawer() {
           <Button
             variant="ghost"
             type="button"
-            onClick={() => {
-              reset();
-              setOpen(false);
-            }}
+            onClick={handleCancel}
             className="text-on-surface-variant"
           >
             Cancelar

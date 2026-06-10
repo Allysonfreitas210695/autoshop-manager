@@ -1,12 +1,7 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { toast } from "sonner";
 
 import { GoogleButton } from "@/_components/shared/google-button";
 import { Button } from "@/_components/ui/button";
@@ -19,39 +14,19 @@ import {
 } from "@/_components/ui/card";
 import { Input } from "@/_components/ui/input";
 import { Label } from "@/_components/ui/label";
-import { signIn } from "@/_lib/auth-client";
-import { type LoginInput, loginSchema } from "@/_schemas/auth";
+import { useLoginForm } from "@/_hooks/use-login-form";
 
 export function LoginForm() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const redirectTo = searchParams.get("redirect") ?? "/";
-  const [pending, setPending] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-
   const {
     register,
     handleSubmit,
-    formState: { errors },
-  } = useForm<LoginInput>({ resolver: zodResolver(loginSchema) });
-
-  async function onSubmit(values: LoginInput) {
-    setPending(true);
-    await signIn.email(
-      { email: values.email, password: values.password },
-      {
-        onSuccess: () => {
-          toast.success("Bem-vindo de volta!");
-          router.push(redirectTo);
-          router.refresh();
-        },
-        onError: ({ error }) => {
-          toast.error(error.message);
-        },
-      },
-    );
-    setPending(false);
-  }
+    errors,
+    pending,
+    showPassword,
+    setShowPassword,
+    redirectTo,
+    onSubmit,
+  } = useLoginForm();
 
   return (
     <Card>

@@ -1,6 +1,5 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
 import {
   AlertTriangle,
   Brush,
@@ -8,7 +7,7 @@ import {
   ShieldCheck,
   Wrench,
 } from "lucide-react";
-import { Controller, useForm } from "react-hook-form";
+import { Controller } from "react-hook-form";
 
 import { Label } from "@/_components/ui/label";
 import {
@@ -18,10 +17,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/_components/ui/select";
+import { useStep2Form } from "@/_hooks/use-step-2-form";
 import {
   priorityValues,
   serviceTypeValues,
-  step2Schema,
   type Step2Values,
 } from "@/_schemas/order-wizard";
 
@@ -72,27 +71,13 @@ const PRIORITY_LABELS: Record<
 };
 
 export function Step02Description({ defaultValues, onNext }: Step2Props) {
-  const {
-    register,
-    handleSubmit,
-    control,
-    formState: { errors },
-  } = useForm<Step2Values>({
-    resolver: zodResolver(step2Schema),
-    defaultValues: {
-      customerReport: "",
-      initialDiagnosis: "",
-      priority: "normal",
-      ...defaultValues,
-    },
+  const { register, handleSubmit, control, errors } = useStep2Form({
+    defaultValues,
+    onNext,
   });
 
   return (
-    <form
-      id="wizard-step-form"
-      onSubmit={handleSubmit(onNext)}
-      className="space-y-6"
-    >
+    <form id="wizard-step-form" onSubmit={handleSubmit} className="space-y-6">
       {/* Relato do Cliente */}
       <div className="space-y-1.5">
         <Label

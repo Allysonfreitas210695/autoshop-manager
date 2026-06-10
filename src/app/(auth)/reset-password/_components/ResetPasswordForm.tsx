@@ -1,13 +1,7 @@
 "use client";
 
-import type { ErrorContext } from "@better-fetch/fetch";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { CheckCircle2, Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { toast } from "sonner";
 
 import { Button } from "@/_components/ui/button";
 import {
@@ -19,43 +13,23 @@ import {
 } from "@/_components/ui/card";
 import { Input } from "@/_components/ui/input";
 import { Label } from "@/_components/ui/label";
-import { resetPassword } from "@/_lib/auth-client";
-import { type ResetPasswordInput, resetPasswordSchema } from "@/_schemas/auth";
+import { useResetPasswordForm } from "@/_hooks/use-reset-password-form";
 
 export function ResetPasswordForm() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const token = searchParams.get("token") ?? "";
-  const [pending, setPending] = useState(false);
-  const [done, setDone] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirm, setShowConfirm] = useState(false);
-
   const {
     register,
     handleSubmit,
-    formState: { errors },
-  } = useForm<ResetPasswordInput>({
-    resolver: zodResolver(resetPasswordSchema),
-  });
-
-  async function onSubmit(values: ResetPasswordInput) {
-    if (!token) {
-      toast.error("Link inválido ou expirado. Solicite um novo.");
-      return;
-    }
-    setPending(true);
-    await resetPassword(
-      { newPassword: values.password, token },
-      {
-        onSuccess: () => setDone(true),
-        onError: ({ error }: ErrorContext) => {
-          toast.error(error.message);
-        },
-      },
-    );
-    setPending(false);
-  }
+    errors,
+    pending,
+    done,
+    token,
+    showPassword,
+    setShowPassword,
+    showConfirm,
+    setShowConfirm,
+    onSubmit,
+    goToLogin,
+  } = useResetPasswordForm();
 
   if (done) {
     return (
@@ -72,7 +46,7 @@ export function ResetPasswordForm() {
               Sua senha foi atualizada com sucesso.
             </p>
           </div>
-          <Button onClick={() => router.push("/login")} className="mt-2">
+          <Button onClick={goToLogin} className="mt-2">
             Ir para o login
           </Button>
         </CardContent>

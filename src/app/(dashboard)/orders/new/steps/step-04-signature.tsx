@@ -1,11 +1,10 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { type FormEvent, useCallback, useRef } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { Controller } from "react-hook-form";
 import SignatureCanvas from "react-signature-canvas";
 
 import { Button } from "@/_components/ui/button";
+import { useStep4Form } from "@/_hooks/use-step-4-form";
 import type {
   LaborItem,
   PartItem,
@@ -14,7 +13,6 @@ import type {
   Step3Values,
   Step4Values,
 } from "@/_schemas/order-wizard";
-import { step4Schema } from "@/_schemas/order-wizard";
 
 type FinancialSummary = {
   subtotalParts: number;
@@ -56,43 +54,14 @@ export function Step04Signature({
   step3,
   onSubmit,
 }: Step4Props) {
-  const sigCanvasRef = useRef<SignatureCanvas | null>(null);
-
   const {
-    handleSubmit,
+    sigCanvasRef,
     control,
-    setValue,
-    formState: { errors },
-  } = useForm<Step4Values>({
-    resolver: zodResolver(step4Schema),
-    defaultValues: {
-      hasSignature: false,
-      ...defaultValues,
-    },
-  });
-
-  const clearSignature = useCallback(() => {
-    sigCanvasRef.current?.clear();
-    setValue("hasSignature", false);
-  }, [setValue]);
-
-  const handleFormSubmit = useCallback(
-    (data: Step4Values) => {
-      const signatureDataUrl = sigCanvasRef.current?.isEmpty()
-        ? null
-        : (sigCanvasRef.current?.toDataURL("image/png") ?? null);
-      onSubmit(data, signatureDataUrl);
-    },
-    [onSubmit],
-  );
-
-  const onFormSubmit = useCallback(
-    (e: FormEvent<HTMLFormElement>) => {
-      e.preventDefault();
-      void handleSubmit(handleFormSubmit)(e);
-    },
-    [handleSubmit, handleFormSubmit],
-  );
+    errors,
+    clearSignature,
+    onFormSubmit,
+    onSignatureEnd,
+  } = useStep4Form({ defaultValues, onSubmit });
 
   const parts: PartItem[] = (step3.parts as PartItem[] | undefined) ?? [];
   const laborItems: LaborItem[] =
@@ -232,7 +201,7 @@ export function Step04Signature({
               className: "w-full",
               style: { height: 140, display: "block" },
             }}
-            onEnd={() => setValue("hasSignature", true)}
+            onEnd={onSignatureEnd}
           />
         </div>
         <p className="text-on-surface-variant/60 font-mono text-[10px]">

@@ -1,12 +1,7 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { toast } from "sonner";
 
 import { GoogleButton } from "@/_components/shared/google-button";
 import { Button } from "@/_components/ui/button";
@@ -19,38 +14,20 @@ import {
 } from "@/_components/ui/card";
 import { Input } from "@/_components/ui/input";
 import { Label } from "@/_components/ui/label";
-import { signUp } from "@/_lib/auth-client";
-import { type RegisterInput, registerSchema } from "@/_schemas/auth";
+import { useRegisterForm } from "@/_hooks/use-register-form";
 
 export function RegisterForm() {
-  const router = useRouter();
-  const [pending, setPending] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirm, setShowConfirm] = useState(false);
-
   const {
     register,
     handleSubmit,
-    formState: { errors },
-  } = useForm<RegisterInput>({ resolver: zodResolver(registerSchema) });
-
-  async function onSubmit(values: RegisterInput) {
-    setPending(true);
-    await signUp.email(
-      { name: values.name, email: values.email, password: values.password },
-      {
-        onSuccess: () => {
-          toast.success("Conta criada!");
-          router.push("/");
-          router.refresh();
-        },
-        onError: ({ error }) => {
-          toast.error(error.message);
-        },
-      },
-    );
-    setPending(false);
-  }
+    errors,
+    pending,
+    showPassword,
+    setShowPassword,
+    showConfirm,
+    setShowConfirm,
+    onSubmit,
+  } = useRegisterForm();
 
   return (
     <Card>

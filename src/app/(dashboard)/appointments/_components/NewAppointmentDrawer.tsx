@@ -1,12 +1,8 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
 import { CalendarDays, Clock, User } from "lucide-react";
-import { useAction } from "next-safe-action/hooks";
-import { Controller, useForm, useWatch } from "react-hook-form";
-import { z } from "zod";
+import { Controller } from "react-hook-form";
 
-import { createAppointmentAction } from "@/_actions/appointments";
 import { Button } from "@/_components/ui/button";
 import { Input } from "@/_components/ui/input";
 import { Label } from "@/_components/ui/label";
@@ -23,17 +19,7 @@ import type {
   CustomerOption,
   MechanicOption,
 } from "@/_data-access/appointments";
-
-const schema = z.object({
-  customerId: z.string().min(1, "Selecione o cliente"),
-  vehicleId: z.string().optional(),
-  mechanicId: z.string().optional(),
-  date: z.string().min(1, "Informe a data"),
-  time: z.string().min(1, "Informe o horário"),
-  notes: z.string().optional(),
-});
-
-type FormData = z.infer<typeof schema>;
+import { useAppointmentForm } from "@/_hooks/use-appointment-form";
 
 type Props = {
   open: boolean;
@@ -52,32 +38,12 @@ export function NewAppointmentDrawer({
     control,
     register,
     handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm<FormData>({
-    resolver: zodResolver(schema),
-    defaultValues: { customerId: "", vehicleId: "", mechanicId: "" },
-  });
-
-  const selectedCustomerId = useWatch({ control, name: "customerId" });
-  const selectedCustomer = customers.find((c) => c.id === selectedCustomerId);
-
-  const { execute, status, result } = useAction(createAppointmentAction, {
-    onSuccess: () => {
-      reset();
-      onClose();
-    },
-  });
-
-  function onSubmit(data: FormData) {
-    execute({
-      customerId: data.customerId,
-      vehicleId: data.vehicleId || undefined,
-      mechanicId: data.mechanicId || undefined,
-      scheduledAt: new Date(`${data.date}T${data.time}:00`).toISOString(),
-      notes: data.notes || undefined,
-    });
-  }
+    errors,
+    status,
+    result,
+    selectedCustomer,
+    onSubmit,
+  } = useAppointmentForm({ customers, mechanics, onClose });
 
   return (
     <Sheet

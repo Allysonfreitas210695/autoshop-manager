@@ -1,14 +1,12 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
 import { Search, UserPlus, X } from "lucide-react";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
 
 import { Input } from "@/_components/ui/input";
 import { Label } from "@/_components/ui/label";
 import type { CustomerRow } from "@/_data-access/customers";
-import { step1Schema, type Step1Values } from "@/_schemas/order-wizard";
+import { useStep1Form } from "@/_hooks/use-step-1-form";
+import type { Step1Values } from "@/_schemas/order-wizard";
 
 type Step1Props = {
   defaultValues: Partial<Step1Values>;
@@ -17,60 +15,20 @@ type Step1Props = {
 };
 
 export function Step01Client({ defaultValues, customers, onNext }: Step1Props) {
-  const [query, setQuery] = useState(defaultValues.customerQuery ?? "");
-  const [selectedCustomer, setSelectedCustomer] = useState<CustomerRow | null>(
-    null,
-  );
-
   const {
     register,
     handleSubmit,
-    setValue,
-    formState: { errors },
-  } = useForm<Step1Values>({
-    resolver: zodResolver(step1Schema),
-    defaultValues: {
-      customerName: "",
-      plate: "",
-      mileage: 0,
-      vehicleModel: "",
-      ...defaultValues,
-    },
-  });
-
-  const filtered =
-    query.length >= 2
-      ? customers.filter(
-          (c) =>
-            c.name.toLowerCase().includes(query.toLowerCase()) ||
-            (c.cpf ?? "").includes(query),
-        )
-      : [];
-
-  function selectCustomer(customer: CustomerRow) {
-    setSelectedCustomer(customer);
-    setQuery(customer.name);
-    setValue("customerId", customer.id);
-    setValue("customerName", customer.name);
-    setValue("plate", customer.lastPlate ?? "");
-    setValue("vehicleModel", customer.lastVehicle ?? "");
-  }
-
-  function clearCustomer() {
-    setSelectedCustomer(null);
-    setQuery("");
-    setValue("customerId", undefined);
-    setValue("customerName", "");
-    setValue("plate", "");
-    setValue("vehicleModel", "");
-  }
+    errors,
+    query,
+    setQuery,
+    selectedCustomer,
+    filtered,
+    selectCustomer,
+    clearCustomer,
+  } = useStep1Form({ defaultValues, customers, onNext });
 
   return (
-    <form
-      id="wizard-step-form"
-      onSubmit={handleSubmit(onNext)}
-      className="space-y-6"
-    >
+    <form id="wizard-step-form" onSubmit={handleSubmit} className="space-y-6">
       {/* Busca de cliente */}
       <div className="space-y-1.5">
         <Label className="text-label-sm text-on-surface-variant font-mono">

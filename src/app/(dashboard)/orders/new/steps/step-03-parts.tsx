@@ -1,15 +1,13 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
 import { AlertTriangle, Plus, Search, Trash2, Wrench } from "lucide-react";
-import { useState } from "react";
-import { useFieldArray, useForm, useWatch } from "react-hook-form";
 
 import { Button } from "@/_components/ui/button";
 import { Input } from "@/_components/ui/input";
 import { Label } from "@/_components/ui/label";
 import type { Part } from "@/_data-access/inventory";
-import { step3Schema, type Step3Values } from "@/_schemas/order-wizard";
+import { useStep3Form } from "@/_hooks/use-step-3-form";
+import type { Step3Values } from "@/_schemas/order-wizard";
 
 type Step3Props = {
   defaultValues: Partial<Step3Values>;
@@ -18,45 +16,28 @@ type Step3Props = {
 };
 
 export function Step03Parts({ defaultValues, parts, onNext }: Step3Props) {
-  const [partsQuery, setPartsQuery] = useState("");
-  const [showLaborForm, setShowLaborForm] = useState(false);
-  const [laborDescription, setLaborDescription] = useState("");
-  const [laborPrice, setLaborPrice] = useState("");
-
-  const { register, handleSubmit, control } = useForm<Step3Values>({
-    resolver: zodResolver(step3Schema),
-    defaultValues: {
-      parts: [],
-      laborItems: [],
-      ...defaultValues,
-    },
-  });
-
   const {
-    fields: partFields,
-    append: appendPart,
-    remove: removePart,
-    update: updatePart,
-  } = useFieldArray({ control, name: "parts" });
-
-  const {
-    fields: laborFields,
-    append: appendLabor,
-    remove: removeLabor,
-  } = useFieldArray({ control, name: "laborItems" });
-
-  const partsValues = useWatch({ control, name: "parts" }) ?? [];
-  const laborValues = useWatch({ control, name: "laborItems" }) ?? [];
-
-  const filteredParts =
-    partsQuery.length >= 2
-      ? parts.filter(
-          (p) =>
-            p.name.toLowerCase().includes(partsQuery.toLowerCase()) ||
-            (p.sku ?? "").toLowerCase().includes(partsQuery.toLowerCase()) ||
-            p.category.toLowerCase().includes(partsQuery.toLowerCase()),
-        )
-      : [];
+    register,
+    handleSubmit,
+    partFields,
+    appendPart,
+    removePart,
+    updatePart,
+    laborFields,
+    appendLabor,
+    removeLabor,
+    partsValues,
+    laborValues,
+    partsQuery,
+    setPartsQuery,
+    showLaborForm,
+    setShowLaborForm,
+    laborDescription,
+    setLaborDescription,
+    laborPrice,
+    setLaborPrice,
+    filteredParts,
+  } = useStep3Form({ defaultValues, parts, onNext });
 
   const subtotalParts = partsValues.reduce(
     (sum, p) => sum + p.quantity * p.unitPrice,
@@ -99,11 +80,7 @@ export function Step03Parts({ defaultValues, parts, onNext }: Step3Props) {
   const lowStockParts = parts.filter((p) => p.stock <= p.minStock);
 
   return (
-    <form
-      id="wizard-step-form"
-      onSubmit={handleSubmit(onNext)}
-      className="space-y-6"
-    >
+    <form id="wizard-step-form" onSubmit={handleSubmit} className="space-y-6">
       {/* Alerta de estoque baixo */}
       {lowStockParts.length > 0 && (
         <div className="border-tertiary/30 bg-tertiary/5 flex items-start gap-3 rounded-md border px-4 py-3">
