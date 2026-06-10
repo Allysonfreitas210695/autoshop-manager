@@ -14,7 +14,6 @@ export function useLoginForm() {
   const searchParams = useSearchParams();
   const redirectTo = searchParams.get("redirect") ?? "/";
   const [pending, setPending] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
 
   const {
     register,
@@ -45,8 +44,6 @@ export function useLoginForm() {
     handleSubmit,
     errors,
     pending,
-    showPassword,
-    setShowPassword,
     redirectTo,
     onSubmit,
   };

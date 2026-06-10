@@ -1,6 +1,5 @@
 "use client";
 
-import { Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 
 import { GoogleButton } from "@/_components/shared/google-button";
@@ -14,20 +13,12 @@ import {
 } from "@/_components/ui/card";
 import { Input } from "@/_components/ui/input";
 import { Label } from "@/_components/ui/label";
+import { PasswordInput } from "@/_components/ui/password-input";
 import { useRegisterForm } from "@/_hooks/use-register-form";
 
 export function RegisterForm() {
-  const {
-    register,
-    handleSubmit,
-    errors,
-    pending,
-    showPassword,
-    setShowPassword,
-    showConfirm,
-    setShowConfirm,
-    onSubmit,
-  } = useRegisterForm();
+  const { register, handleSubmit, errors, pending, onSubmit } =
+    useRegisterForm();
 
   return (
     <Card>
@@ -71,26 +62,7 @@ export function RegisterForm() {
             <Label htmlFor="password" className="text-label-md font-mono">
               Senha
             </Label>
-            <div className="relative">
-              <Input
-                id="password"
-                type={showPassword ? "text" : "password"}
-                className="pr-9"
-                {...register("password")}
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword((v) => !v)}
-                className="text-on-surface-variant/60 hover:text-on-surface absolute top-1/2 right-2.5 -translate-y-1/2 transition-colors"
-                aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
-              >
-                {showPassword ? (
-                  <EyeOff className="size-4" />
-                ) : (
-                  <Eye className="size-4" />
-                )}
-              </button>
-            </div>
+            <PasswordInput id="password" {...register("password")} />
             {errors.password ? (
               <p className="text-label-sm text-destructive">
                 {errors.password.message}
@@ -104,26 +76,10 @@ export function RegisterForm() {
             >
               Confirmar senha
             </Label>
-            <div className="relative">
-              <Input
-                id="confirmPassword"
-                type={showConfirm ? "text" : "password"}
-                className="pr-9"
-                {...register("confirmPassword")}
-              />
-              <button
-                type="button"
-                onClick={() => setShowConfirm((v) => !v)}
-                className="text-on-surface-variant/60 hover:text-on-surface absolute top-1/2 right-2.5 -translate-y-1/2 transition-colors"
-                aria-label={showConfirm ? "Ocultar senha" : "Mostrar senha"}
-              >
-                {showConfirm ? (
-                  <EyeOff className="size-4" />
-                ) : (
-                  <Eye className="size-4" />
-                )}
-              </button>
-            </div>
+            <PasswordInput
+              id="confirmPassword"
+              {...register("confirmPassword")}
+            />
             {errors.confirmPassword ? (
               <p className="text-label-sm text-destructive">
                 {errors.confirmPassword.message}

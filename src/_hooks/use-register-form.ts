@@ -12,8 +12,6 @@ import { type RegisterInput, registerSchema } from "@/_schemas/auth";
 export function useRegisterForm() {
   const router = useRouter();
   const [pending, setPending] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirm, setShowConfirm] = useState(false);
 
   const {
     register,
@@ -44,10 +42,6 @@ export function useRegisterForm() {
     handleSubmit,
     errors,
     pending,
-    showPassword,
-    setShowPassword,
-    showConfirm,
-    setShowConfirm,
     onSubmit,
   };
 }

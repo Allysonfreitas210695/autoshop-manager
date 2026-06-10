@@ -16,8 +16,6 @@ export function useResetPasswordForm() {
   const token = searchParams.get("token") ?? "";
   const [pending, setPending] = useState(false);
   const [done, setDone] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirm, setShowConfirm] = useState(false);
 
   const {
     register,
@@ -52,10 +50,6 @@ export function useResetPasswordForm() {
     pending,
     done,
     token,
-    showPassword,
-    setShowPassword,
-    showConfirm,
-    setShowConfirm,
     onSubmit,
     goToLogin: () => router.push("/login"),
   };

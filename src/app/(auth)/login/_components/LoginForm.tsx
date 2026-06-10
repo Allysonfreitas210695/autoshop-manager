@@ -1,6 +1,5 @@
 "use client";
 
-import { Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 
 import { GoogleButton } from "@/_components/shared/google-button";
@@ -14,19 +13,12 @@ import {
 } from "@/_components/ui/card";
 import { Input } from "@/_components/ui/input";
 import { Label } from "@/_components/ui/label";
+import { PasswordInput } from "@/_components/ui/password-input";
 import { useLoginForm } from "@/_hooks/use-login-form";
 
 export function LoginForm() {
-  const {
-    register,
-    handleSubmit,
-    errors,
-    pending,
-    showPassword,
-    setShowPassword,
-    redirectTo,
-    onSubmit,
-  } = useLoginForm();
+  const { register, handleSubmit, errors, pending, redirectTo, onSubmit } =
+    useLoginForm();
 
   return (
     <Card>
@@ -67,26 +59,7 @@ export function LoginForm() {
                 Esqueci a senha
               </Link>
             </div>
-            <div className="relative">
-              <Input
-                id="password"
-                type={showPassword ? "text" : "password"}
-                className="pr-9"
-                {...register("password")}
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword((v) => !v)}
-                className="text-on-surface-variant/60 hover:text-on-surface absolute top-1/2 right-2.5 -translate-y-1/2 transition-colors"
-                aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
-              >
-                {showPassword ? (
-                  <EyeOff className="size-4" />
-                ) : (
-                  <Eye className="size-4" />
-                )}
-              </button>
-            </div>
+            <PasswordInput id="password" {...register("password")} />
             {errors.password ? (
               <p className="text-label-sm text-destructive">
                 {errors.password.message}
