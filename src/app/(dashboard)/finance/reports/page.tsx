@@ -1,3 +1,5 @@
+export const metadata = { title: "Relatórios Financeiros — Precision Auto" };
+
 import { ArrowLeft, Download, TrendingDown, TrendingUp } from "lucide-react";
 import Link from "next/link";
 

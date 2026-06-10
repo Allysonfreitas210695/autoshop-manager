@@ -1,5 +1,7 @@
 import { CalendarClock, ClipboardList, DollarSign, Wrench } from "lucide-react";
 
+export const metadata = { title: "Dashboard — Precision Auto" };
+
 import { MetricCard } from "@/_components/dashboard/metric-card";
 import { StatusChart } from "@/_components/dashboard/status-chart";
 import { Card } from "@/_components/ui/card";

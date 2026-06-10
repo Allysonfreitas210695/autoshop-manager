@@ -10,6 +10,11 @@ function brl(v: number) {
 
 type Props = { params: Promise<{ id: string }> };
 
+export async function generateMetadata({ params }: Props) {
+  const { id } = await params;
+  return { title: `Aprovação de Orçamento · O.S. ${id}` };
+}
+
 export default async function BudgetPage({ params }: Props) {
   const { id } = await params;
   const order = await getOrderById(id);

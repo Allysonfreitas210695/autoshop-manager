@@ -1,3 +1,5 @@
+export const metadata = { title: "Criar Conta — Precision Auto" };
+
 import { RegisterForm } from "./_components/RegisterForm";
 
 export default function RegisterPage() {

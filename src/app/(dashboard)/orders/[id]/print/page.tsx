@@ -8,6 +8,11 @@ function brl(v: number) {
 
 type Props = { params: Promise<{ id: string }> };
 
+export async function generateMetadata({ params }: Props) {
+  const { id } = await params;
+  return { title: `Impressão · O.S. ${id}` };
+}
+
 export default async function PrintPage({ params }: Props) {
   const { id } = await params;
   const order = await getOrderById(id);

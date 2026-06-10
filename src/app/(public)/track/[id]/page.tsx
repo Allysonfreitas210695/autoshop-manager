@@ -92,7 +92,13 @@ function getTimelineNodes(status: OrderStatus) {
 
 export async function generateMetadata({ params }: Props) {
   const { id } = await params;
-  return { title: `O.S. ${id} — Precision Auto` };
+  const order = await getOrderById(id);
+  if (!order) return { title: "Ordem não encontrada" };
+  return {
+    title: `Rastreamento · O.S. ${id}`,
+    description: `Acompanhe o status do seu veículo ${order.vehicle} na Precision Auto.`,
+    robots: { index: false, follow: false },
+  };
 }
 
 export default async function TrackPage({ params }: Props) {

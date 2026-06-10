@@ -1,3 +1,5 @@
+export const metadata = { title: "Entrar — Precision Auto" };
+
 import { Suspense } from "react";
 
 import { LoginForm } from "./_components/LoginForm";

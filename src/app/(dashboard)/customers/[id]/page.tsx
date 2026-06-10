@@ -17,6 +17,13 @@ import { getOrdersByCustomer } from "@/_lib/queries/orders";
 
 type Props = { params: Promise<{ id: string }> };
 
+export async function generateMetadata({ params }: Props) {
+  const { id } = await params;
+  const customer = await getCustomerById(id);
+  if (!customer) return { title: "Cliente não encontrado" };
+  return { title: `${customer.name} — Clientes` };
+}
+
 type OrderRow = {
   id: string;
   orderNumber: number;

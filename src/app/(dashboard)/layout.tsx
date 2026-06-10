@@ -1,4 +1,9 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
+
+export const metadata: Metadata = {
+  robots: { index: false, follow: false },
+};
 
 import { Header } from "@/_components/shared/header";
 import { Sidebar } from "@/_components/shared/sidebar";

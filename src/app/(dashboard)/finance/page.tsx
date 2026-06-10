@@ -1,3 +1,5 @@
+export const metadata = { title: "Financeiro — Precision Auto" };
+
 import {
   ArrowDownRight,
   ArrowUpRight,
