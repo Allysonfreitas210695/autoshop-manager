@@ -33,7 +33,15 @@ The four phases are ordered 1→4 by risk/priority. They are largely independent
 4. Responses carry security headers (CSP, HSTS, X-Frame-Options, X-Content-Type-Options, Referrer-Policy), and repeated hits to login/register/forgot/reset are rate-limited.
 5. A bundle/env audit confirms no server-only secret is exposed to the client.
 6. Locked completion checklist passes: `npx tsc --noEmit` zero errors, `npm run lint` zero errors, `npm run build` succeeds, all touched routes render without crash.
-   **Plans**: TBD
+   **Plans**: 5 plans
+
+Plans:
+
+- [ ] 01-01-PLAN.md — SEC-01 password policy (shared passwordSchema, minPasswordLength, prod reset-link guard)
+- [ ] 01-02-PLAN.md — SEC-03 proxy route gating (recovery routes + /track public)
+- [ ] 01-03-PLAN.md — SEC-04 security headers + report-only CSP + csp-report sink
+- [ ] 01-04-PLAN.md — SEC-05 Upstash per-IP rate limiting on auth endpoints (generic 429)
+- [ ] 01-05-PLAN.md — SEC-02 server-action validation audit + SEC-06 secret-boundary guard
 
 ### Phase 2: Responsividade (Responsiveness)
 
@@ -89,7 +97,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 
 | Phase                                          | Plans Complete | Status      | Completed |
 | ---------------------------------------------- | -------------- | ----------- | --------- |
-| 1. Segurança (Security)                        | 0/TBD          | Not started | -         |
+| 1. Segurança (Security)                        | 0/5            | Not started | -         |
 | 2. Responsividade (Responsiveness)             | 0/TBD          | Not started | -         |
 | 3. Usabilidade (Usability)                     | 0/TBD          | Not started | -         |
 | 4. Aprimoramento de telas (Screen enhancement) | 0/TBD          | Not started | -         |
