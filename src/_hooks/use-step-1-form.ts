@@ -23,6 +23,7 @@ export function useStep1Form({ defaultValues, customers, onNext }: Params) {
     register,
     handleSubmit,
     setValue,
+    control,
     formState: { errors },
   } = useForm<Step1Values>({
     resolver: zodResolver(step1Schema),
@@ -64,6 +65,7 @@ export function useStep1Form({ defaultValues, customers, onNext }: Params) {
 
   return {
     register,
+    control,
     handleSubmit: handleSubmit(onNext),
     errors,
     query,

@@ -10,6 +10,7 @@ import { Button } from "@/_components/ui/button";
 import { Input } from "@/_components/ui/input";
 import { Label } from "@/_components/ui/label";
 import type { Part } from "@/_data-access/inventory";
+import { formatCurrency } from "@/_helpers/format";
 
 type OrderItem = {
   partId: string;
@@ -225,10 +226,7 @@ export function NewPurchaseOrderClient({ parts }: Props) {
                       </div>
                       <div className="shrink-0 text-right">
                         <p className="text-label-sm text-on-surface font-mono">
-                          {p.unitPrice.toLocaleString("pt-BR", {
-                            style: "currency",
-                            currency: "BRL",
-                          })}
+                          {formatCurrency(p.unitPrice)}
                         </p>
                         <p
                           className={`text-label-xs font-mono ${p.stock < p.minStock ? "text-error" : "text-on-surface-variant"}`}
@@ -315,18 +313,12 @@ export function NewPurchaseOrderClient({ parts }: Props) {
                         </td>
                         <td className="px-3 py-2.5">
                           <span className="text-body-sm text-on-surface font-mono">
-                            {item.unitPrice.toLocaleString("pt-BR", {
-                              style: "currency",
-                              currency: "BRL",
-                            })}
+                            {formatCurrency(item.unitPrice)}
                           </span>
                         </td>
                         <td className="px-3 py-2.5">
                           <span className="text-body-sm text-on-surface font-mono font-medium">
-                            {(item.quantity * item.unitPrice).toLocaleString(
-                              "pt-BR",
-                              { style: "currency", currency: "BRL" },
-                            )}
+                            {formatCurrency(item.quantity * item.unitPrice)}
                           </span>
                         </td>
                         <td className="px-3 py-2.5">
@@ -379,10 +371,7 @@ export function NewPurchaseOrderClient({ parts }: Props) {
                   Total
                 </span>
                 <span className="text-title-sm text-on-surface font-mono font-bold">
-                  {total.toLocaleString("pt-BR", {
-                    style: "currency",
-                    currency: "BRL",
-                  })}
+                  {formatCurrency(total)}
                 </span>
               </div>
             </div>

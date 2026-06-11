@@ -4,8 +4,10 @@ import { Plus } from "lucide-react";
 import { Controller } from "react-hook-form";
 
 import { Button } from "@/_components/ui/button";
+import { CurrencyInput } from "@/_components/ui/currency-input";
 import { Input } from "@/_components/ui/input";
 import { Label } from "@/_components/ui/label";
+import { PlateInput } from "@/_components/ui/plate-input";
 import {
   Select,
   SelectContent,
@@ -66,7 +68,7 @@ export function NewOrderDrawer() {
         <form
           id="new-order-form"
           onSubmit={handleSubmit(onSubmit)}
-          className="flex flex-1 flex-col gap-5 overflow-y-auto py-4"
+          className="flex flex-1 flex-col gap-5 overflow-y-auto px-4 py-4"
         >
           <div className="grid gap-5 sm:grid-cols-2">
             <div className="space-y-1.5">
@@ -76,11 +78,18 @@ export function NewOrderDrawer() {
               >
                 PLACA *
               </Label>
-              <Input
-                id="plate"
-                placeholder="ABC-1234"
-                aria-invalid={!!errors.plate}
-                {...register("plate")}
+              <Controller
+                control={control}
+                name="plate"
+                render={({ field }) => (
+                  <PlateInput
+                    id="plate"
+                    aria-invalid={!!errors.plate}
+                    value={field.value ?? ""}
+                    onChange={field.onChange}
+                    onBlur={field.onBlur}
+                  />
+                )}
               />
               {errors.plate && (
                 <p className="text-label-sm text-error font-mono">
@@ -165,6 +174,7 @@ export function NewOrderDrawer() {
                 control={control}
                 render={({ field }) => (
                   <Select
+                    items={STATUS_LABELS}
                     value={field.value ?? "pending"}
                     onValueChange={field.onChange}
                   >
@@ -190,13 +200,17 @@ export function NewOrderDrawer() {
               >
                 VALOR ESTIMADO (R$)
               </Label>
-              <Input
-                id="totalAmount"
-                type="number"
-                step="0.01"
-                min="0"
-                placeholder="0,00"
-                {...register("totalAmount")}
+              <Controller
+                control={control}
+                name="totalAmount"
+                render={({ field }) => (
+                  <CurrencyInput
+                    id="totalAmount"
+                    value={field.value as number | undefined}
+                    onValueChange={field.onChange}
+                    onBlur={field.onBlur}
+                  />
+                )}
               />
             </div>
           </div>

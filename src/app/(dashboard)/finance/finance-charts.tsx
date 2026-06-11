@@ -20,14 +20,11 @@ import type {
   MonthlyCashFlow,
   WeeklyCashFlow,
 } from "@/_data-access/finance";
-
-function brl(v: number) {
-  return v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-}
+import { formatCurrency } from "@/_helpers/format";
 
 function shortBrl(v: number) {
   if (v >= 1000) return `R$${(v / 1000).toFixed(0)}k`;
-  return brl(v);
+  return formatCurrency(v);
 }
 
 export function CashFlowBarChart({ data }: { data: WeeklyCashFlow[] }) {
@@ -70,7 +67,7 @@ export function CashFlowBarChart({ data }: { data: WeeklyCashFlow[] }) {
             color: "var(--color-on-surface)",
           }}
           formatter={(value) => [
-            typeof value === "number" ? brl(value) : value,
+            typeof value === "number" ? formatCurrency(value) : value,
           ]}
           cursor={{ fill: "rgba(255,255,255,0.04)" }}
         />
@@ -131,7 +128,7 @@ export function MonthlyLineChart({ data }: { data: MonthlyCashFlow[] }) {
             color: "var(--color-on-surface)",
           }}
           formatter={(value) => [
-            typeof value === "number" ? brl(value) : value,
+            typeof value === "number" ? formatCurrency(value) : value,
           ]}
           cursor={{ stroke: "rgba(255,255,255,0.1)" }}
         />

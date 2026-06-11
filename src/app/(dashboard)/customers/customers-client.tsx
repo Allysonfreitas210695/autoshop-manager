@@ -8,12 +8,9 @@ import { Button } from "@/_components/ui/button";
 import { DataTable, type DataTableColumn } from "@/_components/ui/data-table";
 import { Input } from "@/_components/ui/input";
 import type { CustomerRow } from "@/_data-access/customers";
+import { formatCurrency, formatDate } from "@/_helpers/format";
 
 import { CustomerDetailPanel } from "./customer-detail-panel";
-
-function brl(v: number) {
-  return v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-}
 
 const columns: DataTableColumn<CustomerRow>[] = [
   {
@@ -72,9 +69,7 @@ const columns: DataTableColumn<CustomerRow>[] = [
     className: "hidden md:table-cell",
     cell: (row) => (
       <span className="text-label-sm text-on-surface-variant font-mono">
-        {row.lastVisit
-          ? new Date(row.lastVisit).toLocaleDateString("pt-BR")
-          : "—"}
+        {row.lastVisit ? formatDate(row.lastVisit) : "—"}
       </span>
     ),
   },
@@ -84,7 +79,7 @@ const columns: DataTableColumn<CustomerRow>[] = [
     align: "right",
     cell: (row) => (
       <span className="text-label-md text-on-surface font-mono font-semibold">
-        {brl(row.totalSpent)}
+        {formatCurrency(row.totalSpent)}
       </span>
     ),
   },

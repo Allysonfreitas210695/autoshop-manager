@@ -1,12 +1,11 @@
 "use client";
 
-import { format } from "date-fns";
-import { ptBR } from "date-fns/locale";
 import { FileText, Package, Plus, Truck } from "lucide-react";
 import Link from "next/link";
 
 import { Button } from "@/_components/ui/button";
 import type { PurchaseOrderRow } from "@/_data-access/inventory";
+import { formatCurrency, formatDate } from "@/_helpers/format";
 
 type PurchaseOrderStatus = PurchaseOrderRow["status"];
 
@@ -158,20 +157,13 @@ export function PurchaseOrdersClient({ orders }: Props) {
                   </td>
                   <td className="px-4 py-3">
                     <span className="text-body-sm text-on-surface font-mono font-medium">
-                      {order.totalAmount.toLocaleString("pt-BR", {
-                        style: "currency",
-                        currency: "BRL",
-                      })}
+                      {formatCurrency(order.totalAmount)}
                     </span>
                   </td>
                   <td className="px-4 py-3">
                     <span className="text-label-sm text-on-surface-variant font-mono">
                       {order.expectedDelivery
-                        ? format(
-                            new Date(order.expectedDelivery),
-                            "dd MMM yyyy",
-                            { locale: ptBR },
-                          )
+                        ? formatDate(order.expectedDelivery)
                         : "—"}
                     </span>
                   </td>

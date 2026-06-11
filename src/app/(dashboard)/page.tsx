@@ -1,5 +1,4 @@
-import { CalendarClock, ClipboardList, DollarSign, Wrench } from "lucide-react";
-
+import { formatCurrency } from "@/_helpers/format";
 export const metadata = { title: "Dashboard — Precision Auto" };
 
 import { MetricCard } from "@/_components/dashboard/metric-card";
@@ -16,10 +15,6 @@ import {
   getStatusDistribution,
 } from "@/_data-access/dashboard";
 import { listOrders, type OrderRow } from "@/_data-access/orders";
-
-function brl(v: number) {
-  return v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-}
 
 const orderColumns: DataTableColumn<OrderRow>[] = [
   {
@@ -72,7 +67,7 @@ const orderColumns: DataTableColumn<OrderRow>[] = [
     align: "right",
     cell: (row) => (
       <span className="text-label-md text-on-surface font-mono">
-        {brl(Number(row.totalAmount))}
+        {formatCurrency(Number(row.totalAmount))}
       </span>
     ),
   },
@@ -123,28 +118,28 @@ export default async function DashboardPage() {
         <MetricCard
           label="Ordens Abertas"
           value={metrics.openOrders}
-          icon={ClipboardList}
+          icon="clipboardList"
           hint="Em andamento"
           accent="secondary"
         />
         <MetricCard
           label="Veículos Prontos"
           value={metrics.readyVehicles}
-          icon={Wrench}
+          icon="wrench"
           hint="Aguardando retirada"
           accent="completed"
         />
         <MetricCard
           label="Agendamentos Hoje"
           value={metrics.todayAppointments}
-          icon={CalendarClock}
+          icon="calendarClock"
           hint="No dia de hoje"
           accent="secondary"
         />
         <MetricCard
           label="Total de O.S."
           value={orders.length}
-          icon={DollarSign}
+          icon="dollarSign"
           hint="Todas as ordens"
           accent="tertiary"
         />

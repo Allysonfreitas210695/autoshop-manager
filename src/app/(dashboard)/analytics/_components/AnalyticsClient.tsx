@@ -8,6 +8,7 @@ import type {
   MonthlyRevenue,
   ServiceCategory,
 } from "@/_data-access/analytics";
+import { formatCurrency } from "@/_helpers/format";
 
 import {
   MechanicBarChart,
@@ -15,14 +16,10 @@ import {
   ServicePieChart,
 } from "./AnalyticsCharts";
 
-function brl(v: number) {
-  return v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-}
-
 function shortBrl(v: number) {
   if (v >= 1_000_000) return `R$${(v / 1_000_000).toFixed(1)}M`;
   if (v >= 1_000) return `R$${(v / 1_000).toFixed(0)}k`;
-  return brl(v);
+  return formatCurrency(v);
 }
 
 type Props = {
@@ -50,7 +47,7 @@ export function AnalyticsClient({
     {
       label: "Total de O.S.",
       value: analyticsKpis.totalOrders12m.toString(),
-      sub: `Ticket médio ${brl(analyticsKpis.avgTicket)}`,
+      sub: `Ticket médio ${formatCurrency(analyticsKpis.avgTicket)}`,
       icon: BarChart3,
       color: "text-tertiary",
       bg: "bg-tertiary/10",

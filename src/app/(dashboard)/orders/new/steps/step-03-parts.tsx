@@ -3,9 +3,11 @@
 import { AlertTriangle, Plus, Search, Trash2, Wrench } from "lucide-react";
 
 import { Button } from "@/_components/ui/button";
+import { CurrencyInput } from "@/_components/ui/currency-input";
 import { Input } from "@/_components/ui/input";
 import { Label } from "@/_components/ui/label";
 import type { Part } from "@/_data-access/inventory";
+import { formatCurrency } from "@/_helpers/format";
 import { useStep3Form } from "@/_hooks/use-step-3-form";
 import type { Step3Values } from "@/_schemas/order-wizard";
 
@@ -69,11 +71,10 @@ export function Step03Parts({ defaultValues, parts, onNext }: Step3Props) {
   }
 
   function addLabor() {
-    const price = parseFloat(laborPrice.replace(",", "."));
-    if (!laborDescription || isNaN(price)) return;
-    appendLabor({ description: laborDescription, price });
+    if (!laborDescription || !laborPrice || laborPrice <= 0) return;
+    appendLabor({ description: laborDescription, price: laborPrice });
     setLaborDescription("");
-    setLaborPrice("");
+    setLaborPrice(0);
     setShowLaborForm(false);
   }
 
@@ -134,10 +135,7 @@ export function Step03Parts({ defaultValues, parts, onNext }: Step3Props) {
                   </div>
                   <div className="shrink-0 text-right">
                     <p className="text-label-md text-on-surface font-mono font-bold">
-                      {part.unitPrice.toLocaleString("pt-BR", {
-                        style: "currency",
-                        currency: "BRL",
-                      })}
+                      {formatCurrency(part.unitPrice)}
                     </p>
                     <p
                       className={`font-mono text-[10px] ${isLow ? "text-tertiary" : "text-on-surface-variant/60"}`}
@@ -200,10 +198,7 @@ export function Step03Parts({ defaultValues, parts, onNext }: Step3Props) {
                         />
                       </td>
                       <td className="text-label-sm text-on-surface px-3 py-2 text-right font-mono font-bold">
-                        {(qty * field.unitPrice).toLocaleString("pt-BR", {
-                          style: "currency",
-                          currency: "BRL",
-                        })}
+                        {formatCurrency(qty * field.unitPrice)}
                       </td>
                       <td className="px-3 py-2">
                         <button
@@ -252,10 +247,9 @@ export function Step03Parts({ defaultValues, parts, onNext }: Step3Props) {
                 onChange={(e) => setLaborDescription(e.target.value)}
               />
               <div className="flex gap-2">
-                <Input
-                  placeholder="Valor (R$)"
+                <CurrencyInput
                   value={laborPrice}
-                  onChange={(e) => setLaborPrice(e.target.value)}
+                  onValueChange={setLaborPrice}
                   className="flex-1"
                 />
                 <Button
@@ -286,10 +280,7 @@ export function Step03Parts({ defaultValues, parts, onNext }: Step3Props) {
             <p className="text-body-sm text-on-surface">{field.description}</p>
             <div className="flex items-center gap-3">
               <span className="text-label-sm text-on-surface font-mono font-bold">
-                {field.price.toLocaleString("pt-BR", {
-                  style: "currency",
-                  currency: "BRL",
-                })}
+                {formatCurrency(field.price)}
               </span>
               <button
                 type="button"
@@ -316,29 +307,16 @@ export function Step03Parts({ defaultValues, parts, onNext }: Step3Props) {
         </h3>
         <div className="text-body-sm text-on-surface-variant flex justify-between">
           <span>Subtotal peças</span>
-          <span className="font-mono">
-            {subtotalParts.toLocaleString("pt-BR", {
-              style: "currency",
-              currency: "BRL",
-            })}
-          </span>
+          <span className="font-mono">{formatCurrency(subtotalParts)}</span>
         </div>
         <div className="text-body-sm text-on-surface-variant flex justify-between">
           <span>Mão de obra</span>
-          <span className="font-mono">
-            {subtotalLabor.toLocaleString("pt-BR", {
-              style: "currency",
-              currency: "BRL",
-            })}
-          </span>
+          <span className="font-mono">{formatCurrency(subtotalLabor)}</span>
         </div>
         <div className="border-outline-variant text-body-md text-on-surface flex justify-between border-t pt-2 font-bold">
           <span>Total Estimado</span>
           <span className="text-secondary font-mono">
-            {total.toLocaleString("pt-BR", {
-              style: "currency",
-              currency: "BRL",
-            })}
+            {formatCurrency(total)}
           </span>
         </div>
       </div>

@@ -93,3 +93,21 @@
     @apply font-sans;
   }
 }
+
+/* Oculta a scrollbar em todos os navegadores, mantendo o scroll funcional.
+   Fora de @layer de propósito + !important: vence qualquer regra do Tailwind. */
+html,
+body,
+*,
+*::before,
+*::after {
+  scrollbar-width: none !important; /* Firefox */
+  -ms-overflow-style: none !important; /* IE / Edge legado */
+}
+html::-webkit-scrollbar,
+body::-webkit-scrollbar,
+*::-webkit-scrollbar {
+  display: none !important; /* Chrome, Safari, Edge, Opera */
+  width: 0 !important;
+  height: 0 !important;
+}

@@ -70,6 +70,12 @@ const PRIORITY_LABELS: Record<
   urgente: { label: "Urgente", color: "text-error" },
 };
 
+const PRIORITY_ITEMS: Record<(typeof priorityValues)[number], string> = {
+  normal: PRIORITY_LABELS.normal.label,
+  alta: PRIORITY_LABELS.alta.label,
+  urgente: PRIORITY_LABELS.urgente.label,
+};
+
 export function Step02Description({ defaultValues, onNext }: Step2Props) {
   const { register, handleSubmit, control, errors } = useStep2Form({
     defaultValues,
@@ -177,6 +183,7 @@ export function Step02Description({ defaultValues, onNext }: Step2Props) {
           control={control}
           render={({ field }) => (
             <Select
+              items={PRIORITY_ITEMS}
               value={field.value ?? "normal"}
               onValueChange={field.onChange}
             >

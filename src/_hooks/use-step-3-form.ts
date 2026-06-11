@@ -17,7 +17,7 @@ export function useStep3Form({ defaultValues, parts, onNext }: Params) {
   const [partsQuery, setPartsQuery] = useState("");
   const [showLaborForm, setShowLaborForm] = useState(false);
   const [laborDescription, setLaborDescription] = useState("");
-  const [laborPrice, setLaborPrice] = useState("");
+  const [laborPrice, setLaborPrice] = useState<number>(0);
 
   const { register, handleSubmit, control } = useForm<Step3Values>({
     resolver: zodResolver(step3Schema),

@@ -1,16 +1,32 @@
 "use client";
 
 import { animate, motion, useMotionValue, useTransform } from "framer-motion";
-import type { LucideIcon } from "lucide-react";
+import {
+  CalendarClock,
+  ClipboardList,
+  DollarSign,
+  type LucideIcon,
+  Wrench,
+} from "lucide-react";
 import { useEffect } from "react";
 
 import { Card } from "@/_components/ui/card";
+import { formatCurrency } from "@/_helpers/format";
 import { cn } from "@/_lib/utils";
+
+const iconMap = {
+  clipboardList: ClipboardList,
+  wrench: Wrench,
+  calendarClock: CalendarClock,
+  dollarSign: DollarSign,
+} satisfies Record<string, LucideIcon>;
+
+export type MetricIconName = keyof typeof iconMap;
 
 type MetricCardProps = {
   label: string;
   value: number;
-  icon: LucideIcon;
+  icon: MetricIconName;
   hint?: string;
   hintTone?: "positive" | "neutral";
   format?: "number" | "currency";
@@ -26,20 +42,18 @@ const accentClass = {
 export function MetricCard({
   label,
   value,
-  icon: Icon,
+  icon,
   hint,
   hintTone = "neutral",
   format = "number",
   accent = "secondary",
 }: MetricCardProps) {
+  const Icon = iconMap[icon];
   const count = useMotionValue(0);
   const display = useTransform(count, (latest) => {
     const rounded = Math.round(latest);
     if (format === "currency") {
-      return rounded.toLocaleString("pt-BR", {
-        style: "currency",
-        currency: "BRL",
-      });
+      return formatCurrency(rounded);
     }
     return rounded.toLocaleString("pt-BR");
   });

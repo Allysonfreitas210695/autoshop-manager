@@ -15,10 +15,7 @@ import { buttonVariants } from "@/_components/ui/button";
 import { DataTable, type DataTableColumn } from "@/_components/ui/data-table";
 import { Input } from "@/_components/ui/input";
 import type { InventoryMetrics, Part } from "@/_data-access/inventory";
-
-function brl(v: number) {
-  return v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-}
+import { formatCurrency } from "@/_helpers/format";
 
 function StockBadge({ stock, minStock }: { stock: number; minStock: number }) {
   const isCritical = stock < minStock;
@@ -98,7 +95,7 @@ const columns: DataTableColumn<Part>[] = [
     className: "hidden md:table-cell",
     cell: (row) => (
       <span className="text-label-sm text-on-surface-variant font-mono">
-        {brl(row.unitPrice)}
+        {formatCurrency(row.unitPrice)}
       </span>
     ),
   },
@@ -108,7 +105,7 @@ const columns: DataTableColumn<Part>[] = [
     align: "right",
     cell: (row) => (
       <span className="text-label-sm text-on-surface sm:text-label-md font-mono font-semibold">
-        {brl(row.stock * row.unitPrice)}
+        {formatCurrency(row.stock * row.unitPrice)}
       </span>
     ),
   },
@@ -143,7 +140,7 @@ export function InventoryClient({ initialParts, metrics }: Props) {
           </h1>
           <p className="text-label-md text-on-surface-variant mt-1 font-mono">
             {filtered.length} ite{filtered.length !== 1 ? "ns" : "m"} &middot;{" "}
-            {brl(filteredValue)}
+            {formatCurrency(filteredValue)}
           </p>
         </div>
         <Link
@@ -199,7 +196,7 @@ export function InventoryClient({ initialParts, metrics }: Props) {
             </p>
           </div>
           <p className="text-label-lg text-on-surface sm:text-headline-sm lg:text-display-sm mt-2 font-mono font-bold break-all">
-            {brl(metrics.totalValue)}
+            {formatCurrency(metrics.totalValue)}
           </p>
         </div>
       </div>

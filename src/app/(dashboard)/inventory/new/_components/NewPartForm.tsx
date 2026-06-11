@@ -5,12 +5,10 @@ import Link from "next/link";
 import { Controller } from "react-hook-form";
 
 import { Button } from "@/_components/ui/button";
+import { CurrencyInput } from "@/_components/ui/currency-input";
 import { Input } from "@/_components/ui/input";
+import { formatCurrency } from "@/_helpers/format";
 import { categoryOptions, useNewPartForm } from "@/_hooks/use-new-part-form";
-
-function brl(v: number) {
-  return v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-}
 
 export function NewPartForm() {
   const {
@@ -199,14 +197,17 @@ export function NewPartForm() {
                   <label className="text-label-sm text-on-surface-variant mb-1.5 block font-mono">
                     Preço Unitário (R$) *
                   </label>
-                  <Input
-                    type="number"
-                    step="0.01"
-                    min={0.01}
-                    inputMode="decimal"
-                    {...register("unitPrice", { valueAsNumber: true })}
-                    className="font-mono"
-                    placeholder="0,00"
+                  <Controller
+                    control={control}
+                    name="unitPrice"
+                    render={({ field }) => (
+                      <CurrencyInput
+                        value={field.value}
+                        onValueChange={field.onChange}
+                        onBlur={field.onBlur}
+                        className="font-mono"
+                      />
+                    )}
                   />
                   {errors.unitPrice && (
                     <p className="text-error mt-1 font-mono text-[11px]">
@@ -246,14 +247,16 @@ export function NewPartForm() {
                     Preço unitário
                   </span>
                   <span className="text-on-surface">
-                    {brl(Number(unitPriceValue) || 0)}
+                    {formatCurrency(Number(unitPriceValue) || 0)}
                   </span>
                 </div>
                 <div className="border-outline-variant text-label-md flex justify-between border-t pt-2 font-mono font-bold">
                   <span className="text-on-surface-variant">
                     Valor em estoque
                   </span>
-                  <span className="text-secondary">{brl(totalValue)}</span>
+                  <span className="text-secondary">
+                    {formatCurrency(totalValue)}
+                  </span>
                 </div>
               </div>
             </div>
@@ -307,14 +310,16 @@ export function NewPartForm() {
                         Preço unitário
                       </span>
                       <span className="text-on-surface">
-                        {brl(Number(unitPriceValue) || 0)}
+                        {formatCurrency(Number(unitPriceValue) || 0)}
                       </span>
                     </div>
                     <div className="border-outline-variant text-label-md flex justify-between border-t pt-2 font-mono font-bold">
                       <span className="text-on-surface-variant">
                         Valor em estoque
                       </span>
-                      <span className="text-secondary">{brl(totalValue)}</span>
+                      <span className="text-secondary">
+                        {formatCurrency(totalValue)}
+                      </span>
                     </div>
                   </div>
                 </div>

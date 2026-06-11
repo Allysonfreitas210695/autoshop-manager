@@ -1,3 +1,4 @@
+import { formatCurrency } from "@/_helpers/format";
 export const metadata = { title: "Relatórios Financeiros — Precision Auto" };
 
 import { ArrowLeft, Download, TrendingDown, TrendingUp } from "lucide-react";
@@ -14,10 +15,6 @@ import {
 } from "@/_data-access/finance";
 
 import { CostDonutChart, MonthlyLineChart } from "../finance-charts";
-
-function brl(v: number) {
-  return v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-}
 
 type StatusKey = "positive" | "neutral" | "negative";
 
@@ -59,7 +56,7 @@ const columns: DataTableColumn<CategoryRow>[] = [
     align: "right",
     cell: (row) => (
       <span className="text-label-sm text-on-surface font-mono">
-        {brl(row.grossRevenue)}
+        {formatCurrency(row.grossRevenue)}
       </span>
     ),
   },
@@ -70,7 +67,7 @@ const columns: DataTableColumn<CategoryRow>[] = [
     align: "right",
     cell: (row) => (
       <span className="text-label-sm text-error font-mono">
-        -{brl(row.totalExpenses)}
+        -{formatCurrency(row.totalExpenses)}
       </span>
     ),
   },
@@ -82,7 +79,7 @@ const columns: DataTableColumn<CategoryRow>[] = [
       <span
         className={`text-label-md font-mono font-bold ${row.status === "negative" ? "text-error" : "text-status-completed"}`}
       >
-        {brl(row.netProfit)}
+        {formatCurrency(row.netProfit)}
       </span>
     ),
   },
@@ -148,10 +145,10 @@ export default async function FinanceReportsPage() {
     totalRevenue > 0 ? ((totalProfit / totalRevenue) * 100).toFixed(1) : "0.0";
 
   const reportKpis = [
-    { label: "Ticket Médio O.S.", value: brl(avgTicket) },
+    { label: "Ticket Médio O.S.", value: formatCurrency(avgTicket) },
     { label: "Margem Líquida", value: `${netMargin}%` },
     { label: "Categorias", value: String(categoryRows.length) },
-    { label: "Lucro Líquido", value: brl(totalProfit) },
+    { label: "Lucro Líquido", value: formatCurrency(totalProfit) },
   ];
 
   return (
@@ -229,7 +226,8 @@ export default async function FinanceReportsPage() {
             <div className="text-body-sm text-on-surface-variant flex justify-between">
               <span>Total custos</span>
               <span className="text-error font-mono font-bold">
-                -{brl(costBreakdown.reduce((s, d) => s + d.value, 0))}
+                -
+                {formatCurrency(costBreakdown.reduce((s, d) => s + d.value, 0))}
               </span>
             </div>
           </div>
@@ -272,7 +270,7 @@ export default async function FinanceReportsPage() {
                 {label}
               </p>
               <p className={`text-headline-sm font-mono font-bold ${color}`}>
-                {brl(value)}
+                {formatCurrency(value)}
               </p>
             </div>
           </Card>

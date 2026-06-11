@@ -1,3 +1,4 @@
+import { formatCurrency, formatDate } from "@/_helpers/format";
 export const metadata = { title: "Financeiro — Precision Auto" };
 
 import {
@@ -20,10 +21,6 @@ import {
 
 import { CashFlowBarChart } from "./finance-charts";
 
-function brl(v: number) {
-  return v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-}
-
 type TransactionStatus = Transaction["status"];
 
 const statusLabel: Record<TransactionStatus, string> = {
@@ -45,7 +42,7 @@ const columns: DataTableColumn<Transaction>[] = [
     className: "hidden sm:table-cell",
     cell: (row) => (
       <span className="text-label-sm text-on-surface-variant font-mono">
-        {new Date(row.date).toLocaleDateString("pt-BR")}
+        {formatDate(row.date)}
       </span>
     ),
   },
@@ -100,7 +97,7 @@ const columns: DataTableColumn<Transaction>[] = [
         className={`text-label-md font-mono font-bold ${row.type === "income" ? "text-status-completed" : "text-error"}`}
       >
         {row.type === "income" ? "+" : "-"}
-        {brl(row.amount)}
+        {formatCurrency(row.amount)}
       </span>
     ),
   },
@@ -163,7 +160,7 @@ export default async function FinancePage() {
                 Contas a Receber
               </p>
               <p className="text-headline-md text-status-completed mt-2 font-mono font-bold">
-                {brl(metrics.receivable)}
+                {formatCurrency(metrics.receivable)}
               </p>
               <p className="text-label-sm text-on-surface-variant mt-1 font-mono">
                 Pendente de recebimento
@@ -182,7 +179,7 @@ export default async function FinancePage() {
                 Faturamento Total
               </p>
               <p className="text-headline-md text-secondary mt-2 font-mono font-bold">
-                {brl(metrics.monthlyRevenue)}
+                {formatCurrency(metrics.monthlyRevenue)}
               </p>
               <p className="text-label-sm text-on-surface-variant mt-1 font-mono">
                 Receitas pagas
@@ -201,7 +198,7 @@ export default async function FinancePage() {
                 Despesas Pendentes
               </p>
               <p className="text-headline-md text-tertiary mt-2 font-mono font-bold">
-                {brl(metrics.pendingExpenses)}
+                {formatCurrency(metrics.pendingExpenses)}
               </p>
               <p className="text-label-sm text-on-surface-variant mt-1 font-mono">
                 A pagar
@@ -274,7 +271,7 @@ export default async function FinancePage() {
                 <span
                   className={`text-label-md font-mono font-bold ${item.color}`}
                 >
-                  {brl(item.value)}
+                  {formatCurrency(item.value)}
                 </span>
               </div>
             ))}

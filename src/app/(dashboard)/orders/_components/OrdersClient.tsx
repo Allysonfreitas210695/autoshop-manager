@@ -5,6 +5,7 @@ import { useState } from "react";
 import { DataTable, type DataTableColumn } from "@/_components/ui/data-table";
 import { StatusChip } from "@/_components/ui/status-chip";
 import type { OrderRow } from "@/_data-access/orders";
+import { formatCurrency, formatDateTime } from "@/_helpers/format";
 
 import { NewOrderDrawer } from "../new-order-drawer";
 
@@ -17,10 +18,6 @@ const STATUS_FILTER_TABS: { label: string; value: OrderStatus | "all" }[] = [
   { label: "Concluído", value: "completed" },
   { label: "Atrasado", value: "delayed" },
 ];
-
-function brl(v: number) {
-  return v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-}
 
 const columns: DataTableColumn<OrderRow>[] = [
   {
@@ -75,7 +72,7 @@ const columns: DataTableColumn<OrderRow>[] = [
     align: "right",
     cell: (row) => (
       <span className="text-label-md text-on-surface font-mono font-semibold">
-        {brl(Number(row.totalAmount))}
+        {formatCurrency(Number(row.totalAmount))}
       </span>
     ),
   },
@@ -86,12 +83,7 @@ const columns: DataTableColumn<OrderRow>[] = [
     className: "hidden md:table-cell",
     cell: (row) => (
       <span className="text-label-sm text-on-surface-variant font-mono">
-        {new Date(row.updatedAt).toLocaleString("pt-BR", {
-          day: "2-digit",
-          month: "2-digit",
-          hour: "2-digit",
-          minute: "2-digit",
-        })}
+        {formatDateTime(row.updatedAt)}
       </span>
     ),
   },

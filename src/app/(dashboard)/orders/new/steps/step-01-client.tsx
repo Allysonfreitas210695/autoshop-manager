@@ -1,9 +1,11 @@
 "use client";
 
 import { Search, UserPlus, X } from "lucide-react";
+import { Controller } from "react-hook-form";
 
 import { Input } from "@/_components/ui/input";
 import { Label } from "@/_components/ui/label";
+import { PlateInput } from "@/_components/ui/plate-input";
 import type { CustomerRow } from "@/_data-access/customers";
 import { useStep1Form } from "@/_hooks/use-step-1-form";
 import type { Step1Values } from "@/_schemas/order-wizard";
@@ -17,6 +19,7 @@ type Step1Props = {
 export function Step01Client({ defaultValues, customers, onNext }: Step1Props) {
   const {
     register,
+    control,
     handleSubmit,
     errors,
     query,
@@ -131,11 +134,18 @@ export function Step01Client({ defaultValues, customers, onNext }: Step1Props) {
             >
               PLACA *
             </Label>
-            <Input
-              id="plate"
-              placeholder="ABC-1234"
-              aria-invalid={!!errors.plate}
-              {...register("plate")}
+            <Controller
+              control={control}
+              name="plate"
+              render={({ field }) => (
+                <PlateInput
+                  id="plate"
+                  aria-invalid={!!errors.plate}
+                  value={field.value ?? ""}
+                  onChange={field.onChange}
+                  onBlur={field.onBlur}
+                />
+              )}
             />
             {errors.plate && (
               <p className="text-label-sm text-error font-mono">

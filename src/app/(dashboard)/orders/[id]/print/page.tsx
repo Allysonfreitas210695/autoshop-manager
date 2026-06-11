@@ -1,10 +1,7 @@
 import { notFound } from "next/navigation";
 
 import { getOrderById } from "@/_data-access/orders";
-
-function brl(v: number) {
-  return v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-}
+import { formatCurrency, formatDate } from "@/_helpers/format";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -70,7 +67,7 @@ export default async function PrintPage({ params }: Props) {
             </p>
             <p className="text-2xl font-bold text-gray-800">{order.id}</p>
             <p className="font-mono text-xs text-gray-500">
-              Entrada: {new Date(order.openedAt).toLocaleDateString("pt-BR")}
+              Entrada: {formatDate(order.openedAt)}
             </p>
           </div>
         </div>
@@ -174,10 +171,10 @@ export default async function PrintPage({ params }: Props) {
                       {item.quantity}
                     </td>
                     <td className="px-2 py-1.5 text-right font-mono text-gray-600">
-                      {brl(Number(item.unitPrice))}
+                      {formatCurrency(Number(item.unitPrice))}
                     </td>
                     <td className="px-2 py-1.5 text-right font-mono font-bold text-gray-800">
-                      {brl(item.quantity * Number(item.unitPrice))}
+                      {formatCurrency(item.quantity * Number(item.unitPrice))}
                     </td>
                   </tr>
                 ))}
@@ -200,7 +197,7 @@ export default async function PrintPage({ params }: Props) {
                 >
                   <p className="text-sm text-gray-700">{item.description}</p>
                   <p className="font-mono text-sm font-bold text-gray-800">
-                    {brl(Number(item.unitPrice))}
+                    {formatCurrency(Number(item.unitPrice))}
                   </p>
                 </div>
               ))}
@@ -212,15 +209,15 @@ export default async function PrintPage({ params }: Props) {
         <div className="space-y-1 border-t border-gray-300 pt-3">
           <div className="flex justify-between text-sm text-gray-500">
             <span>Subtotal peças</span>
-            <span className="font-mono">{brl(subtotalParts)}</span>
+            <span className="font-mono">{formatCurrency(subtotalParts)}</span>
           </div>
           <div className="flex justify-between text-sm text-gray-500">
             <span>Mão de obra</span>
-            <span className="font-mono">{brl(subtotalLabor)}</span>
+            <span className="font-mono">{formatCurrency(subtotalLabor)}</span>
           </div>
           <div className="flex justify-between border-t border-gray-300 pt-2 text-base font-bold text-gray-900">
             <span>TOTAL</span>
-            <span className="font-mono">{brl(total)}</span>
+            <span className="font-mono">{formatCurrency(total)}</span>
           </div>
         </div>
 
@@ -250,7 +247,7 @@ export default async function PrintPage({ params }: Props) {
                 Chave: {pixKey}
               </p>
               <p className="font-mono text-sm font-bold text-gray-800">
-                {brl(pixAmount)}
+                {formatCurrency(pixAmount)}
               </p>
               <p className="mt-1 font-mono text-[10px] text-gray-400">
                 Escaneie o QR Code com o app do seu banco
@@ -290,7 +287,7 @@ export default async function PrintPage({ params }: Props) {
         {/* Rodapé */}
         <p className="text-center font-mono text-[10px] text-gray-400">
           Precision Auto · precisionauto.com.br · (11) 3000-0000 · Emitido em{" "}
-          {new Date().toLocaleDateString("pt-BR")}
+          {formatDate(new Date())}
         </p>
       </div>
     </>

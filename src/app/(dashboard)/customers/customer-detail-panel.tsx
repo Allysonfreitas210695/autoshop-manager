@@ -10,16 +10,13 @@ import {
   SheetTitle,
 } from "@/_components/ui/sheet";
 import type { CustomerRow } from "@/_data-access/customers";
+import { formatCurrency } from "@/_helpers/format";
 
 type Props = {
   customer: CustomerRow | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 };
-
-function brl(v: number) {
-  return v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-}
 
 export function CustomerDetailPanel({ customer, open, onOpenChange }: Props) {
   const router = useRouter();
@@ -69,7 +66,7 @@ export function CustomerDetailPanel({ customer, open, onOpenChange }: Props) {
               <div className="border-outline-variant grid grid-cols-2 gap-3 border-b p-4">
                 <div className="border-outline-variant bg-surface-container rounded-md border p-3 text-center">
                   <p className="text-headline-sm text-secondary font-mono font-bold break-all">
-                    {brl(customer.totalSpent)}
+                    {formatCurrency(customer.totalSpent)}
                   </p>
                   <p className="text-on-surface-variant font-mono text-[10px] tracking-wider uppercase">
                     Total Gasto

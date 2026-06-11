@@ -1,5 +1,3 @@
-import { format } from "date-fns";
-import { ptBR } from "date-fns/locale";
 import {
   AlertTriangle,
   Calendar,
@@ -16,6 +14,7 @@ import { notFound } from "next/navigation";
 import { ServiceTimeline } from "@/_components/ui/service-timeline";
 import { getOrderById } from "@/_data-access/orders";
 import type { serviceOrderStatus } from "@/_db/schema";
+import { formatCurrency, formatLongDate } from "@/_helpers/format";
 
 type OrderStatus = (typeof serviceOrderStatus.enumValues)[number];
 
@@ -114,18 +113,10 @@ export default async function TrackPage({ params }: Props) {
     0,
   );
 
-  function brl(v: number) {
-    return v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-  }
-
-  const entryDateFormatted = format(
-    new Date(order.openedAt),
-    "dd 'de' MMMM 'de' yyyy",
-    { locale: ptBR },
-  );
+  const entryDateFormatted = formatLongDate(order.openedAt);
 
   const deliveryDateFormatted = order.dueAt
-    ? format(new Date(order.dueAt), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })
+    ? formatLongDate(order.dueAt)
     : "A definir";
 
   return (
@@ -264,7 +255,7 @@ export default async function TrackPage({ params }: Props) {
             Itens Aprovados
           </h2>
           <span className="text-label-sm text-secondary font-mono font-bold">
-            {brl(approvedTotal)}
+            {formatCurrency(approvedTotal)}
           </span>
         </div>
 
@@ -289,7 +280,7 @@ export default async function TrackPage({ params }: Props) {
                   </p>
                 </div>
                 <span className="text-body-sm text-on-surface shrink-0 font-mono font-medium">
-                  {brl(item.quantity * Number(item.unitPrice))}
+                  {formatCurrency(item.quantity * Number(item.unitPrice))}
                 </span>
               </div>
             ))}

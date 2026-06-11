@@ -34,6 +34,7 @@ import type {
   CustomerOption,
   MechanicOption,
 } from "@/_data-access/appointments";
+import { formatTime } from "@/_helpers/format";
 
 import { NewAppointmentDrawer } from "./_components/NewAppointmentDrawer";
 
@@ -63,7 +64,7 @@ const statusDot: Record<AppointmentStatus, string> = {
 };
 
 function apptTime(appt: AppointmentRow) {
-  return format(new Date(appt.scheduledAt), "HH:mm");
+  return formatTime(appt.scheduledAt);
 }
 
 function AppointmentBadge({ appt }: { appt: AppointmentRow }) {

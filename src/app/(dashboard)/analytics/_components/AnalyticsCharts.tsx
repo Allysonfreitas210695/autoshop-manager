@@ -20,10 +20,11 @@ import type {
   MonthlyRevenue,
   ServiceCategory,
 } from "@/_data-access/analytics";
+import { formatCurrency } from "@/_helpers/format";
 
 function shortBrl(v: number) {
   if (v >= 1000) return `R$${(v / 1000).toFixed(0)}k`;
-  return v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+  return formatCurrency(v);
 }
 
 const COLORS = [

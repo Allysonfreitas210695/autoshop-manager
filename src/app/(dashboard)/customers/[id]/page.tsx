@@ -14,6 +14,7 @@ import { DataTable, type DataTableColumn } from "@/_components/ui/data-table";
 import { StatusChip } from "@/_components/ui/status-chip";
 import { getCustomerById } from "@/_data-access/customers";
 import { getOrdersByCustomer } from "@/_data-access/orders";
+import { formatCurrency, formatDate } from "@/_helpers/format";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -33,10 +34,6 @@ type OrderRow = {
   description: string | null;
 };
 
-function brl(v: number) {
-  return v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-}
-
 const orderColumns: DataTableColumn<OrderRow>[] = [
   {
     id: "orderNumber",
@@ -52,7 +49,7 @@ const orderColumns: DataTableColumn<OrderRow>[] = [
     header: "Data",
     cell: (row) => (
       <span className="text-label-sm text-on-surface-variant font-mono">
-        {new Date(row.openedAt).toLocaleDateString("pt-BR")}
+        {formatDate(row.openedAt)}
       </span>
     ),
   },
@@ -76,7 +73,7 @@ const orderColumns: DataTableColumn<OrderRow>[] = [
     align: "right",
     cell: (row) => (
       <span className="text-label-md text-on-surface font-mono font-semibold">
-        {brl(Number(row.totalAmount))}
+        {formatCurrency(Number(row.totalAmount))}
       </span>
     ),
   },
@@ -173,7 +170,7 @@ export default async function CustomerProfilePage({ params }: Props) {
           <div className="flex gap-4 sm:flex-col sm:gap-3">
             <div className="border-outline-variant bg-surface-container-highest rounded-md border p-3 text-center">
               <p className="text-headline-sm text-secondary font-mono font-bold">
-                {brl(customer.totalSpent)}
+                {formatCurrency(customer.totalSpent)}
               </p>
               <p className="text-on-surface-variant font-mono text-[10px] tracking-wider uppercase">
                 Total Gasto

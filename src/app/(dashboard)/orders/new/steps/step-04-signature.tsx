@@ -4,6 +4,7 @@ import { Controller } from "react-hook-form";
 import SignatureCanvas from "react-signature-canvas";
 
 import { Button } from "@/_components/ui/button";
+import { formatCurrency } from "@/_helpers/format";
 import { useStep4Form } from "@/_hooks/use-step-4-form";
 import type {
   LaborItem,
@@ -41,10 +42,6 @@ const PRIORITY_LABELS: Record<string, string> = {
   alta: "Alta",
   urgente: "Urgente",
 };
-
-function brl(value: number) {
-  return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-}
 
 export function Step04Signature({
   defaultValues,
@@ -133,7 +130,7 @@ export function Step04Signature({
                   {p.name} × {p.quantity}
                 </span>
                 <span className="font-mono">
-                  {brl(p.quantity * p.unitPrice)}
+                  {formatCurrency(p.quantity * p.unitPrice)}
                 </span>
               </div>
             ))}
@@ -151,7 +148,7 @@ export function Step04Signature({
                 className="text-body-sm text-on-surface-variant flex justify-between"
               >
                 <span>{l.description}</span>
-                <span className="font-mono">{brl(l.price)}</span>
+                <span className="font-mono">{formatCurrency(l.price)}</span>
               </div>
             ))}
           </>
@@ -162,7 +159,7 @@ export function Step04Signature({
             Subtotal Peças
           </span>
           <span className="text-label-sm text-on-surface font-mono">
-            {brl(summary.subtotalParts)}
+            {formatCurrency(summary.subtotalParts)}
           </span>
         </div>
         <div className="flex justify-between">
@@ -170,12 +167,14 @@ export function Step04Signature({
             Mão de Obra
           </span>
           <span className="text-label-sm text-on-surface font-mono">
-            {brl(summary.subtotalLabor)}
+            {formatCurrency(summary.subtotalLabor)}
           </span>
         </div>
         <div className="border-outline-variant text-body-md text-on-surface flex justify-between border-t pt-2 font-bold">
           <span>Total</span>
-          <span className="text-tertiary font-mono">{brl(summary.total)}</span>
+          <span className="text-tertiary font-mono">
+            {formatCurrency(summary.total)}
+          </span>
         </div>
       </div>
 

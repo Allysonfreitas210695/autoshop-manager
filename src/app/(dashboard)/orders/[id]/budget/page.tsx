@@ -3,10 +3,7 @@ import { notFound } from "next/navigation";
 
 import { Card } from "@/_components/ui/card";
 import { getOrderById } from "@/_data-access/orders";
-
-function brl(v: number) {
-  return v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-}
+import { formatCurrency, formatDate } from "@/_helpers/format";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -147,7 +144,7 @@ export default async function BudgetPage({ params }: Props) {
                 </div>
                 <div className="shrink-0 text-right">
                   <p className="text-label-md text-on-surface font-mono font-bold">
-                    {brl(item.quantity * Number(item.unitPrice))}
+                    {formatCurrency(item.quantity * Number(item.unitPrice))}
                   </p>
                   {!item.approved && (
                     <p className="text-tertiary font-mono text-[10px] uppercase">
@@ -170,21 +167,21 @@ export default async function BudgetPage({ params }: Props) {
               <div className="text-body-sm text-on-surface-variant flex justify-between">
                 <span>Itens aprovados</span>
                 <span className="text-status-completed font-mono">
-                  {brl(approvedTotal)}
+                  {formatCurrency(approvedTotal)}
                 </span>
               </div>
               {pendingTotal > 0 && (
                 <div className="text-body-sm text-on-surface-variant flex justify-between">
                   <span>Itens pendentes</span>
                   <span className="text-tertiary font-mono">
-                    {brl(pendingTotal)}
+                    {formatCurrency(pendingTotal)}
                   </span>
                 </div>
               )}
               <div className="border-outline-variant text-on-surface flex justify-between border-t pt-2 font-bold">
                 <span>Total</span>
                 <span className="text-secondary font-mono">
-                  {brl(grandTotal)}
+                  {formatCurrency(grandTotal)}
                 </span>
               </div>
             </div>
@@ -193,7 +190,7 @@ export default async function BudgetPage({ params }: Props) {
                 Previsão de entrega
               </p>
               <p className="text-label-md text-on-surface font-mono font-bold">
-                {order.dueAt?.toLocaleDateString("pt-BR") ?? "A definir"}
+                {order.dueAt ? formatDate(order.dueAt) : "A definir"}
               </p>
             </div>
           </Card>
