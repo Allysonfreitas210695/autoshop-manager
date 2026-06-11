@@ -1,0 +1,108 @@
+# Requirements: AutoShop Manager (Precision Auto)
+
+**Defined:** 2026-06-11
+**Core Value:** A workshop operator can run the full day-to-day flow (intake → service order → budget approval → print/PIX → inventory/finance) on desktop AND mobile, securely, without rough edges.
+
+> Milestone: **Hardening & Polish** over the existing app. Requirements below are improvement requirements over already-shipped screens — not a greenfield build. The Drizzle/live-DB integration is explicitly out of scope (see below).
+
+## v1 Requirements
+
+Requirements for the Hardening & Polish milestone. Each maps to exactly one phase.
+
+### Security (Segurança)
+
+- [ ] **SEC-01**: Authentication is hardened (Better Auth: secure session handling, secure/HttpOnly cookies, password policy enforced)
+- [ ] **SEC-02**: All server actions in `src/_actions/` enforce server-side Zod validation on their inputs
+- [ ] **SEC-03**: Route access control in `src/proxy.ts` correctly protects dashboard routes, allows public routes, and gates auth routes (dashboard vs public vs auth route groups)
+- [ ] **SEC-04**: Security headers are applied (CSP, HSTS, X-Frame-Options, X-Content-Type-Options, Referrer-Policy)
+- [ ] **SEC-05**: Auth endpoints (login, register, forgot, reset) are rate-limited against brute force
+- [ ] **SEC-06**: No secrets leak into client bundles; env var boundaries are verified (server-only secrets stay server-side)
+
+### Responsiveness (Responsividade)
+
+- [ ] **RESP-01**: Sidebar collapses into a mobile-friendly drawer on small screens
+- [ ] **RESP-02**: `DataTable` instances scroll horizontally without breaking layout on small screens
+- [ ] **RESP-03**: Dashboard, order wizard steps, and detail screens use adaptive layouts that reflow at breakpoints
+- [ ] **RESP-04**: Interactive controls meet touch-friendly target sizing on mobile
+- [ ] **RESP-05**: Breakpoints are verified across all existing routes (no horizontal overflow or clipped content)
+
+### Usability (Usabilidade)
+
+- [ ] **USAB-01**: Data-fetching screens show loading states (skeletons/spinners)
+- [ ] **USAB-02**: Error states render user-friendly messages instead of crashing or blank screens
+- [ ] **USAB-03**: Forms give consistent inline validation feedback across all forms
+- [ ] **USAB-04**: Lists/tables with no data show empty states
+- [ ] **USAB-05**: Create/update/delete actions give toast/confirmation feedback
+- [ ] **USAB-06**: Optimistic UI is applied where appropriate (e.g., create/update interactions)
+
+### Screen enhancement (Aprimoramento de telas)
+
+- [ ] **SCRN-01**: Strategic dashboard implemented (`dashboard_estrat_gico_precision_auto` — advanced metrics) at `/analytics` or dashboard tab
+- [ ] **SCRN-02**: Low-stock alerts screen implemented at `/inventory/alerts` (`estoque_alerta_de_itens_baixos`) with CRÍTICO/ATENÇÃO highlighting
+- [ ] **SCRN-03**: Purchase-order generation implemented under `/inventory/purchase-orders` (`gerar_ordem_de_compra`)
+- [ ] **SCRN-04**: Purchase order with delivery forecast implemented (`ordem_de_compra_com_previs_o_de_entrega`)
+- [ ] **SCRN-05**: New O.S. with intake checklist implemented (`nova_ordem_de_servi_o_com_checklist`) as part of the order flow
+- [ ] **SCRN-06**: Placeholder routes resolved — `/appointments` (react-big-calendar + date-fns) and `/track/[id]` (public tracking with qrcode.react)
+- [ ] **SCRN-07**: Design-system consistency polish (font-mono labels, status chips, system colors) applied across all screens
+
+## v2 Requirements
+
+Deferred to future release. Tracked but not in current roadmap.
+
+### Database integration
+
+- **DB-01**: Replace mock data with real Drizzle ORM queries across all modules
+- **DB-02**: Implement full CRUD server actions for Customers/Vehicles, O.S., Inventory, Finance, Appointments
+- **DB-03**: Connect Better Auth to the database
+
+## Out of Scope
+
+Explicitly excluded. Documented to prevent scope creep.
+
+| Feature                                                       | Reason                                                           |
+| ------------------------------------------------------------- | ---------------------------------------------------------------- |
+| Drizzle / live DB integration                                 | Mock-data-first until MVP validated; separate deferred milestone |
+| Re-architecture of existing screens                           | This milestone improves screens, does not redesign structure     |
+| New business modules beyond the listed pending design screens | Scope limited to documented pending screens                      |
+
+## Traceability
+
+Which phases cover which requirements.
+
+| Requirement | Phase   | Status  |
+| ----------- | ------- | ------- |
+| SEC-01      | Phase 1 | Pending |
+| SEC-02      | Phase 1 | Pending |
+| SEC-03      | Phase 1 | Pending |
+| SEC-04      | Phase 1 | Pending |
+| SEC-05      | Phase 1 | Pending |
+| SEC-06      | Phase 1 | Pending |
+| RESP-01     | Phase 2 | Pending |
+| RESP-02     | Phase 2 | Pending |
+| RESP-03     | Phase 2 | Pending |
+| RESP-04     | Phase 2 | Pending |
+| RESP-05     | Phase 2 | Pending |
+| USAB-01     | Phase 3 | Pending |
+| USAB-02     | Phase 3 | Pending |
+| USAB-03     | Phase 3 | Pending |
+| USAB-04     | Phase 3 | Pending |
+| USAB-05     | Phase 3 | Pending |
+| USAB-06     | Phase 3 | Pending |
+| SCRN-01     | Phase 4 | Pending |
+| SCRN-02     | Phase 4 | Pending |
+| SCRN-03     | Phase 4 | Pending |
+| SCRN-04     | Phase 4 | Pending |
+| SCRN-05     | Phase 4 | Pending |
+| SCRN-06     | Phase 4 | Pending |
+| SCRN-07     | Phase 4 | Pending |
+
+**Coverage:**
+
+- v1 requirements: 24 total
+- Mapped to phases: 24
+- Unmapped: 0 ✓
+
+---
+
+_Requirements defined: 2026-06-11_
+_Last updated: 2026-06-11 after Hardening & Polish milestone bootstrap_
