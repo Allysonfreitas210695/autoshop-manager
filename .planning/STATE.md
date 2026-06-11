@@ -1,7 +1,10 @@
 ---
-gsd_state_version: "1.0" # placeholder; syncStateFrontmatter overwrites on first state.* call
-status: planning
+gsd_state_version: 1.0
 milestone: Hardening & Polish
+milestone_name: milestone
+status: planning
+last_updated: "2026-06-11T23:07:14.046Z"
+last_activity: 2026-06-11 — Bootstrapped .planning/ structure from .planning/PLAN.md ingest; opened "Hardening & Polish" milestone with 4 phases.
 progress:
   total_phases: 4
   completed_phases: 0
@@ -80,6 +83,6 @@ Items acknowledged and carried forward:
 
 ## Session Continuity
 
-Last session: 2026-06-11 19:56
-Stopped at: Wrote PROJECT.md, REQUIREMENTS.md, ROADMAP.md, STATE.md for the Hardening & Polish milestone.
-Resume file: None
+Last session: 2026-06-11T23:07:14.028Z
+Stopped at: Phase 1 context gathered
+Resume file: .planning/phases/01-seguran-a-security/01-CONTEXT.md
