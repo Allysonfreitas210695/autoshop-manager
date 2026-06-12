@@ -20,10 +20,10 @@ Requirements for the Hardening & Polish milestone. Each maps to exactly one phas
 
 ### Responsiveness (Responsividade)
 
-- [ ] **RESP-01**: Sidebar collapses into a mobile-friendly drawer on small screens
+- [x] **RESP-01**: Sidebar collapses into a mobile-friendly drawer on small screens
 - [ ] **RESP-02**: `DataTable` instances scroll horizontally without breaking layout on small screens
 - [ ] **RESP-03**: Dashboard, order wizard steps, and detail screens use adaptive layouts that reflow at breakpoints
-- [ ] **RESP-04**: Interactive controls meet touch-friendly target sizing on mobile
+- [x] **RESP-04**: Interactive controls meet touch-friendly target sizing on mobile
 - [ ] **RESP-05**: Breakpoints are verified across all existing routes (no horizontal overflow or clipped content)
 
 ### Usability (Usabilidade)
@@ -69,32 +69,32 @@ Explicitly excluded. Documented to prevent scope creep.
 
 Which phases cover which requirements.
 
-| Requirement | Phase   | Status  |
-| ----------- | ------- | ------- |
-| SEC-01      | Phase 1 | Pending |
-| SEC-02      | Phase 1 | Pending |
-| SEC-03      | Phase 1 | Pending |
-| SEC-04      | Phase 1 | Pending |
-| SEC-05      | Phase 1 | Pending |
-| SEC-06      | Phase 1 | Pending |
-| RESP-01     | Phase 2 | Pending |
-| RESP-02     | Phase 2 | Pending |
-| RESP-03     | Phase 2 | Pending |
-| RESP-04     | Phase 2 | Pending |
-| RESP-05     | Phase 2 | Pending |
-| USAB-01     | Phase 3 | Pending |
-| USAB-02     | Phase 3 | Pending |
-| USAB-03     | Phase 3 | Pending |
-| USAB-04     | Phase 3 | Pending |
-| USAB-05     | Phase 3 | Pending |
-| USAB-06     | Phase 3 | Pending |
-| SCRN-01     | Phase 4 | Pending |
-| SCRN-02     | Phase 4 | Pending |
-| SCRN-03     | Phase 4 | Pending |
-| SCRN-04     | Phase 4 | Pending |
-| SCRN-05     | Phase 4 | Pending |
-| SCRN-06     | Phase 4 | Pending |
-| SCRN-07     | Phase 4 | Pending |
+| Requirement | Phase   | Status   |
+| ----------- | ------- | -------- |
+| SEC-01      | Phase 1 | Pending  |
+| SEC-02      | Phase 1 | Pending  |
+| SEC-03      | Phase 1 | Pending  |
+| SEC-04      | Phase 1 | Pending  |
+| SEC-05      | Phase 1 | Pending  |
+| SEC-06      | Phase 1 | Pending  |
+| RESP-01     | Phase 2 | Complete |
+| RESP-02     | Phase 2 | Pending  |
+| RESP-03     | Phase 2 | Pending  |
+| RESP-04     | Phase 2 | Complete |
+| RESP-05     | Phase 2 | Pending  |
+| USAB-01     | Phase 3 | Pending  |
+| USAB-02     | Phase 3 | Pending  |
+| USAB-03     | Phase 3 | Pending  |
+| USAB-04     | Phase 3 | Pending  |
+| USAB-05     | Phase 3 | Pending  |
+| USAB-06     | Phase 3 | Pending  |
+| SCRN-01     | Phase 4 | Pending  |
+| SCRN-02     | Phase 4 | Pending  |
+| SCRN-03     | Phase 4 | Pending  |
+| SCRN-04     | Phase 4 | Pending  |
+| SCRN-05     | Phase 4 | Pending  |
+| SCRN-06     | Phase 4 | Pending  |
+| SCRN-07     | Phase 4 | Pending  |
 
 **Coverage:**
 
