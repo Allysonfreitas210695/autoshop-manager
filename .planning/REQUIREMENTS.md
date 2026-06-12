@@ -21,8 +21,8 @@ Requirements for the Hardening & Polish milestone. Each maps to exactly one phas
 ### Responsiveness (Responsividade)
 
 - [x] **RESP-01**: Sidebar collapses into a mobile-friendly drawer on small screens
-- [ ] **RESP-02**: `DataTable` instances scroll horizontally without breaking layout on small screens
-- [ ] **RESP-03**: Dashboard, order wizard steps, and detail screens use adaptive layouts that reflow at breakpoints
+- [x] **RESP-02**: `DataTable` instances scroll horizontally without breaking layout on small screens
+- [x] **RESP-03**: Dashboard, order wizard steps, and detail screens use adaptive layouts that reflow at breakpoints
 - [x] **RESP-04**: Interactive controls meet touch-friendly target sizing on mobile
 - [ ] **RESP-05**: Breakpoints are verified across all existing routes (no horizontal overflow or clipped content)
 
@@ -78,8 +78,8 @@ Which phases cover which requirements.
 | SEC-05      | Phase 1 | Pending  |
 | SEC-06      | Phase 1 | Pending  |
 | RESP-01     | Phase 2 | Complete |
-| RESP-02     | Phase 2 | Pending  |
-| RESP-03     | Phase 2 | Pending  |
+| RESP-02     | Phase 2 | Complete |
+| RESP-03     | Phase 2 | Complete |
 | RESP-04     | Phase 2 | Complete |
 | RESP-05     | Phase 2 | Pending  |
 | USAB-01     | Phase 3 | Pending  |

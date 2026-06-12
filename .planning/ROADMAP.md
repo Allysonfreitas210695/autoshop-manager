@@ -62,7 +62,7 @@ Plans:
    **Wave 1**
 
 - [x] 02-01-PLAN.md — RESP-01/RESP-04 navigation: icon-touch Button variant, w-[85vw] mobile drawer, py-3 touch targets
-- [ ] 02-02-PLAN.md — RESP-02/RESP-03 responsive column hiding on orders + dashboard tables (totalAmount hidden at sm)
+- [x] 02-02-PLAN.md — RESP-02/RESP-03 responsive column hiding on orders + dashboard tables (totalAmount hidden at sm)
 - [ ] 02-03-PLAN.md — RESP-03 adaptive layouts: horizontal-scroll step indicator + finance chart scroll wrappers
 
 **Wave 2** _(blocked on Wave 1 completion)_
@@ -108,6 +108,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 | Phase                                          | Plans Complete | Status      | Completed |
 | ---------------------------------------------- | -------------- | ----------- | --------- |
 | 1. Segurança (Security)                        | 0/5            | Not started | -         |
-| 2. Responsividade (Responsiveness)             | 1/4            | In Progress |           |
+| 2. Responsividade (Responsiveness)             | 2/4            | In Progress |           |
 | 3. Usabilidade (Usability)                     | 0/TBD          | Not started | -         |
 | 4. Aprimoramento de telas (Screen enhancement) | 0/TBD          | Not started | -         |
