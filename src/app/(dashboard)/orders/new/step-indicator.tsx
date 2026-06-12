@@ -22,13 +22,16 @@ type StepIndicatorProps = {
 export function StepIndicator({ currentStep }: StepIndicatorProps) {
   return (
     <div className="w-full">
-      <div className="flex items-center justify-between">
+      <div className="flex [scrollbar-width:none] items-center overflow-x-auto pb-1 [&::-webkit-scrollbar]:hidden">
         {STEPS.map((step, index) => {
           const isDone = step.number < currentStep;
           const isActive = step.number === currentStep;
 
           return (
-            <div key={step.number} className="flex flex-1 items-center">
+            <div
+              key={step.number}
+              className="flex min-w-[56px] shrink-0 items-center"
+            >
               <div className="flex flex-col items-center gap-1.5">
                 <div
                   className={`text-label-sm flex size-8 items-center justify-center rounded-full border-2 font-mono font-bold transition-colors ${
