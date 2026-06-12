@@ -2,8 +2,8 @@
 gsd_state_version: 1.0
 milestone: Hardening & Polish
 milestone_name: milestone
-status: verifying
-last_updated: "2026-06-12T20:09:03.831Z"
+status: ready_to_plan
+last_updated: 2026-06-12T20:19:08.410Z
 last_activity: 2026-06-12
 progress:
   total_phases: 4
@@ -11,6 +11,7 @@ progress:
   total_plans: 9
   completed_plans: 9
   percent: 50
+stopped_at: Phase 02 complete (4/4) — ready to discuss Phase 3
 ---
 
 # Project State
@@ -20,13 +21,13 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-11)
 
 **Core value:** A workshop operator can run the full day-to-day flow (intake → service order → budget approval → print/PIX → inventory/finance) on desktop AND mobile, securely, without rough edges.
-**Current focus:** Phase 02 — responsividade-responsiveness
+**Current focus:** Phase 3 — usabilidade (usability)
 
 ## Current Position
 
-Phase: 02 (responsividade-responsiveness) — EXECUTING
-Plan: 4 of 4
-Status: Phase complete — ready for verification
+Phase: 3
+Plan: Not started
+Status: Ready to plan
 Last activity: 2026-06-12
 
 Progress: [██████████] 100%
@@ -35,7 +36,7 @@ Progress: [██████████] 100%
 
 **Velocity:**
 
-- Total plans completed: 5
+- Total plans completed: 9
 - Average duration: — min
 - Total execution time: — hours
 
@@ -43,7 +44,7 @@ Progress: [██████████] 100%
 
 | Phase | Plans | Total | Avg/Plan |
 | ----- | ----- | ----- | -------- |
-| -     | -     | -     | -        |
+| 02    | 4     | -     | -        |
 
 **Recent Trend:**
 
