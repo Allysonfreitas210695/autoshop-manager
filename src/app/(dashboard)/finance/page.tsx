@@ -234,8 +234,10 @@ export default async function FinancePage() {
               </span>
             </div>
           </div>
-          <div className="p-4">
-            <CashFlowBarChart data={cashFlow} />
+          <div className="overflow-x-auto p-4">
+            <div className="min-w-[300px]">
+              <CashFlowBarChart data={cashFlow} />
+            </div>
           </div>
         </Card>
 
