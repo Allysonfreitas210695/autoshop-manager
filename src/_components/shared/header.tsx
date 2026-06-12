@@ -83,7 +83,7 @@ export function Header({ user }: { user: HeaderUser }) {
               render={
                 <Button
                   variant="ghost"
-                  size="icon"
+                  size="icon-touch"
                   className="lg:hidden"
                   aria-label="Abrir menu"
                 />
@@ -93,7 +93,7 @@ export function Header({ user }: { user: HeaderUser }) {
             </SheetTrigger>
             <SheetContent
               side="left"
-              className="border-outline-variant bg-surface-container w-64 p-0"
+              className="border-outline-variant bg-surface-container w-[85vw] max-w-xs p-0"
             >
               <SheetTitle className="sr-only">Navegação</SheetTitle>
               <SidebarContent onNavigate={() => setMenuOpen(false)} />
@@ -135,7 +135,7 @@ export function Header({ user }: { user: HeaderUser }) {
         <div className="flex items-center gap-2">
           <Button
             variant="ghost"
-            size="icon"
+            size="icon-touch"
             onClick={() => setSearchOpen(true)}
             aria-label="Pesquisar"
             className="sm:hidden"
@@ -144,7 +144,7 @@ export function Header({ user }: { user: HeaderUser }) {
           </Button>
           <Button
             variant="ghost"
-            size="icon"
+            size="icon-touch"
             aria-label="Notificações"
             className="text-on-surface-variant hover:bg-surface-container relative rounded-full"
           >
