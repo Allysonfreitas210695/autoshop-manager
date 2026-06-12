@@ -1,7 +1,12 @@
 import { getSessionCookie } from "better-auth/cookies";
 import { type NextRequest, NextResponse } from "next/server";
 
-const authRoutes = ["/login", "/register"];
+const authRoutes = [
+  "/login",
+  "/register",
+  "/forgot-password",
+  "/reset-password",
+];
 
 const STATIC_FILE_REGEX =
   /\.(png|jpg|jpeg|gif|svg|ico|webp|woff|woff2|ttf|otf|json|webmanifest)$/;
@@ -9,6 +14,7 @@ const STATIC_FILE_REGEX =
 const ALWAYS_PUBLIC_PREFIXES = [
   "/api/auth",
   "/api/setup-admin",
+  "/track",
   "/_next",
   "/terms",
   "/privacy",
