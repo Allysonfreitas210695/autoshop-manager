@@ -58,7 +58,7 @@ export function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
                     onClick={onNavigate}
                     aria-current={active ? "page" : undefined}
                     className={cn(
-                      "text-label-md flex items-center gap-3 rounded-lg px-4 py-2.5 font-mono transition-colors",
+                      "text-label-md flex items-center gap-3 rounded-lg px-4 py-3 font-mono transition-colors",
                       active
                         ? "bg-secondary-container text-on-secondary-container"
                         : "text-on-surface-variant hover:bg-surface-container-highest",
@@ -75,7 +75,7 @@ export function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
       </nav>
 
       <div className="mt-auto px-6 pt-4">
-        <button className="bg-surface-container-highest text-label-md text-on-surface hover:bg-outline-variant flex w-full items-center justify-center gap-2 rounded-lg px-4 py-2.5 font-mono transition-colors">
+        <button className="bg-surface-container-highest text-label-md text-on-surface hover:bg-outline-variant flex w-full items-center justify-center gap-2 rounded-lg px-4 py-3 font-mono transition-colors">
           <Headset className="size-4" />
           Suporte Técnico
         </button>
