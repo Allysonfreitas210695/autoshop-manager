@@ -24,7 +24,7 @@ Requirements for the Hardening & Polish milestone. Each maps to exactly one phas
 - [x] **RESP-02**: `DataTable` instances scroll horizontally without breaking layout on small screens
 - [x] **RESP-03**: Dashboard, order wizard steps, and detail screens use adaptive layouts that reflow at breakpoints
 - [x] **RESP-04**: Interactive controls meet touch-friendly target sizing on mobile
-- [ ] **RESP-05**: Breakpoints are verified across all existing routes (no horizontal overflow or clipped content)
+- [x] **RESP-05**: Breakpoints are verified across all existing routes (no horizontal overflow or clipped content)
 
 ### Usability (Usabilidade)
 
@@ -81,7 +81,7 @@ Which phases cover which requirements.
 | RESP-02     | Phase 2 | Complete |
 | RESP-03     | Phase 2 | Complete |
 | RESP-04     | Phase 2 | Complete |
-| RESP-05     | Phase 2 | Pending  |
+| RESP-05     | Phase 2 | Complete |
 | USAB-01     | Phase 3 | Pending  |
 | USAB-02     | Phase 3 | Pending  |
 | USAB-03     | Phase 3 | Pending  |

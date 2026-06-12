@@ -14,7 +14,7 @@ This is a **Hardening & Polish** milestone over the already-shipped AutoShop Man
 The four phases are ordered 1→4 by risk/priority. They are largely independent improvements over existing screens; the order is a recommended sequence, not a hard technical dependency chain.
 
 - [ ] **Phase 1: Segurança (Security)** - Harden auth, validate all server actions, lock down route access, add security headers, rate-limit auth, verify no leaked secrets
-- [ ] **Phase 2: Responsividade (Responsiveness)** - Collapsible mobile sidebar, horizontal-scroll tables, adaptive layouts, touch targets, verified breakpoints
+- [x] **Phase 2: Responsividade (Responsiveness)** - Collapsible mobile sidebar, horizontal-scroll tables, adaptive layouts, touch targets, verified breakpoints (completed 2026-06-12)
 - [ ] **Phase 3: Usabilidade (Usability)** - Loading/error/empty states, consistent validation feedback, toasts/confirmations, optimistic UI
 - [ ] **Phase 4: Aprimoramento de telas (Screen enhancement)** - Implement pending design screens, resolve placeholder routes, apply design-system consistency polish
 
@@ -67,7 +67,7 @@ Plans:
 
 **Wave 2** _(blocked on Wave 1 completion)_
 
-- [ ] 02-04-PLAN.md — RESP-05 breakpoint verification pass + locked completion gate (tsc/lint/build)
+- [x] 02-04-PLAN.md — RESP-05 breakpoint verification pass + locked completion gate (tsc/lint/build)
 
 ### Phase 3: Usabilidade (Usability)
 
@@ -105,9 +105,9 @@ Plans:
 **Execution Order:**
 Phases execute in numeric order: 1 → 2 → 3 → 4
 
-| Phase                                          | Plans Complete | Status      | Completed |
-| ---------------------------------------------- | -------------- | ----------- | --------- |
-| 1. Segurança (Security)                        | 0/5            | Not started | -         |
-| 2. Responsividade (Responsiveness)             | 3/4            | In Progress |           |
-| 3. Usabilidade (Usability)                     | 0/TBD          | Not started | -         |
-| 4. Aprimoramento de telas (Screen enhancement) | 0/TBD          | Not started | -         |
+| Phase                                          | Plans Complete | Status      | Completed  |
+| ---------------------------------------------- | -------------- | ----------- | ---------- |
+| 1. Segurança (Security)                        | 0/5            | Not started | -          |
+| 2. Responsividade (Responsiveness)             | 4/4            | Complete    | 2026-06-12 |
+| 3. Usabilidade (Usability)                     | 0/TBD          | Not started | -          |
+| 4. Aprimoramento de telas (Screen enhancement) | 0/TBD          | Not started | -          |
