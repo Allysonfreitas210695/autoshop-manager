@@ -58,12 +58,15 @@ Plans:
 6. Locked completion checklist passes: `npx tsc --noEmit` zero errors, `npm run lint` zero errors, `npm run build` succeeds, all routes render without crash, responsiveness tested (mobile sidebar + horizontal-scroll tables), design patterns applied.
    **Plans**: 4 plans
    **UI hint**: yes
-
-Plans:
+   Plans:
+   **Wave 1**
 
 - [ ] 02-01-PLAN.md — RESP-01/RESP-04 navigation: icon-touch Button variant, w-[85vw] mobile drawer, py-3 touch targets
 - [ ] 02-02-PLAN.md — RESP-02/RESP-03 responsive column hiding on orders + dashboard tables (totalAmount hidden at sm)
 - [ ] 02-03-PLAN.md — RESP-03 adaptive layouts: horizontal-scroll step indicator + finance chart scroll wrappers
+
+**Wave 2** _(blocked on Wave 1 completion)_
+
 - [ ] 02-04-PLAN.md — RESP-05 breakpoint verification pass + locked completion gate (tsc/lint/build)
 
 ### Phase 3: Usabilidade (Usability)
