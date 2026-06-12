@@ -14,9 +14,15 @@ export const auth = betterAuth({
   }),
   emailAndPassword: {
     enabled: true,
+    // Mirrors the Zod floor (SEC-01 / D-08). Better Auth has no native
+    // complexity validator, so this only enforces length server-side.
+    minPasswordLength: 8,
     sendResetPassword: async ({ url }) => {
       // TODO: integrate email provider (Resend, Nodemailer, etc.) for production
-      console.log("[reset-password] link:", url);
+      // Guard the sensitive reset URL so it never reaches production logs.
+      if (process.env.NODE_ENV !== "production") {
+        console.log("[reset-password] link:", url);
+      }
     },
   },
   socialProviders: {
