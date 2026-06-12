@@ -65,6 +65,7 @@ const orderColumns: DataTableColumn<OrderRow>[] = [
     id: "totalAmount",
     header: "Total",
     align: "right",
+    className: "hidden sm:table-cell",
     cell: (row) => (
       <span className="text-label-md text-on-surface font-mono">
         {formatCurrency(Number(row.totalAmount))}
