@@ -212,8 +212,10 @@ export default async function FinanceReportsPage() {
               </span>
             </div>
           </div>
-          <div className="p-4">
-            <MonthlyLineChart data={monthlyCashFlow} />
+          <div className="overflow-x-auto p-4">
+            <div className="min-w-[360px]">
+              <MonthlyLineChart data={monthlyCashFlow} />
+            </div>
           </div>
         </Card>
 
@@ -221,7 +223,11 @@ export default async function FinanceReportsPage() {
           <h2 className="text-label-lg text-on-surface mb-4 font-mono font-semibold tracking-wider uppercase">
             Custos por Categoria
           </h2>
-          <CostDonutChart data={costBreakdown} />
+          <div className="overflow-x-auto">
+            <div className="min-w-[280px]">
+              <CostDonutChart data={costBreakdown} />
+            </div>
+          </div>
           <div className="border-outline-variant mt-4 space-y-2 border-t pt-4">
             <div className="text-body-sm text-on-surface-variant flex justify-between">
               <span>Total custos</span>
