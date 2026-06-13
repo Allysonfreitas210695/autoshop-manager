@@ -5,19 +5,21 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
 import { db } from "@/_db";
-import { serviceOrderItems, serviceOrders } from "@/_db/schema";
+import { serviceOrderItems, serviceOrders, vehicles } from "@/_db/schema";
 import { authActionClient } from "@/_lib/safe-action";
 
 export const createOrderAction = authActionClient
   .schema(
     z.object({
-      vehicleId: z.uuid(),
+      plate: z.string().min(6).max(8),
+      customerName: z.string().min(2),
+      vehicleModel: z.string().min(2),
       customerId: z.string().optional(),
       mechanicId: z.string().optional(),
       clientReport: z.string().optional(),
       diagnosis: z.string().optional(),
       serviceType: z.string().optional(),
-      priority: z.string().default("normal"),
+      priority: z.string(),
       dueAt: z.string().datetime().optional(),
       items: z
         .array(
@@ -33,6 +35,15 @@ export const createOrderAction = authActionClient
     }),
   )
   .action(async ({ parsedInput }) => {
+    const [vehicle] = await db
+      .insert(vehicles)
+      .values({
+        plate: parsedInput.plate.toUpperCase(),
+        make: "Não informado",
+        model: parsedInput.vehicleModel,
+      })
+      .returning({ id: vehicles.id });
+
     const totalAmount = parsedInput.items.reduce(
       (s, i) => s + i.quantity * i.unitPrice,
       0,
@@ -41,7 +52,7 @@ export const createOrderAction = authActionClient
     const [order] = await db
       .insert(serviceOrders)
       .values({
-        vehicleId: parsedInput.vehicleId,
+        vehicleId: vehicle.id,
         customerId: parsedInput.customerId ?? null,
         mechanicId: parsedInput.mechanicId ?? null,
         clientReport: parsedInput.clientReport ?? null,
