@@ -81,8 +81,19 @@ Plans:
 3. Forms show consistent inline validation feedback across the app (driven by the existing Zod + react-hook-form pattern).
 4. Create, update, and delete actions surface a toast/confirmation, with optimistic UI applied where appropriate.
 5. Locked completion checklist passes: `npx tsc --noEmit` zero errors, `npm run lint` zero errors, `npm run build` succeeds, all routes render without crash, responsiveness still holds, design patterns applied.
-   **Plans**: TBD
+   **Plans**: 5 plans
    **UI hint**: yes
+   Plans:
+   **Wave 1**
+
+- [ ] 03-01-PLAN.md — USAB-03/05 wiring de criação de O.S. (schema createOrderAction + vehicle inline + wizard via useAction)
+- [ ] 03-02-PLAN.md — USAB-03/05 wiring de clientes (NewCustomerDrawer + fix de rota errada do botão)
+- [ ] 03-03-PLAN.md — USAB-03/05 wiring de inventário (use-new-part-form → createPartAction + UpdateStockDialog → updateStockAction)
+- [ ] 03-05-PLAN.md — USAB-01/02/04 loading.tsx + error.tsx (unstable_retry) em todos os segmentos + verificação de empty states
+
+**Wave 2** _(blocked on Wave 1 completion)_
+
+- [ ] 03-04-PLAN.md — USAB-05/06 status otimista de O.S. (useOptimisticAction) + split Server/Client da budget page para approveOrderItemAction
 
 ### Phase 4: Aprimoramento de telas (Screen enhancement)
 
@@ -109,5 +120,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 | ---------------------------------------------- | -------------- | ----------- | ---------- |
 | 1. Segurança (Security)                        | 0/5            | Not started | -          |
 | 2. Responsividade (Responsiveness)             | 4/4            | Complete    | 2026-06-12 |
-| 3. Usabilidade (Usability)                     | 0/TBD          | Not started | -          |
+| 3. Usabilidade (Usability)                     | 0/5            | Not started | -          |
 | 4. Aprimoramento de telas (Screen enhancement) | 0/TBD          | Not started | -          |
