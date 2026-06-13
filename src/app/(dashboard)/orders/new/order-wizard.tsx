@@ -2,9 +2,11 @@
 
 import { ChevronLeft, FileText } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useAction } from "next-safe-action/hooks";
 import { useState } from "react";
 import { toast } from "sonner";
 
+import { createOrderAction } from "@/_actions/orders";
 import { Button } from "@/_components/ui/button";
 import type { CustomerRow } from "@/_data-access/customers";
 import type { Part } from "@/_data-access/inventory";
@@ -51,6 +53,16 @@ export function OrderWizard({ customers, parts }: OrderWizardProps) {
   const [currentStep, setCurrentStep] = useState(1);
   const [wizardData, setWizardData] = useState<WizardState>(INITIAL_STATE);
 
+  const { execute, status } = useAction(createOrderAction, {
+    onSuccess: ({ data }) => {
+      toast.success(`O.S. #${data?.orderNumber} criada com sucesso.`);
+      router.push("/orders");
+    },
+    onError: ({ error }) => {
+      toast.error(error.serverError ?? "Erro ao criar O.S.");
+    },
+  });
+
   function handleStep1Next(data: Step1Values) {
     setWizardData((prev) => ({ ...prev, step1: data }));
     setCurrentStep(2);
@@ -71,18 +83,38 @@ export function OrderWizard({ customers, parts }: OrderWizardProps) {
     setCurrentStep(5);
   }
 
-  async function handleFinalSubmit(
-    data: Step4Values,
-    signatureDataUrl: string | null,
+  function handleFinalSubmit(
+    _data: Step4Values,
+    _signatureDataUrl: string | null,
   ) {
-    const finalData = { ...wizardData, step4: data, signatureDataUrl };
-    // Simula envio
-    await new Promise((r) => setTimeout(r, 800));
-    console.log("Nova O.S. criada:", finalData);
-    toast.success(
-      `O.S. criada com sucesso — Placa ${wizardData.step1.plate ?? "N/A"}`,
-    );
-    router.push("/orders");
+    const partItems = (
+      (wizardData.step3.parts as PartItem[] | undefined) ?? []
+    ).map((p) => ({
+      description: p.name,
+      itemType: "part" as const,
+      quantity: p.quantity,
+      unitPrice: p.unitPrice,
+    }));
+
+    const laborItems = (
+      (wizardData.step3.laborItems as LaborItem[] | undefined) ?? []
+    ).map((l) => ({
+      description: l.description,
+      itemType: "labor" as const,
+      quantity: 1,
+      unitPrice: l.price,
+    }));
+
+    execute({
+      plate: wizardData.step1.plate ?? "",
+      customerName: wizardData.step1.customerName ?? "",
+      vehicleModel: wizardData.step1.vehicleModel ?? "",
+      clientReport: wizardData.step2.customerReport,
+      diagnosis: wizardData.step2.initialDiagnosis,
+      serviceType: wizardData.step2.serviceType,
+      priority: wizardData.step2.priority ?? "normal",
+      items: [...partItems, ...laborItems],
+    });
   }
 
   function goBack() {
@@ -207,13 +239,18 @@ export function OrderWizard({ customers, parts }: OrderWizardProps) {
             <Button
               type="submit"
               form="wizard-step-form"
+              disabled={isFinalStep && status === "executing"}
               className={
                 isFinalStep
                   ? "bg-tertiary text-surface hover:bg-tertiary/90"
                   : ""
               }
             >
-              {isFinalStep ? "Gerar O.S." : "Próximo Passo →"}
+              {isFinalStep
+                ? status === "executing"
+                  ? "Gerando O.S...."
+                  : "Gerar O.S."
+                : "Próximo Passo →"}
             </Button>
           </div>
         </div>
