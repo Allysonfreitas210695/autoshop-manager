@@ -2,16 +2,15 @@
 gsd_state_version: 1.0
 milestone: Hardening & Polish
 milestone_name: milestone
-status: ready_to_plan
-last_updated: 2026-06-12T20:19:08.410Z
-last_activity: 2026-06-12
+status: executing
+last_updated: "2026-06-13T14:44:42.897Z"
+last_activity: 2026-06-13
 progress:
   total_phases: 4
   completed_phases: 2
-  total_plans: 9
-  completed_plans: 9
+  total_plans: 14
+  completed_plans: 10
   percent: 50
-stopped_at: Phase 02 complete (4/4) — ready to discuss Phase 3
 ---
 
 # Project State
@@ -21,16 +20,16 @@ stopped_at: Phase 02 complete (4/4) — ready to discuss Phase 3
 See: .planning/PROJECT.md (updated 2026-06-11)
 
 **Core value:** A workshop operator can run the full day-to-day flow (intake → service order → budget approval → print/PIX → inventory/finance) on desktop AND mobile, securely, without rough edges.
-**Current focus:** Phase 3 — usabilidade (usability)
+**Current focus:** Phase 03 — usabilidade-usability
 
 ## Current Position
 
-Phase: 3
-Plan: Not started
-Status: Ready to plan
-Last activity: 2026-06-12
+Phase: 03 (usabilidade-usability) — EXECUTING
+Plan: 2 of 5
+Status: Ready to execute
+Last activity: 2026-06-13
 
-Progress: [██████████] 100%
+Progress: [███████░░░] 71%
 
 ## Performance Metrics
 
@@ -53,6 +52,7 @@ Progress: [██████████] 100%
 
 _Updated after each plan completion_
 | Phase 02-responsividade-responsiveness P04 | 20 | 2 tasks | 0 files |
+| Phase 03-usabilidade-usability P01 | 8 | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -67,6 +67,7 @@ Recent decisions affecting current work:
 - [Locked]: Next.js 16 + Turbopack; access control in `proxy.ts` (not `middleware.ts`); Better Auth.
 - [Locked]: Mock-data-first; Drizzle/live-DB integration deferred to a later milestone (out of scope this milestone).
 - [Phase ?]: Human approved breakpoint pass
+- [Phase ?]: createOrderAction reescrito para plate/customerName/vehicleModel com insert de vehicle inline; wizard wired via useAction
 
 ### Pending Todos
 
@@ -86,6 +87,6 @@ Items acknowledged and carried forward:
 
 ## Session Continuity
 
-Last session: 2026-06-12T20:08:59.254Z
+Last session: 2026-06-13T14:44:36.650Z
 Stopped at: Phase 2 context gathered
 Resume file: None

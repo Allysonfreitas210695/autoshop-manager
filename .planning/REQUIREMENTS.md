@@ -30,9 +30,9 @@ Requirements for the Hardening & Polish milestone. Each maps to exactly one phas
 
 - [ ] **USAB-01**: Data-fetching screens show loading states (skeletons/spinners)
 - [ ] **USAB-02**: Error states render user-friendly messages instead of crashing or blank screens
-- [ ] **USAB-03**: Forms give consistent inline validation feedback across all forms
+- [x] **USAB-03**: Forms give consistent inline validation feedback across all forms
 - [ ] **USAB-04**: Lists/tables with no data show empty states
-- [ ] **USAB-05**: Create/update/delete actions give toast/confirmation feedback
+- [x] **USAB-05**: Create/update/delete actions give toast/confirmation feedback
 - [ ] **USAB-06**: Optimistic UI is applied where appropriate (e.g., create/update interactions)
 
 ### Screen enhancement (Aprimoramento de telas)
@@ -84,9 +84,9 @@ Which phases cover which requirements.
 | RESP-05     | Phase 2 | Complete |
 | USAB-01     | Phase 3 | Pending  |
 | USAB-02     | Phase 3 | Pending  |
-| USAB-03     | Phase 3 | Pending  |
+| USAB-03     | Phase 3 | Complete |
 | USAB-04     | Phase 3 | Pending  |
-| USAB-05     | Phase 3 | Pending  |
+| USAB-05     | Phase 3 | Complete |
 | USAB-06     | Phase 3 | Pending  |
 | SCRN-01     | Phase 4 | Pending  |
 | SCRN-02     | Phase 4 | Pending  |

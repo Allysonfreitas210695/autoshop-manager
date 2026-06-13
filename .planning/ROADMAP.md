@@ -86,7 +86,7 @@ Plans:
    Plans:
    **Wave 1**
 
-- [ ] 03-01-PLAN.md — USAB-03/05 wiring de criação de O.S. (schema createOrderAction + vehicle inline + wizard via useAction)
+- [x] 03-01-PLAN.md — USAB-03/05 wiring de criação de O.S. (schema createOrderAction + vehicle inline + wizard via useAction)
 - [ ] 03-02-PLAN.md — USAB-03/05 wiring de clientes (NewCustomerDrawer + fix de rota errada do botão)
 - [ ] 03-03-PLAN.md — USAB-03/05 wiring de inventário (use-new-part-form → createPartAction + UpdateStockDialog → updateStockAction)
 - [ ] 03-05-PLAN.md — USAB-01/02/04 loading.tsx + error.tsx (unstable_retry) em todos os segmentos + verificação de empty states
@@ -120,5 +120,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 | ---------------------------------------------- | -------------- | ----------- | ---------- |
 | 1. Segurança (Security)                        | 0/5            | Not started | -          |
 | 2. Responsividade (Responsiveness)             | 4/4            | Complete    | 2026-06-12 |
-| 3. Usabilidade (Usability)                     | 0/5            | Not started | -          |
+| 3. Usabilidade (Usability)                     | 1/5            | In Progress |            |
 | 4. Aprimoramento de telas (Screen enhancement) | 0/TBD          | Not started | -          |
