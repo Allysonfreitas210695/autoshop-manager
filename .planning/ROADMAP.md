@@ -15,7 +15,7 @@ The four phases are ordered 1→4 by risk/priority. They are largely independent
 
 - [ ] **Phase 1: Segurança (Security)** - Harden auth, validate all server actions, lock down route access, add security headers, rate-limit auth, verify no leaked secrets
 - [x] **Phase 2: Responsividade (Responsiveness)** - Collapsible mobile sidebar, horizontal-scroll tables, adaptive layouts, touch targets, verified breakpoints (completed 2026-06-12)
-- [ ] **Phase 3: Usabilidade (Usability)** - Loading/error/empty states, consistent validation feedback, toasts/confirmations, optimistic UI
+- [x] **Phase 3: Usabilidade (Usability)** - Loading/error/empty states, consistent validation feedback, toasts/confirmations, optimistic UI (completed 2026-06-14)
 - [ ] **Phase 4: Aprimoramento de telas (Screen enhancement)** - Implement pending design screens, resolve placeholder routes, apply design-system consistency polish
 
 ## Phase Details
@@ -87,13 +87,13 @@ Plans:
    **Wave 1**
 
 - [x] 03-01-PLAN.md — USAB-03/05 wiring de criação de O.S. (schema createOrderAction + vehicle inline + wizard via useAction)
-- [ ] 03-02-PLAN.md — USAB-03/05 wiring de clientes (NewCustomerDrawer + fix de rota errada do botão)
-- [ ] 03-03-PLAN.md — USAB-03/05 wiring de inventário (use-new-part-form → createPartAction + UpdateStockDialog → updateStockAction)
-- [ ] 03-05-PLAN.md — USAB-01/02/04 loading.tsx + error.tsx (unstable_retry) em todos os segmentos + verificação de empty states
+- [x] 03-02-PLAN.md — USAB-03/05 wiring de clientes (NewCustomerDrawer + fix de rota errada do botão)
+- [x] 03-03-PLAN.md — USAB-03/05 wiring de inventário (use-new-part-form → createPartAction + UpdateStockDialog → updateStockAction)
+- [x] 03-05-PLAN.md — USAB-01/02/04 loading.tsx + error.tsx (unstable_retry) em todos os segmentos + verificação de empty states
 
-**Wave 2** _(blocked on Wave 1 completion)_
+**Wave 2**
 
-- [ ] 03-04-PLAN.md — USAB-05/06 status otimista de O.S. (useOptimisticAction) + split Server/Client da budget page para approveOrderItemAction
+- [x] 03-04-PLAN.md — USAB-05/06 status otimista de O.S. (useOptimisticAction) + split Server/Client da budget page para approveOrderItemAction
 
 ### Phase 4: Aprimoramento de telas (Screen enhancement)
 
@@ -120,5 +120,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 | ---------------------------------------------- | -------------- | ----------- | ---------- |
 | 1. Segurança (Security)                        | 0/5            | Not started | -          |
 | 2. Responsividade (Responsiveness)             | 4/4            | Complete    | 2026-06-12 |
-| 3. Usabilidade (Usability)                     | 1/5            | In Progress |            |
+| 3. Usabilidade (Usability)                     | 5/5            | Complete    | 2026-06-14 |
 | 4. Aprimoramento de telas (Screen enhancement) | 0/TBD          | Not started | -          |
