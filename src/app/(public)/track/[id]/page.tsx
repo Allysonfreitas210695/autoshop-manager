@@ -16,6 +16,8 @@ import { getOrderById } from "@/_data-access/orders";
 import type { serviceOrderStatus } from "@/_db/schema";
 import { formatCurrency, formatLongDate } from "@/_helpers/format";
 
+import { TrackQrCode } from "./_components/TrackQrCode";
+
 type OrderStatus = (typeof serviceOrderStatus.enumValues)[number];
 
 type Props = { params: Promise<{ id: string }> };
@@ -290,18 +292,7 @@ export default async function TrackPage({ params }: Props) {
 
       {/* QR code / info box */}
       <div className="border-outline-variant/30 rounded-2xl border p-6 text-center">
-        <div className="mx-auto mb-4 grid size-20 grid-cols-5 gap-0.5 rounded-lg border border-current p-2 opacity-40">
-          {Array.from({ length: 25 }).map((_, i) => (
-            <div
-              key={i}
-              className={`rounded-sm ${
-                [0, 1, 2, 5, 10, 12, 14, 15, 16, 17, 20, 22, 24].includes(i)
-                  ? "bg-on-surface"
-                  : "bg-transparent"
-              }`}
-            />
-          ))}
-        </div>
+        <TrackQrCode orderId={order.id} />
         <p className="text-label-sm text-on-surface-variant font-mono">
           Código da O.S.:{" "}
           <span className="text-on-surface font-bold">{order.id}</span>
