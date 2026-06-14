@@ -1,9 +1,14 @@
-import { CheckCircle, Download, FileText } from "lucide-react";
+import { Download, FileText } from "lucide-react";
 import { notFound } from "next/navigation";
 
 import { Card } from "@/_components/ui/card";
 import { getOrderById } from "@/_data-access/orders";
 import { formatCurrency, formatDate } from "@/_helpers/format";
+
+import {
+  ApproveItemButton,
+  ConfirmApprovalButton,
+} from "./_components/BudgetClient";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -122,17 +127,11 @@ export default async function BudgetPage({ params }: Props) {
                   item.approved ? "bg-surface-container/30" : "opacity-50"
                 }`}
               >
-                <div
-                  className={`mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full border ${
-                    item.approved
-                      ? "border-status-completed bg-status-completed/10"
-                      : "border-outline-variant bg-surface-container"
-                  }`}
-                >
-                  {item.approved && (
-                    <CheckCircle className="text-status-completed size-3.5" />
-                  )}
-                </div>
+                <ApproveItemButton
+                  itemId={item.id}
+                  orderId={id}
+                  approved={item.approved}
+                />
                 <div className="min-w-0 flex-1">
                   <p className="text-body-sm text-on-surface font-medium">
                     {item.description}
@@ -205,9 +204,10 @@ export default async function BudgetPage({ params }: Props) {
               </p>
             )}
             <div className="mt-auto space-y-2">
-              <button className="bg-secondary text-label-sm text-surface hover:bg-secondary/90 w-full rounded-md px-4 py-2.5 font-mono font-bold transition-colors">
-                Confirmar Aprovação
-              </button>
+              <ConfirmApprovalButton
+                orderId={id}
+                itemIds={pendingItems.map((i) => i.id)}
+              />
               <button className="border-outline-variant bg-surface-container text-label-sm text-on-surface-variant hover:bg-surface-container-highest w-full rounded-md border px-4 py-2.5 font-mono transition-colors">
                 Baixar PDF do Orçamento
               </button>

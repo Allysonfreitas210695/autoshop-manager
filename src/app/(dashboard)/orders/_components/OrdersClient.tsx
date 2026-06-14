@@ -6,10 +6,39 @@ import { DataTable, type DataTableColumn } from "@/_components/ui/data-table";
 import { StatusChip } from "@/_components/ui/status-chip";
 import type { OrderRow } from "@/_data-access/orders";
 import { formatCurrency, formatDateTime } from "@/_helpers/format";
+import { useUpdateOrderStatus } from "@/_hooks/use-update-order-status";
 
 import { NewOrderDrawer } from "../new-order-drawer";
 
 type OrderStatus = OrderRow["status"];
+
+const STATUS_OPTIONS: { label: string; value: OrderStatus }[] = [
+  { label: "Pendente", value: "pending" },
+  { label: "Em Progresso", value: "in_progress" },
+  { label: "Concluído", value: "completed" },
+  { label: "Atrasado", value: "delayed" },
+];
+
+function OrderStatusCell({ id, status }: { id: string; status: OrderStatus }) {
+  const { execute, optimisticStatus } = useUpdateOrderStatus(id, status);
+  return (
+    <div className="flex flex-col gap-1">
+      <StatusChip status={optimisticStatus} />
+      <select
+        value={optimisticStatus}
+        onChange={(e) => execute({ id, status: e.target.value as OrderStatus })}
+        onClick={(e) => e.stopPropagation()}
+        className="border-outline-variant bg-surface text-on-surface-variant rounded border px-1 py-0.5 font-mono text-[10px]"
+      >
+        {STATUS_OPTIONS.map((opt) => (
+          <option key={opt.value} value={opt.value}>
+            {opt.label}
+          </option>
+        ))}
+      </select>
+    </div>
+  );
+}
 
 const STATUS_FILTER_TABS: { label: string; value: OrderStatus | "all" }[] = [
   { label: "Todas", value: "all" },
@@ -64,7 +93,7 @@ const columns: DataTableColumn<OrderRow>[] = [
   {
     id: "status",
     header: "Status",
-    cell: (row) => <StatusChip status={row.status} />,
+    cell: (row) => <OrderStatusCell id={row.id} status={row.status} />,
   },
   {
     id: "totalAmount",
