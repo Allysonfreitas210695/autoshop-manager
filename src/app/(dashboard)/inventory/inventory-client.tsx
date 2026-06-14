@@ -4,6 +4,7 @@ import {
   AlertTriangle,
   Package,
   PackageSearch,
+  Pencil,
   Plus,
   Search,
   TrendingDown,
@@ -11,11 +12,13 @@ import {
 import Link from "next/link";
 import { useState } from "react";
 
-import { buttonVariants } from "@/_components/ui/button";
+import { Button, buttonVariants } from "@/_components/ui/button";
 import { DataTable, type DataTableColumn } from "@/_components/ui/data-table";
 import { Input } from "@/_components/ui/input";
 import type { InventoryMetrics, Part } from "@/_data-access/inventory";
 import { formatCurrency } from "@/_helpers/format";
+
+import { UpdateStockDialog } from "./_components/UpdateStockDialog";
 
 function StockBadge({ stock, minStock }: { stock: number; minStock: number }) {
   const isCritical = stock < minStock;
@@ -58,63 +61,82 @@ function StockBadge({ stock, minStock }: { stock: number; minStock: number }) {
   );
 }
 
-const columns: DataTableColumn<Part>[] = [
-  {
-    id: "name",
-    header: "Peça / SKU",
-    cell: (row) => (
-      <div className="min-w-0">
-        <p className="text-body-sm text-on-surface max-w-[160px] truncate font-medium sm:max-w-none">
-          {row.name}
-        </p>
-        <p className="text-label-sm text-on-surface-variant font-mono">
-          {row.sku ?? "—"}
-        </p>
-      </div>
-    ),
-  },
-  {
-    id: "category",
-    header: "Categoria",
-    className: "hidden sm:table-cell",
-    cell: (row) => (
-      <span className="border-outline-variant bg-surface-container text-on-surface-variant inline-flex items-center rounded-full border px-2 py-0.5 font-mono text-[11px]">
-        {row.category}
-      </span>
-    ),
-  },
-  {
-    id: "stock",
-    header: "Estoque",
-    cell: (row) => <StockBadge stock={row.stock} minStock={row.minStock} />,
-  },
-  {
-    id: "unitPrice",
-    header: "Unit.",
-    align: "right",
-    className: "hidden md:table-cell",
-    cell: (row) => (
-      <span className="text-label-sm text-on-surface-variant font-mono">
-        {formatCurrency(row.unitPrice)}
-      </span>
-    ),
-  },
-  {
-    id: "totalValue",
-    header: "Total",
-    align: "right",
-    cell: (row) => (
-      <span className="text-label-sm text-on-surface sm:text-label-md font-mono font-semibold">
-        {formatCurrency(row.stock * row.unitPrice)}
-      </span>
-    ),
-  },
-];
-
 type Props = { initialParts: Part[]; metrics: InventoryMetrics };
 
 export function InventoryClient({ initialParts, metrics }: Props) {
   const [search, setSearch] = useState("");
+  const [editingPart, setEditingPart] = useState<Part | null>(null);
+
+  const columns: DataTableColumn<Part>[] = [
+    {
+      id: "name",
+      header: "Peça / SKU",
+      cell: (row) => (
+        <div className="min-w-0">
+          <p className="text-body-sm text-on-surface max-w-[160px] truncate font-medium sm:max-w-none">
+            {row.name}
+          </p>
+          <p className="text-label-sm text-on-surface-variant font-mono">
+            {row.sku ?? "—"}
+          </p>
+        </div>
+      ),
+    },
+    {
+      id: "category",
+      header: "Categoria",
+      className: "hidden sm:table-cell",
+      cell: (row) => (
+        <span className="border-outline-variant bg-surface-container text-on-surface-variant inline-flex items-center rounded-full border px-2 py-0.5 font-mono text-[11px]">
+          {row.category}
+        </span>
+      ),
+    },
+    {
+      id: "stock",
+      header: "Estoque",
+      cell: (row) => <StockBadge stock={row.stock} minStock={row.minStock} />,
+    },
+    {
+      id: "unitPrice",
+      header: "Unit.",
+      align: "right",
+      className: "hidden md:table-cell",
+      cell: (row) => (
+        <span className="text-label-sm text-on-surface-variant font-mono">
+          {formatCurrency(row.unitPrice)}
+        </span>
+      ),
+    },
+    {
+      id: "totalValue",
+      header: "Total",
+      align: "right",
+      cell: (row) => (
+        <span className="text-label-sm text-on-surface sm:text-label-md font-mono font-semibold">
+          {formatCurrency(row.stock * row.unitPrice)}
+        </span>
+      ),
+    },
+    {
+      id: "actions",
+      header: "",
+      align: "right",
+      cell: (row) => (
+        <Button
+          variant="ghost"
+          className="text-on-surface-variant size-8 p-0"
+          aria-label="Editar estoque"
+          onClick={(e) => {
+            e.stopPropagation();
+            setEditingPart(row);
+          }}
+        >
+          <Pencil className="size-3.5" />
+        </Button>
+      ),
+    },
+  ];
 
   const filtered = initialParts.filter((part) => {
     const q = search.trim().toLowerCase();
@@ -239,6 +261,16 @@ export function InventoryClient({ initialParts, metrics }: Props) {
           {filteredLowStock} ite{filteredLowStock !== 1 ? "ns" : "m"} com
           estoque baixo ou crítico
         </p>
+      )}
+
+      {editingPart !== null && (
+        <UpdateStockDialog
+          partId={editingPart.id}
+          partName={editingPart.name}
+          currentStock={editingPart.stock}
+          open={true}
+          onClose={() => setEditingPart(null)}
+        />
       )}
     </div>
   );

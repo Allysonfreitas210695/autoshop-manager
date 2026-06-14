@@ -16,8 +16,7 @@ export function NewPartForm() {
     handleSubmit,
     control,
     errors,
-    isSubmitting,
-    submitted,
+    status,
     stockValue,
     unitPriceValue,
     nameValue,
@@ -26,22 +25,6 @@ export function NewPartForm() {
     onSubmit,
     goToInventory,
   } = useNewPartForm();
-
-  if (submitted) {
-    return (
-      <div className="flex flex-col items-center justify-center gap-4 py-24 text-center">
-        <span className="bg-secondary/10 text-secondary flex size-16 items-center justify-center rounded-2xl">
-          <Package className="size-8" />
-        </span>
-        <h2 className="text-headline-sm text-on-surface font-bold">
-          Peça cadastrada!
-        </h2>
-        <p className="text-label-md text-on-surface-variant font-mono">
-          Redirecionando para o estoque...
-        </p>
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-6">
@@ -262,8 +245,12 @@ export function NewPartForm() {
             </div>
 
             <div className="flex flex-col gap-2 lg:hidden">
-              <Button type="submit" disabled={isSubmitting} className="w-full">
-                {isSubmitting ? "Salvando..." : "Cadastrar Peça"}
+              <Button
+                type="submit"
+                disabled={status === "executing"}
+                className="w-full"
+              >
+                {status === "executing" ? "Salvando..." : "Cadastrar Peça"}
               </Button>
               <Button
                 type="button"
@@ -328,10 +315,10 @@ export function NewPartForm() {
               <div className="space-y-2">
                 <Button
                   type="submit"
-                  disabled={isSubmitting}
+                  disabled={status === "executing"}
                   className="w-full"
                 >
-                  {isSubmitting ? "Salvando..." : "Cadastrar Peça"}
+                  {status === "executing" ? "Salvando..." : "Cadastrar Peça"}
                 </Button>
                 <Button
                   type="button"

@@ -2,10 +2,13 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import { useCallback, useState } from "react";
+import { useAction } from "next-safe-action/hooks";
+import { useCallback } from "react";
 import { useForm, useWatch } from "react-hook-form";
+import { toast } from "sonner";
 import { z } from "zod";
 
+import { createPartAction } from "@/_actions/inventory";
 import { inventoryCategories } from "@/_helpers/mock-data";
 
 export const newPartSchema = z.object({
@@ -28,13 +31,12 @@ export const categoryOptions = inventoryCategories.filter((c) => c !== "Todos");
 
 export function useNewPartForm() {
   const router = useRouter();
-  const [submitted, setSubmitted] = useState(false);
 
   const {
     register,
     handleSubmit,
     control,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm<NewPartValues>({
     resolver: zodResolver(newPartSchema),
     defaultValues: { stock: 0, minStock: 5, unitPrice: 0 },
@@ -47,13 +49,27 @@ export function useNewPartForm() {
 
   const totalValue = (Number(stockValue) || 0) * (Number(unitPriceValue) || 0);
 
+  const { execute, status } = useAction(createPartAction, {
+    onSuccess: () => {
+      toast.success("Peça cadastrada com sucesso.");
+      router.push("/inventory");
+    },
+    onError: ({ error }) => {
+      toast.error(error.serverError ?? "Erro ao cadastrar peça.");
+    },
+  });
+
   const onSubmit = useCallback(
     (data: NewPartValues) => {
-      console.log("Nova peça:", data);
-      setSubmitted(true);
-      setTimeout(() => router.push("/inventory"), 1500);
+      execute({
+        name: data.name,
+        sku: data.sku,
+        price: data.unitPrice,
+        stockQuantity: data.stock,
+        minStock: data.minStock,
+      });
     },
-    [router],
+    [execute],
   );
 
   return {
@@ -61,8 +77,7 @@ export function useNewPartForm() {
     handleSubmit,
     control,
     errors,
-    isSubmitting,
-    submitted,
+    status,
     stockValue,
     unitPriceValue,
     nameValue,
