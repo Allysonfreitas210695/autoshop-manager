@@ -1,7 +1,6 @@
 "use client";
 
 import { Download, Filter, Search, UserPlus } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { Button } from "@/_components/ui/button";
@@ -10,6 +9,7 @@ import { Input } from "@/_components/ui/input";
 import type { CustomerRow } from "@/_data-access/customers";
 import { formatCurrency, formatDate } from "@/_helpers/format";
 
+import { NewCustomerDrawer } from "./_components/NewCustomerDrawer";
 import { CustomerDetailPanel } from "./customer-detail-panel";
 
 const columns: DataTableColumn<CustomerRow>[] = [
@@ -88,12 +88,12 @@ const columns: DataTableColumn<CustomerRow>[] = [
 type Props = { customers: CustomerRow[] };
 
 export function CustomersClient({ customers }: Props) {
-  const router = useRouter();
   const [search, setSearch] = useState("");
   const [selectedCustomer, setSelectedCustomer] = useState<CustomerRow | null>(
     null,
   );
   const [panelOpen, setPanelOpen] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   const filtered =
     search.trim().length >= 2
@@ -123,7 +123,7 @@ export function CustomersClient({ customers }: Props) {
               encontrado{filtered.length !== 1 ? "s" : ""}
             </p>
           </div>
-          <Button onClick={() => router.push("/orders/new")} className="gap-2">
+          <Button onClick={() => setDrawerOpen(true)} className="gap-2">
             <UserPlus className="size-4" />
             Cadastrar Novo Cliente
           </Button>
@@ -198,6 +198,10 @@ export function CustomersClient({ customers }: Props) {
         customer={selectedCustomer}
         open={panelOpen}
         onOpenChange={setPanelOpen}
+      />
+      <NewCustomerDrawer
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
       />
     </>
   );
