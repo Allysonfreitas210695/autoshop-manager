@@ -252,6 +252,7 @@ export function AnalyticsClient({
               <ServicePieChart data={serviceCategories} />
               <div className="space-y-2">
                 {serviceCategories.map((cat, i) => {
+                  // chart-data palette — hex allowed here, not UI chrome
                   const colors = [
                     "#adc6ff",
                     "#ffb690",
