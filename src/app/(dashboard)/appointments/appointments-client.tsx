@@ -17,6 +17,7 @@ import {
 import { ptBR } from "date-fns/locale";
 import {
   CalendarDays,
+  CalendarRange,
   CheckCircle2,
   ChevronLeft,
   ChevronRight,
@@ -128,7 +129,7 @@ function AppointmentCard({ appt }: { appt: AppointmentRow }) {
   );
 }
 
-type View = "calendar" | "list";
+type View = "calendar" | "week" | "list";
 
 type Props = {
   initialAppointments: AppointmentRow[];
@@ -144,8 +145,14 @@ export function AppointmentsClient({
   const today = new Date();
   const [currentMonth, setCurrentMonth] = useState(startOfMonth(today));
   const [selectedDate, setSelectedDate] = useState(today);
+  const [currentWeek, setCurrentWeek] = useState(
+    startOfWeek(today, { weekStartsOn: 0 }),
+  );
   const [view, setView] = useState<View>("calendar");
   const [drawerOpen, setDrawerOpen] = useState(false);
+
+  const prevWeek = () => setCurrentWeek((w) => addDays(w, -7));
+  const nextWeek = () => setCurrentWeek((w) => addDays(w, 7));
 
   const monthStart = startOfMonth(currentMonth);
   const monthEnd = endOfMonth(currentMonth);
@@ -205,6 +212,17 @@ export function AppointmentsClient({
             >
               <CalendarDays className="size-4" />
               <span className="hidden sm:inline">Calendário</span>
+            </button>
+            <button
+              onClick={() => setView("week")}
+              className={`text-label-sm flex items-center gap-1.5 rounded-md px-3 py-1.5 font-medium transition-colors ${
+                view === "week"
+                  ? "bg-secondary text-on-secondary"
+                  : "text-on-surface-variant hover:text-on-surface"
+              }`}
+            >
+              <CalendarRange className="size-4" />
+              <span className="hidden sm:inline">Semana</span>
             </button>
             <button
               onClick={() => setView("list")}
@@ -366,6 +384,73 @@ export function AppointmentsClient({
                 ))}
               </div>
             )}
+          </div>
+        </div>
+      ) : view === "week" ? (
+        /* Week View */
+        <div className="bg-surface-container border-outline-variant/30 space-y-4 rounded-2xl border p-5">
+          {/* Week nav */}
+          <div className="flex items-center justify-between">
+            <button
+              onClick={prevWeek}
+              className="text-on-surface-variant hover:bg-outline-variant/20 rounded-lg p-1.5 transition-colors"
+            >
+              <ChevronLeft className="size-5" />
+            </button>
+            <h2 className="text-title-md text-on-surface font-semibold">
+              {format(currentWeek, "dd 'de' MMM", { locale: ptBR })} –{" "}
+              {format(
+                endOfWeek(currentWeek, { weekStartsOn: 0 }),
+                "dd 'de' MMM",
+                { locale: ptBR },
+              )}
+            </h2>
+            <button
+              onClick={nextWeek}
+              className="text-on-surface-variant hover:bg-outline-variant/20 rounded-lg p-1.5 transition-colors"
+            >
+              <ChevronRight className="size-5" />
+            </button>
+          </div>
+
+          {/* 7-column week grid */}
+          <div className="grid grid-cols-7 gap-1">
+            {eachDayOfInterval({
+              start: currentWeek,
+              end: endOfWeek(currentWeek, { weekStartsOn: 0 }),
+            }).map((day, i) => {
+              const appts = countByDate(day).sort(byTime);
+              const todayDay = isToday(day);
+              return (
+                <div
+                  key={day.toISOString()}
+                  className="flex min-h-32 flex-col gap-1"
+                >
+                  {/* Day header */}
+                  <div className="mb-1 flex flex-col items-center gap-0.5">
+                    <span className="text-label-xs text-on-surface-variant font-mono tracking-wider uppercase">
+                      {weekDays[i]}
+                    </span>
+                    <span
+                      className={`text-label-sm flex size-6 items-center justify-center rounded-full font-mono font-bold ${todayDay ? "bg-secondary text-on-secondary" : "text-on-surface-variant"}`}
+                    >
+                      {format(day, "d")}
+                    </span>
+                  </div>
+                  {/* Appointments */}
+                  <div className="max-h-48 space-y-0.5 overflow-y-auto">
+                    {appts.slice(0, 3).map((a) => (
+                      <AppointmentBadge key={a.id} appt={a} />
+                    ))}
+                    {appts.length > 3 && (
+                      <p className="text-on-surface-variant px-1 font-mono text-[10px]">
+                        +{appts.length - 3} mais
+                      </p>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       ) : (
