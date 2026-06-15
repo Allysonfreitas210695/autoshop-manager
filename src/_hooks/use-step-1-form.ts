@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 
 import type { CustomerRow } from "@/_data-access/customers";
+import { formatPlate } from "@/_helpers/format";
 import { step1Schema, type Step1Values } from "@/_schemas/order-wizard";
 
 type Params = {
@@ -50,7 +51,7 @@ export function useStep1Form({ defaultValues, customers, onNext }: Params) {
     setQuery(customer.name);
     setValue("customerId", customer.id);
     setValue("customerName", customer.name);
-    setValue("plate", customer.lastPlate ?? "");
+    setValue("plate", formatPlate(customer.lastPlate ?? ""));
     setValue("vehicleModel", customer.lastVehicle ?? "");
   }
 

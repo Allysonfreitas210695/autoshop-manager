@@ -1,11 +1,13 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useAction } from "next-safe-action/hooks";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
+import { createOrderAction } from "@/_actions/orders";
 import { createServiceOrderSchema } from "@/_schemas/service-order";
 
 type OrderFormValues = z.input<typeof createServiceOrderSchema>;
@@ -24,12 +26,28 @@ export function useNewOrderForm(onClose: () => void) {
     defaultValues: { status: "pending", totalAmount: 0 },
   });
 
-  async function onSubmit(data: OrderFormValues) {
-    await new Promise((r) => setTimeout(r, 600));
-    toast.success(`O.S. criada — Placa ${data.plate}`);
-    reset();
-    setOpen(false);
-    onClose();
+  const { execute, status: actionStatus } = useAction(createOrderAction, {
+    onSuccess: ({ data }) => {
+      toast.success(`O.S. #${data?.orderNumber} criada com sucesso.`);
+      reset();
+      setOpen(false);
+      onClose();
+    },
+    onError: ({ error }) => {
+      toast.error(error.serverError ?? "Erro ao criar O.S.");
+    },
+  });
+
+  function onSubmit(data: OrderFormValues) {
+    execute({
+      plate: data.plate,
+      customerName: data.customerName,
+      vehicleModel: data.vehicleModel,
+      clientReport: data.description,
+      status: data.status,
+      priority: "normal",
+      dueAt: data.dueAt ? new Date(data.dueAt).toISOString() : undefined,
+    });
   }
 
   function handleCancel() {
@@ -44,7 +62,7 @@ export function useNewOrderForm(onClose: () => void) {
     handleSubmit,
     control,
     errors,
-    isSubmitting,
+    isSubmitting: isSubmitting || actionStatus === "executing",
     onSubmit,
     handleCancel,
   };

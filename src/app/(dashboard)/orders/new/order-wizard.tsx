@@ -109,6 +109,7 @@ export function OrderWizard({ customers, parts }: OrderWizardProps) {
       plate: wizardData.step1.plate ?? "",
       customerName: wizardData.step1.customerName ?? "",
       vehicleModel: wizardData.step1.vehicleModel ?? "",
+      mileage: wizardData.step1.mileage,
       clientReport: wizardData.step2.customerReport,
       diagnosis: wizardData.step2.initialDiagnosis,
       serviceType: wizardData.step2.serviceType,

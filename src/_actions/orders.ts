@@ -14,12 +14,16 @@ export const createOrderAction = authActionClient
       plate: z.string().min(6).max(8),
       customerName: z.string().min(2),
       vehicleModel: z.string().min(2),
+      mileage: z.coerce.number().min(0).optional(),
       customerId: z.string().optional(),
       mechanicId: z.string().optional(),
       clientReport: z.string().optional(),
       diagnosis: z.string().optional(),
       serviceType: z.string().optional(),
-      priority: z.string(),
+      priority: z.string().default("normal"),
+      status: z
+        .enum(["pending", "in_progress", "completed", "delayed"])
+        .optional(),
       dueAt: z.string().datetime().optional(),
       items: z
         .array(
@@ -41,6 +45,15 @@ export const createOrderAction = authActionClient
         plate: parsedInput.plate.toUpperCase(),
         make: "Não informado",
         model: parsedInput.vehicleModel,
+        mileage: parsedInput.mileage ?? null,
+      })
+      .onConflictDoUpdate({
+        target: vehicles.plate,
+        set: {
+          model: parsedInput.vehicleModel,
+          mileage: parsedInput.mileage ?? null,
+          updatedAt: new Date(),
+        },
       })
       .returning({ id: vehicles.id });
 
@@ -59,6 +72,7 @@ export const createOrderAction = authActionClient
         diagnosis: parsedInput.diagnosis ?? null,
         serviceType: parsedInput.serviceType ?? null,
         priority: parsedInput.priority,
+        status: parsedInput.status ?? "pending",
         dueAt: parsedInput.dueAt ? new Date(parsedInput.dueAt) : null,
         totalAmount: String(totalAmount),
       })
