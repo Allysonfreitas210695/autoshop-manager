@@ -88,7 +88,7 @@ const columns: DataTableColumn<CategoryRow>[] = [
     header: "Status",
     cell: (row) => (
       <span
-        className={`rounded-full px-2 py-0.5 font-mono text-[10px] tracking-wider uppercase ${statusClass[row.status]}`}
+        className={`rounded-full px-2 py-0.5 font-mono text-[10px] font-bold tracking-wider uppercase ${statusClass[row.status]}`}
       >
         {statusLabel[row.status]}
       </span>
@@ -163,7 +163,7 @@ export default async function FinanceReportsPage() {
             <ArrowLeft className="size-3.5" />
             Voltar para Financeiro
           </Link>
-          <h1 className="text-headline-lg text-on-surface font-bold">
+          <h1 className="text-headline-md text-on-surface font-bold">
             Relatório de Lucratividade
           </h1>
           <p className="text-label-md text-on-surface-variant mt-1 font-mono">

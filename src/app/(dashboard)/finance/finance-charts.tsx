@@ -71,6 +71,7 @@ export function CashFlowBarChart({ data }: { data: WeeklyCashFlow[] }) {
           ]}
           cursor={{ fill: "rgba(255,255,255,0.04)" }}
         />
+        {/* chart-data colors — Recharts requires literal strings, not CSS tokens */}
         <Bar
           dataKey="receitas"
           name="Receitas"

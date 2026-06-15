@@ -82,7 +82,7 @@ const columns: DataTableColumn<Transaction>[] = [
     header: "Status",
     cell: (row) => (
       <span
-        className={`rounded-full px-2 py-0.5 font-mono text-[10px] tracking-wider uppercase ${statusClass[row.status]}`}
+        className={`rounded-full px-2 py-0.5 font-mono text-[10px] font-bold tracking-wider uppercase ${statusClass[row.status]}`}
       >
         {statusLabel[row.status]}
       </span>
@@ -115,7 +115,7 @@ export default async function FinancePage() {
       {/* Header */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-headline-lg text-on-surface font-bold">
+          <h1 className="text-headline-md text-on-surface font-bold">
             Financeiro
           </h1>
           <p className="text-label-md text-on-surface-variant mt-1 font-mono">

@@ -115,7 +115,7 @@ export function CustomersClient({ customers }: Props) {
       <div className="space-y-6">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-headline-lg text-on-surface font-bold">
+            <h1 className="text-headline-md text-on-surface font-bold">
               Gestão de Clientes
             </h1>
             <p className="text-label-md text-on-surface-variant mt-1 font-mono">

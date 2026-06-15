@@ -107,7 +107,7 @@ export default async function DashboardPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-headline-lg text-on-surface font-bold">
+        <h1 className="text-headline-md text-on-surface font-bold">
           Dashboard Operacional
         </h1>
         <p className="text-label-md text-on-surface-variant mt-1 font-mono">
