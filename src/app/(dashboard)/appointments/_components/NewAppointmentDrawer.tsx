@@ -66,7 +66,7 @@ export function NewAppointmentDrawer({
           </SheetDescription>
         </SheetHeader>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 px-1 py-5">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 px-4 py-5">
           {/* Cliente */}
           <section className="space-y-3">
             <h3 className="text-label-sm text-on-surface-variant/60 flex items-center gap-2 font-mono tracking-wider uppercase">
@@ -164,7 +164,12 @@ export function NewAppointmentDrawer({
               <div className="grid grid-cols-3 gap-3">
                 <div className="col-span-2 space-y-1.5">
                   <Label htmlFor="date">Data</Label>
-                  <Input id="date" type="date" {...register("date")} />
+                  <Input
+                    id="date"
+                    type="date"
+                    aria-invalid={!!errors.date}
+                    {...register("date")}
+                  />
                   {errors.date && (
                     <p className="text-label-xs text-error">
                       {errors.date.message}
@@ -173,7 +178,12 @@ export function NewAppointmentDrawer({
                 </div>
                 <div className="space-y-1.5">
                   <Label htmlFor="time">Hora</Label>
-                  <Input id="time" type="time" {...register("time")} />
+                  <Input
+                    id="time"
+                    type="time"
+                    aria-invalid={!!errors.time}
+                    {...register("time")}
+                  />
                   {errors.time && (
                     <p className="text-label-xs text-error">
                       {errors.time.message}

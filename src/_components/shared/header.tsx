@@ -1,6 +1,6 @@
 "use client";
 
-import { Bell, Menu, Search, X } from "lucide-react";
+import { Bell, CheckCircle2, Info, Menu, Search, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -20,6 +20,8 @@ import { Input } from "@/_components/ui/input";
 import {
   Sheet,
   SheetContent,
+  SheetDescription,
+  SheetHeader,
   SheetTitle,
   SheetTrigger,
 } from "@/_components/ui/sheet";
@@ -32,10 +34,31 @@ type HeaderUser = {
   image?: string | null;
 };
 
+const NOTIFICATIONS = [
+  {
+    id: "1",
+    title: "Estoque crítico",
+    description: "3 peças abaixo do estoque mínimo",
+    icon: Info,
+    color: "text-error",
+    time: "Agora",
+  },
+  {
+    id: "2",
+    title: "O.S. #42 concluída",
+    description: "Honda Civic · ABC-1234",
+    icon: CheckCircle2,
+    color: "text-status-completed",
+    time: "2h atrás",
+  },
+];
+
 export function Header({ user }: { user: HeaderUser }) {
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [notifOpen, setNotifOpen] = useState(false);
+  const [avatarError, setAvatarError] = useState(false);
   const crumbs = useBreadcrumb();
 
   const initials = user.name
@@ -142,15 +165,58 @@ export function Header({ user }: { user: HeaderUser }) {
           >
             <Search className="size-5" />
           </Button>
-          <Button
-            variant="ghost"
-            size="icon-touch"
-            aria-label="Notificações"
-            className="text-on-surface-variant hover:bg-surface-container relative rounded-full"
-          >
-            <Bell className="size-5" />
-            <span className="bg-tertiary absolute top-2 right-2 size-2 rounded-full" />
-          </Button>
+          <Sheet open={notifOpen} onOpenChange={setNotifOpen}>
+            <SheetTrigger
+              render={
+                <Button
+                  variant="ghost"
+                  size="icon-touch"
+                  aria-label="Notificações"
+                  className="text-on-surface-variant hover:bg-surface-container relative rounded-full"
+                />
+              }
+            >
+              <Bell className="size-5" />
+              <span className="bg-tertiary absolute top-2 right-2 size-2 rounded-full" />
+            </SheetTrigger>
+            <SheetContent
+              side="right"
+              className="border-outline-variant bg-surface w-full p-0 sm:max-w-sm"
+            >
+              <SheetHeader className="border-outline-variant border-b px-6 py-4">
+                <SheetTitle className="text-on-surface font-semibold">
+                  Notificações
+                </SheetTitle>
+                <SheetDescription className="text-on-surface-variant text-label-sm">
+                  Avisos e atualizações recentes
+                </SheetDescription>
+              </SheetHeader>
+              <div className="divide-outline-variant/30 divide-y">
+                {NOTIFICATIONS.map((n) => {
+                  const Icon = n.icon;
+                  return (
+                    <div
+                      key={n.id}
+                      className="flex items-start gap-3 px-6 py-4"
+                    >
+                      <Icon className={`mt-0.5 size-4 shrink-0 ${n.color}`} />
+                      <div className="min-w-0 flex-1">
+                        <p className="text-body-sm text-on-surface font-medium">
+                          {n.title}
+                        </p>
+                        <p className="text-label-sm text-on-surface-variant font-mono">
+                          {n.description}
+                        </p>
+                      </div>
+                      <span className="text-label-xs text-on-surface-variant/60 shrink-0 font-mono">
+                        {n.time}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </SheetContent>
+          </Sheet>
           <ThemeToggle />
           <div className="bg-outline-variant mx-1 hidden h-8 w-px sm:block" />
           <DropdownMenu>
@@ -163,8 +229,12 @@ export function Header({ user }: { user: HeaderUser }) {
               }
             >
               <Avatar className="border-outline-variant size-9 border">
-                {user.image ? (
-                  <AvatarImage src={user.image} alt={user.name} />
+                {user.image && !avatarError ? (
+                  <AvatarImage
+                    src={user.image}
+                    alt={user.name}
+                    onError={() => setAvatarError(true)}
+                  />
                 ) : null}
                 <AvatarFallback className="bg-surface-container-highest text-label-md">
                   {initials}

@@ -72,7 +72,7 @@ export function UpdateStockDialog({
           </SheetDescription>
         </SheetHeader>
 
-        <div className="space-y-4 py-5">
+        <div className="space-y-4 px-4 py-5">
           <div className="space-y-1.5">
             <Label htmlFor="qty" className="text-on-surface-variant font-mono">
               Nova quantidade

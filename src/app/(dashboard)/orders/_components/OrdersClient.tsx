@@ -9,6 +9,7 @@ import { formatCurrency, formatDateTime } from "@/_helpers/format";
 import { useUpdateOrderStatus } from "@/_hooks/use-update-order-status";
 
 import { NewOrderDrawer } from "../new-order-drawer";
+import { OrderDetailPanel } from "./OrderDetailPanel";
 
 type OrderStatus = OrderRow["status"];
 
@@ -123,96 +124,113 @@ type Props = { orders: OrderRow[] };
 
 export function OrdersClient({ orders }: Props) {
   const [activeFilter, setActiveFilter] = useState<OrderStatus | "all">("all");
+  const [selectedOrder, setSelectedOrder] = useState<OrderRow | null>(null);
+  const [panelOpen, setPanelOpen] = useState(false);
 
   const filtered =
     activeFilter === "all"
       ? orders
       : orders.filter((o) => o.status === activeFilter);
 
-  return (
-    <div className="space-y-6">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-headline-md text-on-surface font-bold">
-            Gestão de Ordens de Serviço
-          </h1>
-          <p className="text-label-md text-on-surface-variant mt-1 font-mono">
-            {filtered.length} ordem{filtered.length !== 1 ? "s" : ""} encontrada
-            {filtered.length !== 1 ? "s" : ""}
-          </p>
-        </div>
-        <NewOrderDrawer />
-      </div>
+  function openPanel(order: OrderRow) {
+    setSelectedOrder(order);
+    setPanelOpen(true);
+  }
 
-      <div
-        role="tablist"
-        aria-label="Filtrar por status"
-        className="-mx-4 flex scrollbar-none gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:flex-wrap sm:px-0 [&::-webkit-scrollbar]:hidden"
-      >
-        {STATUS_FILTER_TABS.map((tab) => {
-          const isActive = activeFilter === tab.value;
-          const count =
-            tab.value === "all"
-              ? orders.length
-              : orders.filter((o) => o.status === tab.value).length;
-          return (
-            <button
-              key={tab.value}
-              role="tab"
-              aria-selected={isActive}
-              onClick={() => setActiveFilter(tab.value)}
-              className={`text-label-sm flex items-center gap-1.5 rounded-full border px-3 py-1 font-mono transition-colors ${
-                isActive
-                  ? "border-secondary bg-secondary/10 text-secondary"
-                  : "border-outline-variant bg-surface-container text-on-surface-variant hover:border-secondary/50 hover:text-on-surface"
-              }`}
-            >
-              {tab.label}
-              <span
-                className={`rounded-full px-1.5 py-0.5 text-[10px] font-bold ${
+  return (
+    <>
+      <div className="space-y-6">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h1 className="text-headline-md text-on-surface font-bold">
+              Gestão de Ordens de Serviço
+            </h1>
+            <p className="text-label-md text-on-surface-variant mt-1 font-mono">
+              {filtered.length} ordem{filtered.length !== 1 ? "s" : ""}{" "}
+              encontrada
+              {filtered.length !== 1 ? "s" : ""}
+            </p>
+          </div>
+          <NewOrderDrawer />
+        </div>
+
+        <div
+          role="tablist"
+          aria-label="Filtrar por status"
+          className="-mx-4 flex scrollbar-none gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:flex-wrap sm:px-0 [&::-webkit-scrollbar]:hidden"
+        >
+          {STATUS_FILTER_TABS.map((tab) => {
+            const isActive = activeFilter === tab.value;
+            const count =
+              tab.value === "all"
+                ? orders.length
+                : orders.filter((o) => o.status === tab.value).length;
+            return (
+              <button
+                key={tab.value}
+                role="tab"
+                aria-selected={isActive}
+                onClick={() => setActiveFilter(tab.value)}
+                className={`text-label-sm flex items-center gap-1.5 rounded-full border px-3 py-1 font-mono transition-colors ${
                   isActive
-                    ? "bg-secondary text-surface"
-                    : "bg-surface-container-highest text-on-surface-variant"
+                    ? "border-secondary bg-secondary/10 text-secondary"
+                    : "border-outline-variant bg-surface-container text-on-surface-variant hover:border-secondary/50 hover:text-on-surface"
                 }`}
               >
-                {count}
-              </span>
+                {tab.label}
+                <span
+                  className={`rounded-full px-1.5 py-0.5 text-[10px] font-bold ${
+                    isActive
+                      ? "bg-secondary text-surface"
+                      : "bg-surface-container-highest text-on-surface-variant"
+                  }`}
+                >
+                  {count}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="border-outline-variant overflow-hidden rounded-lg border">
+          <DataTable
+            columns={columns}
+            data={filtered}
+            getRowId={(row) => row.id}
+            onRowClick={openPanel}
+            emptyMessage="Nenhuma ordem encontrada para este filtro."
+          />
+        </div>
+
+        <div className="border-outline-variant flex flex-col gap-3 border-t pt-4 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-label-sm text-on-surface-variant font-mono">
+            Exibindo {filtered.length} de {orders.length} resultados
+          </p>
+          <div className="flex items-center gap-2">
+            <button
+              disabled
+              className="border-outline-variant text-label-sm text-on-surface-variant rounded border px-3 py-1 font-mono disabled:opacity-40"
+            >
+              ← Ant.
             </button>
-          );
-        })}
-      </div>
-
-      <div className="border-outline-variant overflow-hidden rounded-lg border">
-        <DataTable
-          columns={columns}
-          data={filtered}
-          getRowId={(row) => row.id}
-          emptyMessage="Nenhuma ordem encontrada para este filtro."
-        />
-      </div>
-
-      <div className="border-outline-variant flex flex-col gap-3 border-t pt-4 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-label-sm text-on-surface-variant font-mono">
-          Exibindo {filtered.length} de {orders.length} resultados
-        </p>
-        <div className="flex items-center gap-2">
-          <button
-            disabled
-            className="border-outline-variant text-label-sm text-on-surface-variant rounded border px-3 py-1 font-mono disabled:opacity-40"
-          >
-            ← Ant.
-          </button>
-          <span className="border-secondary bg-secondary/10 text-label-sm text-secondary rounded border px-3 py-1 font-mono">
-            1
-          </span>
-          <button
-            disabled
-            className="border-outline-variant text-label-sm text-on-surface-variant rounded border px-3 py-1 font-mono disabled:opacity-40"
-          >
-            Próx. →
-          </button>
+            <span className="border-secondary bg-secondary/10 text-label-sm text-secondary rounded border px-3 py-1 font-mono">
+              1
+            </span>
+            <button
+              disabled
+              className="border-outline-variant text-label-sm text-on-surface-variant rounded border px-3 py-1 font-mono disabled:opacity-40"
+            >
+              Próx. →
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+
+      <OrderDetailPanel
+        order={selectedOrder}
+        open={panelOpen}
+        onOpenChange={setPanelOpen}
+      />
+    </>
   );
 }

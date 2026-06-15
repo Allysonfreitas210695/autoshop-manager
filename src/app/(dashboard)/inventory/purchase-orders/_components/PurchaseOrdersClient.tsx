@@ -2,8 +2,16 @@
 
 import { FileText, Package, Plus, Truck } from "lucide-react";
 import Link from "next/link";
+import { useState } from "react";
 
 import { Button } from "@/_components/ui/button";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/_components/ui/sheet";
 import type { PurchaseOrderRow } from "@/_data-access/inventory";
 import { formatCurrency, formatDate } from "@/_helpers/format";
 
@@ -25,9 +33,87 @@ const statusColor: Record<PurchaseOrderStatus, string> = {
   cancelled: "bg-error/20 text-error border-error/30",
 };
 
+function PurchaseOrderDetailPanel({
+  order,
+  open,
+  onOpenChange,
+}: {
+  order: PurchaseOrderRow | null;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}) {
+  if (!order) return null;
+
+  return (
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetContent
+        side="right"
+        className="flex w-full flex-col gap-0 p-0 sm:max-w-md"
+      >
+        <SheetHeader className="border-outline-variant bg-surface-container border-b px-6 py-5">
+          <SheetTitle className="text-body-lg text-on-surface font-semibold">
+            OC-{order.id.slice(0, 8).toUpperCase()}
+          </SheetTitle>
+          <SheetDescription className="text-label-sm text-on-surface-variant font-mono">
+            {order.supplier}
+          </SheetDescription>
+        </SheetHeader>
+        <div className="divide-outline-variant/30 flex-1 divide-y overflow-y-auto">
+          <div className="space-y-3 px-6 py-4">
+            <p className="text-on-surface-variant/60 font-mono text-[10px] tracking-wider uppercase">
+              Detalhes
+            </p>
+            <div className="space-y-2.5">
+              <div className="text-body-sm flex justify-between">
+                <span className="text-on-surface-variant">Fornecedor</span>
+                <span className="text-on-surface font-medium">
+                  {order.supplier}
+                </span>
+              </div>
+              <div className="text-body-sm flex justify-between">
+                <span className="text-on-surface-variant">Itens</span>
+                <span className="text-on-surface font-mono">
+                  {order.itemCount} iten{order.itemCount !== 1 ? "s" : ""}
+                </span>
+              </div>
+              <div className="text-body-sm flex justify-between">
+                <span className="text-on-surface-variant">Valor Total</span>
+                <span className="text-secondary font-mono font-bold">
+                  {formatCurrency(order.totalAmount)}
+                </span>
+              </div>
+              <div className="text-body-sm flex justify-between">
+                <span className="text-on-surface-variant">Prev. Entrega</span>
+                <span className="text-on-surface font-mono">
+                  {order.expectedDelivery
+                    ? formatDate(order.expectedDelivery)
+                    : "—"}
+                </span>
+              </div>
+              <div className="text-body-sm flex items-center justify-between">
+                <span className="text-on-surface-variant">Status</span>
+                <span
+                  className={`rounded-full border px-2 py-1 font-mono text-[10px] font-bold tracking-wider uppercase ${statusColor[order.status]}`}
+                >
+                  {statusLabels[order.status]}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </SheetContent>
+    </Sheet>
+  );
+}
+
 type Props = { orders: PurchaseOrderRow[] };
 
 export function PurchaseOrdersClient({ orders }: Props) {
+  const [selectedOrder, setSelectedOrder] = useState<PurchaseOrderRow | null>(
+    null,
+  );
+  const [panelOpen, setPanelOpen] = useState(false);
+
   const totals = {
     draft: orders.filter((o) => o.status === "draft").length,
     sent: orders.filter((o) => o.status === "sent").length,
@@ -138,7 +224,11 @@ export function PurchaseOrdersClient({ orders }: Props) {
               {orders.map((order) => (
                 <tr
                   key={order.id}
-                  className="border-outline-variant/20 hover:bg-surface/40 border-b transition-colors last:border-0"
+                  onClick={() => {
+                    setSelectedOrder(order);
+                    setPanelOpen(true);
+                  }}
+                  className="border-outline-variant/20 hover:bg-surface/40 cursor-pointer border-b transition-colors last:border-0"
                 >
                   <td className="px-4 py-3">
                     <span className="text-label-sm text-secondary font-mono font-bold">
@@ -180,6 +270,12 @@ export function PurchaseOrdersClient({ orders }: Props) {
           </table>
         </div>
       </div>
+
+      <PurchaseOrderDetailPanel
+        order={selectedOrder}
+        open={panelOpen}
+        onOpenChange={setPanelOpen}
+      />
     </div>
   );
 }

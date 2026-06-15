@@ -60,6 +60,7 @@ export function NewPartForm() {
                   <Input
                     {...register("name")}
                     placeholder="Ex: Filtro de Óleo Bosch"
+                    aria-invalid={!!errors.name}
                   />
                   {errors.name && (
                     <p className="text-error mt-1 font-mono text-[11px]">
@@ -76,6 +77,7 @@ export function NewPartForm() {
                     {...register("sku")}
                     placeholder="Ex: FO-1234"
                     className="font-mono"
+                    aria-invalid={!!errors.sku}
                   />
                   {errors.sku && (
                     <p className="text-error mt-1 font-mono text-[11px]">
@@ -150,6 +152,7 @@ export function NewPartForm() {
                     inputMode="numeric"
                     {...register("stock", { valueAsNumber: true })}
                     className="font-mono"
+                    aria-invalid={!!errors.stock}
                   />
                   {errors.stock && (
                     <p className="text-error mt-1 font-mono text-[11px]">
@@ -168,6 +171,7 @@ export function NewPartForm() {
                     inputMode="numeric"
                     {...register("minStock", { valueAsNumber: true })}
                     className="font-mono"
+                    aria-invalid={!!errors.minStock}
                   />
                   {errors.minStock && (
                     <p className="text-error mt-1 font-mono text-[11px]">

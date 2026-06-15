@@ -7,9 +7,22 @@ import { usePathname } from "next/navigation";
 import { navItems } from "@/_helpers/nav";
 import { cn } from "@/_lib/utils";
 
+const allNavHrefs = navItems.map((i) => i.href);
+
 function isActive(pathname: string, href: string) {
   if (href === "/") return pathname === "/";
-  return pathname === href || pathname.startsWith(`${href}/`);
+  if (pathname === href) return true;
+  if (pathname.startsWith(`${href}/`)) {
+    // Don't highlight parent when a more-specific nav item matches
+    const hasMoreSpecific = allNavHrefs.some(
+      (h) =>
+        h !== href &&
+        h.startsWith(`${href}/`) &&
+        (pathname === h || pathname.startsWith(`${h}/`)),
+    );
+    return !hasMoreSpecific;
+  }
+  return false;
 }
 
 export function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {

@@ -1,0 +1,203 @@
+"use client";
+
+import {
+  Calendar,
+  Car,
+  Clipboard,
+  ExternalLink,
+  Trash2,
+  User,
+  Wrench,
+} from "lucide-react";
+import Link from "next/link";
+import { useAction } from "next-safe-action/hooks";
+import { toast } from "sonner";
+
+import { deleteOrderAction } from "@/_actions/orders";
+import {
+  AlertDialog,
+  AlertDialogClose,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/_components/ui/alert-dialog";
+import { Button } from "@/_components/ui/button";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/_components/ui/sheet";
+import { StatusChip } from "@/_components/ui/status-chip";
+import type { OrderRow } from "@/_data-access/orders";
+import { formatCurrency, formatDateTime } from "@/_helpers/format";
+
+type Props = {
+  order: OrderRow | null;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+};
+
+export function OrderDetailPanel({ order, open, onOpenChange }: Props) {
+  const { execute: execDelete, status: deleteStatus } = useAction(
+    deleteOrderAction,
+    {
+      onSuccess: () => {
+        toast.success("Ordem excluída com sucesso.");
+        onOpenChange(false);
+      },
+      onError: () => toast.error("Erro ao excluir ordem."),
+    },
+  );
+
+  function handleDelete() {
+    if (!order) return;
+    execDelete({ id: order.id });
+  }
+
+  return (
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetContent
+        side="right"
+        className="flex w-full flex-col gap-0 p-0 sm:max-w-md"
+      >
+        {order ? (
+          <>
+            <SheetHeader className="border-outline-variant bg-surface-container border-b px-6 py-5">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <SheetTitle className="text-body-lg text-on-surface font-semibold">
+                    O.S. #{order.orderNumber}
+                  </SheetTitle>
+                  <SheetDescription className="text-label-sm text-on-surface-variant mt-0.5 font-mono">
+                    {order.plate} · {order.vehicle}
+                  </SheetDescription>
+                </div>
+                <StatusChip status={order.status} />
+              </div>
+            </SheetHeader>
+
+            <div className="divide-outline-variant/30 flex-1 divide-y overflow-y-auto">
+              {/* Cliente / Mecânico */}
+              <div className="space-y-3 px-6 py-4">
+                <p className="text-on-surface-variant/60 font-mono text-[10px] tracking-wider uppercase">
+                  Informações
+                </p>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2.5">
+                    <User className="text-on-surface-variant size-4 shrink-0" />
+                    <span className="text-body-sm text-on-surface">
+                      {order.customer ?? "Cliente não informado"}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2.5">
+                    <Car className="text-on-surface-variant size-4 shrink-0" />
+                    <span className="text-body-sm text-on-surface font-mono">
+                      {order.plate}
+                    </span>
+                    <span className="text-body-sm text-on-surface-variant">
+                      {order.vehicle}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2.5">
+                    <Wrench className="text-on-surface-variant size-4 shrink-0" />
+                    <span className="text-body-sm text-on-surface">
+                      {order.mechanic ?? "Mecânico não atribuído"}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2.5">
+                    <Calendar className="text-on-surface-variant size-4 shrink-0" />
+                    <span className="text-label-sm text-on-surface-variant font-mono">
+                      {formatDateTime(order.updatedAt)}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Total */}
+              <div className="px-6 py-4">
+                <div className="bg-surface-container border-outline-variant/30 flex items-center justify-between rounded-lg border p-4">
+                  <div className="flex items-center gap-2">
+                    <Clipboard className="text-on-surface-variant size-4" />
+                    <span className="text-label-sm text-on-surface-variant font-mono">
+                      Total da O.S.
+                    </span>
+                  </div>
+                  <span className="text-headline-sm text-secondary font-mono font-bold">
+                    {formatCurrency(Number(order.totalAmount))}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="border-outline-variant space-y-2 border-t p-4">
+              <Link
+                href={`/orders/${order.id}/budget`}
+                className="bg-secondary text-surface text-label-sm hover:bg-secondary/90 flex w-full items-center justify-center gap-2 rounded-lg px-3 py-2.5 font-mono font-bold transition-colors"
+              >
+                <ExternalLink className="size-4" />
+                Ver Ficha Completa
+              </Link>
+              <AlertDialog>
+                <AlertDialogTrigger
+                  render={
+                    <Button
+                      variant="outline"
+                      className="text-error border-error/30 hover:bg-error/10 w-full gap-2"
+                    >
+                      <Trash2 className="size-4" />
+                      Excluir Ordem
+                    </Button>
+                  }
+                />
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>
+                      Excluir Ordem de Serviço
+                    </AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Tem certeza que deseja excluir a O.S. #{order.orderNumber}
+                      ? Esta ação não pode ser desfeita.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogClose
+                      render={<Button variant="outline">Cancelar</Button>}
+                    />
+                    <AlertDialogClose
+                      render={
+                        <Button
+                          variant="destructive"
+                          onClick={handleDelete}
+                          disabled={deleteStatus === "executing"}
+                        >
+                          {deleteStatus === "executing"
+                            ? "Excluindo..."
+                            : "Excluir"}
+                        </Button>
+                      }
+                    />
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </div>
+          </>
+        ) : (
+          <>
+            <SheetHeader className="sr-only">
+              <SheetTitle>Detalhes da ordem</SheetTitle>
+              <SheetDescription>
+                Painel lateral com informações da O.S.
+              </SheetDescription>
+            </SheetHeader>
+          </>
+        )}
+      </SheetContent>
+    </Sheet>
+  );
+}

@@ -106,6 +106,16 @@ export const updateOrderStatusAction = authActionClient
     revalidatePath(`/orders/${parsedInput.id}`);
   });
 
+export const deleteOrderAction = authActionClient
+  .schema(z.object({ id: z.uuid() }))
+  .action(async ({ parsedInput }) => {
+    await db
+      .delete(serviceOrderItems)
+      .where(eq(serviceOrderItems.serviceOrderId, parsedInput.id));
+    await db.delete(serviceOrders).where(eq(serviceOrders.id, parsedInput.id));
+    revalidatePath("/orders");
+  });
+
 export const approveOrderItemAction = authActionClient
   .schema(
     z.object({

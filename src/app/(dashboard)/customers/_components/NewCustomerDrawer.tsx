@@ -95,7 +95,7 @@ export function NewCustomerDrawer({ open, onClose }: Props) {
           </SheetDescription>
         </SheetHeader>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 px-1 py-5">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 px-4 py-5">
           <div className="space-y-1.5">
             <Label htmlFor="name" className="text-on-surface-variant font-mono">
               Nome *
@@ -103,6 +103,7 @@ export function NewCustomerDrawer({ open, onClose }: Props) {
             <Input
               id="name"
               placeholder="Nome completo"
+              aria-invalid={!!errors.name}
               {...register("name")}
             />
             {errors.name && (
@@ -121,6 +122,7 @@ export function NewCustomerDrawer({ open, onClose }: Props) {
               id="email"
               type="email"
               placeholder="email@exemplo.com"
+              aria-invalid={!!errors.email}
               {...register("email")}
             />
             {errors.email && (
