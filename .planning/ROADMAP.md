@@ -105,11 +105,25 @@ Plans:
 1. The strategic dashboard renders advanced metrics (per `dashboard_estrat_gico_precision_auto`) at `/analytics` or a dashboard tab.
 2. `/inventory/alerts` shows low-stock items with CRÍTICO/ATENÇÃO highlighting, and `/inventory/purchase-orders` supports generating a purchase order including a delivery forecast.
 3. The new-O.S. flow includes a vehicle intake checklist (per `nova_ordem_de_servi_o_com_checklist`).
-4. `/appointments` renders a working calendar (react-big-calendar + date-fns) and `/track/[id]` renders public O.S. tracking with a QR code (qrcode.react) — both no longer placeholders.
+4. `/appointments` renders a working calendar (custom date-fns implementation — month + week + list views, per D-10) and `/track/[id]` renders public O.S. tracking with a QR code (qrcode.react) — both no longer placeholders.
 5. Design-system polish (font-mono labels, status chips, system colors) is applied consistently across all screens.
 6. Locked completion checklist passes: `npx tsc --noEmit` zero errors, `npm run lint` zero errors, `npm run build` succeeds, all new/updated routes render without crash, responsiveness tested, design patterns applied.
-   **Plans**: TBD
+   **Plans**: 5 plans
    **UI hint**: yes
+   Plans:
+   **Wave 1**
+
+- [x] 04-01-PLAN.md — SCRN-06 real QR code on /track/[id] (qrcode.react encoding the tracking URL)
+- [ ] 04-02-PLAN.md — SCRN-06 weekly view in the appointments calendar (custom date-fns, third switcher option)
+- [ ] 04-03-PLAN.md — SCRN-01..05 audit + completeness fixes (analytics, alerts, purchase-orders + delivery forecast, intake checklist)
+
+**Wave 2**
+
+- [ ] 04-04-PLAN.md — SCRN-07 design-system polish: status-heavy screens (appointments, purchase-orders, alerts, analytics)
+
+**Wave 3**
+
+- [ ] 04-05-PLAN.md — SCRN-07 design-system polish: remaining screens (home, inventory, customers, orders, finance, finance/reports) + locked completion gate (tsc/lint/build)
 
 ## Progress
 
@@ -121,4 +135,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 | 1. Segurança (Security)                        | 0/5            | Not started | -          |
 | 2. Responsividade (Responsiveness)             | 4/4            | Complete    | 2026-06-12 |
 | 3. Usabilidade (Usability)                     | 5/5            | Complete    | 2026-06-14 |
-| 4. Aprimoramento de telas (Screen enhancement) | 0/TBD          | Not started | -          |
+| 4. Aprimoramento de telas (Screen enhancement) | 1/5            | In progress | -          |
