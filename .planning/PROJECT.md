@@ -1,8 +1,21 @@
 # AutoShop Manager (Precision Auto)
 
+## Current Milestone: v1.1 DB Integration & Live Data
+
+**Goal:** Substituir todo o mock data por queries Drizzle ORM reais em todos os módulos, conectando Better Auth ao banco de dados.
+
+**Target features:**
+
+- Better Auth ↔ Drizzle DB (usuários, sessões, conta)
+- Ordens de serviço: CRUD real (criar, listar, status, orçamento)
+- Clientes & veículos: CRUD real
+- Inventário: peças, estoque, alertas de mínimo, ordens de compra
+- Agendamentos: salvar e carregar do banco
+- Finance & Analytics: relatórios financeiros e dashboard analítico com dados reais
+
 ## What This Is
 
-AutoShop Manager (brand "Precision Auto", repo "Oficina-Mecanica") is a management system for an auto mechanic workshop (oficina mecânica). It covers the full day-to-day operation: service orders (O.S.), customers & vehicles, parts inventory, finance, and appointments. The app is built on Next.js 16 (App Router, Turbopack, React Compiler), deployed on Vercel, and uses Better Auth for authentication. v1.0 hardened, polished, and completed all screens — the app is now production-ready on mock data, with the full operator flow working end-to-end on desktop and mobile.
+AutoShop Manager (brand "Precision Auto", repo "Oficina-Mecanica") is a management system for an auto mechanic workshop (oficina mecânica). It covers the full day-to-day operation: service orders (O.S.), customers & vehicles, parts inventory, finance, and appointments. The app is built on Next.js 16 (App Router, Turbopack, React Compiler), deployed on Vercel, and uses Better Auth for authentication. v1.0 hardened, polished, and completed all screens — the app is now production-ready on mock data, with the full operator flow working end-to-end on desktop and mobile. v1.1 integrates the real Drizzle ORM database to replace all mock data.
 
 ## Core Value
 
@@ -30,10 +43,14 @@ A workshop operator can run the full day-to-day flow — intake → service orde
 
 ### Active
 
-<!-- Next milestone: v1.1 — DB integration and live data. -->
+<!-- Current milestone: v1.1 — DB integration and live data. -->
 
-- [ ] **DB integration** — Replace mock data with real Drizzle ORM queries across all modules (DB-01..DB-03)
-- [ ] **Better Auth ↔ DB** — Connect Better Auth to the Drizzle database (DB-03)
+- [ ] **DB-01** — Better Auth ↔ Drizzle DB (usuários, sessões, conta)
+- [ ] **DB-02** — Ordens de serviço: CRUD real (criar, listar, status, orçamento)
+- [ ] **DB-03** — Clientes & veículos: CRUD real
+- [ ] **DB-04** — Inventário: peças, estoque, alertas de mínimo, ordens de compra
+- [ ] **DB-05** — Agendamentos: salvar e carregar do banco
+- [ ] **DB-06** — Finance & Analytics: relatórios financeiros e dashboard analítico com dados reais
 
 ### Out of Scope
 
@@ -76,4 +93,25 @@ A workshop operator can run the full day-to-day flow — intake → service orde
 
 ---
 
-_Last updated: 2026-06-20 after v1.0 Hardening & Polish milestone_
+## Evolution
+
+This document evolves at phase transitions and milestone boundaries.
+
+**After each phase transition** (via `/gsd-transition`):
+
+1. Requirements invalidated? → Move to Out of Scope with reason
+2. Requirements validated? → Move to Validated with phase reference
+3. New requirements emerged? → Add to Active
+4. Decisions to log? → Add to Key Decisions
+5. "What This Is" still accurate? → Update if drifted
+
+**After each milestone** (via `/gsd-complete-milestone`):
+
+1. Full review of all sections
+2. Core Value check — still the right priority?
+3. Audit Out of Scope — reasons still valid?
+4. Update Context with current state
+
+---
+
+_Last updated: 2026-06-20 — Milestone v1.1 DB Integration started_
