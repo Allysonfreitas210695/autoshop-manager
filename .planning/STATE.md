@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: Hardening & Polish
 milestone_name: milestone
-status: complete
-last_updated: "2026-06-15T00:00:00.000Z"
-last_activity: 2026-06-15 -- Phase 04 complete (human approved gate)
+status: Awaiting next milestone
+last_updated: "2026-06-20T23:07:19.306Z"
+last_activity: 2026-06-20 — Milestone v1.0 completed and archived
 progress:
   total_phases: 4
   completed_phases: 4
@@ -24,12 +24,10 @@ See: .planning/PROJECT.md (updated 2026-06-11)
 
 ## Current Position
 
-Phase: 03 (usabilidade-usability) — EXECUTING
-Plan: 2 of 5
-Status: Ready to execute
-Last activity: 2026-06-15 -- Phase 04 planning complete
-
-Progress: [███████░░░] 71%
+Phase: Milestone v1.0 complete
+Plan: —
+Status: Awaiting next milestone
+Last activity: 2026-06-20 — Milestone v1.0 completed and archived
 
 ## Performance Metrics
 
@@ -81,12 +79,20 @@ None yet.
 
 Items acknowledged and carried forward:
 
-| Category       | Item                                                                             | Status                       | Deferred At |
-| -------------- | -------------------------------------------------------------------------------- | ---------------------------- | ----------- |
-| DB integration | Drizzle ORM live queries + CRUD server actions + Better Auth ↔ DB (DB-01..DB-03) | Deferred to future milestone | 2026-06-11  |
+| Category       | Item                                                                             | Status                          | Deferred At |
+| -------------- | -------------------------------------------------------------------------------- | ------------------------------- | ----------- |
+| DB integration | Drizzle ORM live queries + CRUD server actions + Better Auth ↔ DB (DB-01..DB-03) | Deferred to future milestone    | 2026-06-11  |
+| uat_gap        | Phase 01: 01-HUMAN-UAT.md — 3 cenários pendentes                                 | Acknowledged at milestone close | 2026-06-20  |
+| uat_gap        | Phase 02: 02-HUMAN-UAT.md — status partial                                       | Acknowledged at milestone close | 2026-06-20  |
+| verification   | Phase 01: 01-VERIFICATION.md — human_needed                                      | Acknowledged at milestone close | 2026-06-20  |
+| verification   | Phase 02: 02-VERIFICATION.md — human_needed                                      | Acknowledged at milestone close | 2026-06-20  |
 
 ## Session Continuity
 
 Last session: 2026-06-13T14:44:36.650Z
 Stopped at: Phase 2 context gathered
 Resume file: None
+
+## Operator Next Steps
+
+- Start the next milestone with /gsd-new-milestone
