@@ -15,6 +15,13 @@
       "when": 1779903679889,
       "tag": "0001_phase16_additions",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1781980235036,
+      "tag": "0002_flat_reavers",
+      "breakpoints": true
     }
   ]
 }

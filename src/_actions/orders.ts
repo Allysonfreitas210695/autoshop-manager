@@ -90,7 +90,7 @@ export const createOrderAction = authActionClient
           quantity: i.quantity,
           unitPrice: String(i.unitPrice),
           serviceId: i.serviceId ?? null,
-          approved: false,
+          approved: true,
         })),
       );
     }
