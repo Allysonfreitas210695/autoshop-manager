@@ -55,23 +55,23 @@
 
 ## Traceability
 
-| REQ-ID   | Phase | Status  |
-| -------- | ----- | ------- |
-| FOUND-01 | —     | Pending |
-| FOUND-02 | —     | Pending |
-| FOUND-03 | —     | Pending |
-| OS-01    | —     | Pending |
-| OS-02    | —     | Pending |
-| OS-03    | —     | Pending |
-| CLI-01   | —     | Pending |
-| CLI-02   | —     | Pending |
-| CLI-03   | —     | Pending |
-| INV-01   | —     | Pending |
-| INV-02   | —     | Pending |
-| INV-03   | —     | Pending |
-| APPT-01  | —     | Pending |
-| APPT-02  | —     | Pending |
-| FIN-01   | —     | Pending |
-| FIN-02   | —     | Pending |
-| FIN-03   | —     | Pending |
-| FIN-04   | —     | Pending |
+| REQ-ID   | Phase    | Status  |
+| -------- | -------- | ------- |
+| FOUND-01 | Phase 5  | Pending |
+| FOUND-02 | Phase 5  | Pending |
+| FOUND-03 | Phase 5  | Pending |
+| OS-01    | Phase 6  | Pending |
+| OS-02    | Phase 6  | Pending |
+| OS-03    | Phase 6  | Pending |
+| CLI-01   | Phase 7  | Pending |
+| CLI-02   | Phase 7  | Pending |
+| CLI-03   | Phase 7  | Pending |
+| INV-01   | Phase 8  | Pending |
+| INV-02   | Phase 8  | Pending |
+| INV-03   | Phase 8  | Pending |
+| APPT-01  | Phase 9  | Pending |
+| APPT-02  | Phase 9  | Pending |
+| FIN-01   | Phase 10 | Pending |
+| FIN-02   | Phase 10 | Pending |
+| FIN-03   | Phase 10 | Pending |
+| FIN-04   | Phase 10 | Pending |

@@ -3,10 +3,10 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: DB Integration & Live Data
 status: planning
-last_updated: "2026-06-20T23:13:33.351Z"
+last_updated: "2026-06-20T00:00:00.000Z"
 last_activity: 2026-06-20
 progress:
-  total_phases: 0
+  total_phases: 6
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -17,23 +17,23 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-06-11)
+See: .planning/PROJECT.md (updated 2026-06-20)
 
 **Core value:** A workshop operator can run the full day-to-day flow (intake → service order → budget approval → print/PIX → inventory/finance) on desktop AND mobile, securely, without rough edges.
-**Current focus:** Phase 03 — usabilidade-usability
+**Current focus:** Phase 05 — DB Foundation & Auth
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: Phase 5 — DB Foundation & Auth (not started)
 Plan: —
-Status: Defining requirements
-Last activity: 2026-06-20 — Milestone v1.1 started
+Status: Roadmap defined, ready to plan Phase 5
+Last activity: 2026-06-20 — v1.1 roadmap created
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 9
+- Total plans completed (v1.1): 0
 - Average duration: — min
 - Total execution time: — hours
 
@@ -41,7 +41,12 @@ Last activity: 2026-06-20 — Milestone v1.1 started
 
 | Phase | Plans | Total | Avg/Plan |
 | ----- | ----- | ----- | -------- |
-| 02    | 4     | -     | -        |
+| 05    | 0     | -     | -        |
+| 06    | 0     | -     | -        |
+| 07    | 0     | -     | -        |
+| 08    | 0     | -     | -        |
+| 09    | 0     | -     | -        |
+| 10    | 0     | -     | -        |
 
 **Recent Trend:**
 
@@ -49,8 +54,6 @@ Last activity: 2026-06-20 — Milestone v1.1 started
 - Trend: —
 
 _Updated after each plan completion_
-| Phase 02-responsividade-responsiveness P04 | 20 | 2 tasks | 0 files |
-| Phase 03-usabilidade-usability P01 | 8 | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -63,13 +66,18 @@ Recent decisions affecting current work:
 - [Locked]: No `any`/`as unknown`; Server Components by default; Zod in `src/_schemas/` (no `.default()` in form schemas); controlled Select via `<Controller>`.
 - [Locked]: Base UI (`@base-ui/react`) uses `render` prop, never `asChild`.
 - [Locked]: Next.js 16 + Turbopack; access control in `proxy.ts` (not `middleware.ts`); Better Auth.
-- [Locked]: Mock-data-first; Drizzle/live-DB integration deferred to a later milestone (out of scope this milestone).
-- [Phase ?]: Human approved breakpoint pass
-- [Phase ?]: createOrderAction reescrito para plate/customerName/vehicleModel com insert de vehicle inline; wizard wired via useAction
+- [v1.1]: DB integration is audit + gap-fix, not from-scratch wiring — all data-access files already import from `@/_db` with real Drizzle queries.
+- [v1.1]: `pg.Pool` must be replaced with serverless-safe driver before any Vercel deploy (connection exhaustion risk).
+- [v1.1]: `numeric(12,2)` Drizzle columns return JS strings — must wrap with `Number()` at data-access layer before reaching UI.
+- [v1.1]: O.S. close → auto-insert `transactions` row is required for Finance/Analytics to show non-zero data.
+- [v1.1]: Appointments schema needs `serviceType` + `duration` migration before form wiring.
+- [v1.1]: `createCustomerAction` needs email pre-check before insert to avoid PG UNIQUE crash.
 
 ### Pending Todos
 
-None yet.
+- Confirm DB provider (Neon vs Supabase vs Railway) at Phase 5 planning to select correct serverless driver.
+- Review `scripts/seed.ts` at Phase 5 planning to confirm all 12 tables covered.
+- Audit `revalidatePath` coverage per module during each phase.
 
 ### Blockers/Concerns
 
@@ -79,20 +87,22 @@ None yet.
 
 Items acknowledged and carried forward:
 
-| Category       | Item                                                                             | Status                          | Deferred At |
-| -------------- | -------------------------------------------------------------------------------- | ------------------------------- | ----------- |
-| DB integration | Drizzle ORM live queries + CRUD server actions + Better Auth ↔ DB (DB-01..DB-03) | Deferred to future milestone    | 2026-06-11  |
-| uat_gap        | Phase 01: 01-HUMAN-UAT.md — 3 cenários pendentes                                 | Acknowledged at milestone close | 2026-06-20  |
-| uat_gap        | Phase 02: 02-HUMAN-UAT.md — status partial                                       | Acknowledged at milestone close | 2026-06-20  |
-| verification   | Phase 01: 01-VERIFICATION.md — human_needed                                      | Acknowledged at milestone close | 2026-06-20  |
-| verification   | Phase 02: 02-VERIFICATION.md — human_needed                                      | Acknowledged at milestone close | 2026-06-20  |
+| Category     | Item                                                                         | Status                          | Deferred At |
+| ------------ | ---------------------------------------------------------------------------- | ------------------------------- | ----------- |
+| uat_gap      | Phase 01: 01-HUMAN-UAT.md — 3 cenários pendentes                             | Acknowledged at milestone close | 2026-06-20  |
+| uat_gap      | Phase 02: 02-HUMAN-UAT.md — status partial                                   | Acknowledged at milestone close | 2026-06-20  |
+| verification | Phase 01: 01-VERIFICATION.md — human_needed                                  | Acknowledged at milestone close | 2026-06-20  |
+| verification | Phase 02: 02-VERIFICATION.md — human_needed                                  | Acknowledged at milestone close | 2026-06-20  |
+| future_req   | Driver swap to @neondatabase/serverless (pg.Pool adequate for v1.1 if max=3) | Future requirement              | 2026-06-20  |
+| future_req   | nextServices section in /customers/[id] with real data source                | Future requirement              | 2026-06-20  |
+| future_req   | Server-side pagination for large lists (O.S., customers, inventory)          | Future requirement              | 2026-06-20  |
 
 ## Session Continuity
 
-Last session: 2026-06-13T14:44:36.650Z
-Stopped at: Phase 2 context gathered
+Last session: 2026-06-20
+Stopped at: Roadmap created for v1.1
 Resume file: None
 
 ## Operator Next Steps
 
-- Start the next milestone with /gsd-new-milestone
+- Run `/gsd-plan-phase 5` to plan Phase 5 (DB Foundation & Auth)
