@@ -67,8 +67,14 @@ Plans:
 2. Operator can list all O.S., change status, and see status reflected immediately after revalidation
 3. Approving/closing an O.S. automatically creates a row in `transactions` with the correct amount
 4. All update actions (status change, budget approval) include `updatedAt: new Date()` and the field is correct in the DB
-   **Plans**: TBD
-   **UI hint**: no
+
+**Plans**: 1 plan
+Plans:
+**Wave 1**
+
+- [ ] 06-01-PLAN.md — Atomic transaction insert on O.S. close + totalAmount recalc on budget approval (surgical edits to src/\_actions/orders.ts)
+
+**UI hint**: no
 
 ### Phase 7: Customers & Vehicles
 
@@ -134,7 +140,7 @@ Plans:
 | 3. Usabilidade (Usability)                     | v1.0      | 5/5            | Complete    | 2026-06-14 |
 | 4. Aprimoramento de telas (Screen enhancement) | v1.0      | 5/5            | Complete    | 2026-06-15 |
 | 5. DB Foundation & Auth                        | v1.1      | 2/2            | Complete    | 2026-06-21 |
-| 6. Orders & Transactions                       | v1.1      | 0/?            | Not started | -          |
+| 6. Orders & Transactions                       | v1.1      | 0/1            | In progress | -          |
 | 7. Customers & Vehicles                        | v1.1      | 0/?            | Not started | -          |
 | 8. Inventory                                   | v1.1      | 0/?            | Not started | -          |
 | 9. Appointments                                | v1.1      | 0/?            | Not started | -          |
