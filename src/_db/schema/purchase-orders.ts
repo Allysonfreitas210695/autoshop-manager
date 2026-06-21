@@ -16,6 +16,7 @@ export const purchaseOrderStatus = pgEnum("purchase_order_status", [
   "sent",
   "received",
   "cancelled",
+  "confirmed",
 ]);
 
 export const purchaseOrders = pgTable("purchase_orders", {
