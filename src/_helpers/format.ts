@@ -68,8 +68,9 @@ export function formatPlate(raw: string): string {
     .replace(/[^A-Z0-9]/g, "")
     .slice(0, 7);
 
-  // 4º caractere numérico => formato antigo => insere hífen após as 3 letras
-  if (clean.length > 3 && /\d/.test(clean[3])) {
+  // 5º caractere numérico => formato antigo (ex: ABC1234) => insere hífen
+  // Se for letra, é Mercosul (ex: ABC1D23) => não insere hífen
+  if (clean.length > 4 && /\d/.test(clean[4])) {
     return `${clean.slice(0, 3)}-${clean.slice(3)}`;
   }
   return clean;

@@ -30,6 +30,7 @@ describe("Phase 6 orders actions wiring (D-01..D-06)", () => {
 
   const updateBlock = blocks.find((b) => b.name === "updateOrderStatusAction");
   const approveBlock = blocks.find((b) => b.name === "approveOrderItemAction");
+  const addOrderItemBlock = blocks.find((b) => b.name === "addOrderItemAction");
 
   // D-01: transaction insert guarded by completed check
   it('D-01: updateOrderStatusAction inserts a transactions row guarded by status === "completed"', () => {
@@ -169,6 +170,24 @@ describe("Phase 6 orders actions wiring (D-01..D-06)", () => {
     expect(
       hasDetailPath,
       "approveOrderItemAction must also revalidatePath the /orders/[id] detail path",
+    ).toBe(true);
+  });
+
+  // Gap Analysis 2: addOrderItemAction
+  it("addOrderItemAction checks stock and deducts if order is in progress", () => {
+    expect(
+      addOrderItemBlock?.body.includes("Estoque insuficiente"),
+      "addOrderItemAction must check for insufficient stock",
+    ).toBe(true);
+
+    expect(
+      addOrderItemBlock?.body.includes('status === "in_progress"'),
+      "addOrderItemAction must check if order is in_progress to deduct stock",
+    ).toBe(true);
+
+    expect(
+      addOrderItemBlock?.body.includes("db.transaction"),
+      "addOrderItemAction must use db.transaction for atomic operations",
     ).toBe(true);
   });
 });

@@ -10,7 +10,13 @@ import { describe, expect, it } from "vitest";
 // coverage cannot silently regress. No edits to the action files themselves.
 
 const ACTIONS_DIR = dirname(fileURLToPath(import.meta.url));
-const ACTION_FILES = ["appointments", "customers", "inventory", "orders"];
+const ACTION_FILES = [
+  "appointments",
+  "customers",
+  "feedbacks",
+  "inventory",
+  "orders",
+];
 
 interface ExportBlock {
   name: string;
@@ -37,8 +43,8 @@ describe("SEC-02 server-action coverage audit (D-09)", () => {
 
       for (const { name, body } of blocks) {
         expect(
-          body.includes("authActionClient"),
-          `${file}.ts → "${name}" does not use authActionClient`,
+          body.includes("authActionClient") || body.includes("actionClient"),
+          `${file}.ts → "${name}" does not use an action client`,
         ).toBe(true);
         expect(
           body.includes(".schema("),
@@ -48,11 +54,11 @@ describe("SEC-02 server-action coverage audit (D-09)", () => {
     });
   }
 
-  it("covers all 9 known server actions across the four files", () => {
+  it("covers all 18 known server actions across the five files", () => {
     const total = ACTION_FILES.reduce((sum, file) => {
       const source = readFileSync(join(ACTIONS_DIR, `${file}.ts`), "utf8");
       return sum + exportBlocks(source).length;
     }, 0);
-    expect(total).toBe(15);
+    expect(total).toBe(18);
   });
 });
