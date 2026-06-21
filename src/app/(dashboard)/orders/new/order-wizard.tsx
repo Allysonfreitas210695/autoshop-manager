@@ -141,6 +141,7 @@ export function OrderWizard({
     execute({
       plate: wizardData.step1.plate ?? "",
       customerName: wizardData.step1.customerName ?? "",
+      vehicleMake: wizardData.step1.vehicleMake,
       vehicleModel: wizardData.step1.vehicleModel ?? "",
       mileage: wizardData.step1.mileage,
       customerId: wizardData.step1.customerId,

@@ -14,6 +14,7 @@ export const createServiceOrderSchema = z.object({
     .max(8)
     .transform((value) => value.toUpperCase().trim()),
   customerName: z.string().min(2, "Informe o cliente."),
+  vehicleMake: z.string().optional(),
   vehicleModel: z.string().min(2, "Informe o veículo."),
   description: z.string().min(3, "Descreva o serviço.").max(2000),
   status: z.enum(serviceOrderStatusValues).default("pending"),

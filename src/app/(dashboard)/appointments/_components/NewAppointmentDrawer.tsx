@@ -42,7 +42,6 @@ export function NewAppointmentDrawer({
     status,
     result,
     selectedCustomer,
-    onSubmit,
   } = useAppointmentForm({ customers, mechanics, onClose });
 
   return (
@@ -66,7 +65,7 @@ export function NewAppointmentDrawer({
           </SheetDescription>
         </SheetHeader>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 px-4 py-5">
+        <form onSubmit={handleSubmit} className="space-y-5 px-4 py-5">
           {/* Cliente */}
           <section className="space-y-3">
             <h3 className="text-label-sm text-on-surface-variant/60 flex items-center gap-2 font-mono tracking-wider uppercase">
@@ -168,6 +167,42 @@ export function NewAppointmentDrawer({
                   )}
                 />
               </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <Label htmlFor="serviceType">Tipo de Serviço</Label>
+                  <Controller
+                    name="serviceType"
+                    control={control}
+                    render={({ field }) => (
+                      <select
+                        {...field}
+                        id="serviceType"
+                        className="bg-surface-container border-outline-variant/50 text-body-sm text-on-surface focus:ring-secondary w-full rounded-lg border px-3 py-2 focus:ring-1 focus:outline-none"
+                      >
+                        <option value="">Selecione...</option>
+                        <option value="preventiva">Preventiva</option>
+                        <option value="corretiva">Corretiva</option>
+                        <option value="garantia">Garantia</option>
+                        <option value="estetica">Estética</option>
+                        <option value="revisao">Revisão</option>
+                        <option value="eletrica">Elétrica</option>
+                        <option value="funilaria">Funilaria</option>
+                      </select>
+                    )}
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="duration">Duração (min)</Label>
+                  <Input
+                    id="duration"
+                    type="number"
+                    min="15"
+                    step="15"
+                    placeholder="Ex: 60"
+                    {...register("duration")}
+                  />
+                </div>
+              </div>
               <div className="grid grid-cols-3 gap-3">
                 <div className="col-span-2 space-y-1.5">
                   <Label htmlFor="date">Data</Label>
@@ -226,10 +261,7 @@ export function NewAppointmentDrawer({
               </Button>
             }
           />
-          <Button
-            onClick={handleSubmit(onSubmit)}
-            disabled={status === "executing"}
-          >
+          <Button onClick={handleSubmit} disabled={status === "executing"}>
             {status === "executing" ? "Salvando..." : "Confirmar Agendamento"}
           </Button>
         </SheetFooter>

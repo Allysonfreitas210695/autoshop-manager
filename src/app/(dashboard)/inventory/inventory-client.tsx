@@ -10,8 +10,10 @@ import {
   TrendingDown,
 } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useAction } from "next-safe-action/hooks";
+import { useEffect, useState } from "react";
 
+import { searchPartsAction } from "@/_actions/inventory";
 import { Button, buttonVariants } from "@/_components/ui/button";
 import { DataTable, type DataTableColumn } from "@/_components/ui/data-table";
 import { Input } from "@/_components/ui/input";
@@ -25,9 +27,30 @@ type Props = { initialParts: Part[]; metrics: InventoryMetrics };
 
 export function InventoryClient({ initialParts, metrics }: Props) {
   const [search, setSearch] = useState("");
+  const [parts, setParts] = useState<Part[]>(initialParts);
   const [page, setPage] = useState(1);
   const [editingPart, setEditingPart] = useState<Part | null>(null);
   const PAGE_SIZE = 20;
+
+  const { execute: execSearch, status: searchStatus } = useAction(
+    searchPartsAction,
+    {
+      onSuccess: ({ data }) => {
+        if (data?.parts) {
+          setParts(data.parts);
+          setPage(1);
+        }
+      },
+    },
+  );
+
+  // Debounce: dispara busca server-side após 300ms de inatividade
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      execSearch({ query: search });
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [search]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const columns: DataTableColumn<Part>[] = [
     {
@@ -100,24 +123,17 @@ export function InventoryClient({ initialParts, metrics }: Props) {
     },
   ];
 
-  const filtered = initialParts.filter((part) => {
-    const q = search.trim().toLowerCase();
-    return (
-      q.length < 2 ||
-      part.name.toLowerCase().includes(q) ||
-      (part.sku ?? "").toLowerCase().includes(q)
-    );
-  });
+  const isSearching = searchStatus === "executing";
 
-  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const totalPages = Math.max(1, Math.ceil(parts.length / PAGE_SIZE));
   const safePage = Math.min(page, totalPages);
-  const paginated = filtered.slice(
+  const paginated = parts.slice(
     (safePage - 1) * PAGE_SIZE,
     safePage * PAGE_SIZE,
   );
 
-  const filteredLowStock = filtered.filter((p) => p.stock <= p.minStock).length;
-  const filteredValue = filtered.reduce(
+  const filteredLowStock = parts.filter((p) => p.stock <= p.minStock).length;
+  const filteredValue = parts.reduce(
     (sum, p) => sum + p.stock * p.unitPrice,
     0,
   );
@@ -130,7 +146,7 @@ export function InventoryClient({ initialParts, metrics }: Props) {
             Controle de Estoque
           </h1>
           <p className="text-label-md text-on-surface-variant mt-1 font-mono">
-            {filtered.length} ite{filtered.length !== 1 ? "ns" : "m"} &middot;{" "}
+            {parts.length} ite{parts.length !== 1 ? "ns" : "m"} &middot;{" "}
             {formatCurrency(filteredValue)}
           </p>
         </div>
@@ -211,12 +227,16 @@ export function InventoryClient({ initialParts, metrics }: Props) {
           value={search}
           onChange={(e) => {
             setSearch(e.target.value);
-            setPage(1);
           }}
           placeholder="Nome ou SKU..."
-          className="w-full pl-9 sm:max-w-sm"
+          className={`w-full pl-9 transition-opacity sm:max-w-sm ${isSearching ? "opacity-60" : ""}`}
           aria-label="Buscar peças"
         />
+        {isSearching && (
+          <span className="text-on-surface-variant absolute top-1/2 right-3 -translate-y-1/2 animate-pulse font-mono text-[10px]">
+            buscando...
+          </span>
+        )}
       </div>
 
       <div className="border-outline-variant overflow-hidden rounded-lg border">

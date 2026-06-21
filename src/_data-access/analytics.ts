@@ -33,7 +33,6 @@ export type MechanicPerformance = {
   orders: number;
   revenue: number;
   completionRate: number;
-  avgRating: number;
 };
 
 export type ServiceCategory = {
@@ -150,7 +149,6 @@ export async function getMechanicPerformance(): Promise<MechanicPerformance[]> {
       orders,
       revenue: Number(r.totalAmount),
       completionRate: orders > 0 ? Math.round((completed / orders) * 100) : 0,
-      avgRating: 4.5,
     };
   });
 }

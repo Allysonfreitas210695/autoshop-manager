@@ -1,6 +1,6 @@
 "use server";
 
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
@@ -8,6 +8,7 @@ import { db } from "@/_db";
 import {
   serviceOrderItems,
   serviceOrders,
+  services,
   transactions,
   vehicles,
 } from "@/_db/schema";
@@ -18,6 +19,7 @@ export const createOrderAction = authActionClient
     z.object({
       plate: z.string().min(6).max(8),
       customerName: z.string().min(2),
+      vehicleMake: z.string().optional(),
       vehicleModel: z.string().min(2),
       mileage: z.coerce.number().min(0).optional(),
       customerId: z.string().optional(),
@@ -51,7 +53,7 @@ export const createOrderAction = authActionClient
       .insert(vehicles)
       .values({
         plate: parsedInput.plate.toUpperCase(),
-        make: "Não informado",
+        make: parsedInput.vehicleMake?.trim() || "Não informado",
         model: parsedInput.vehicleModel,
         mileage: parsedInput.mileage ?? null,
       })
@@ -93,20 +95,37 @@ export const createOrderAction = authActionClient
       });
 
     if (parsedInput.items.length > 0) {
-      await db.insert(serviceOrderItems).values(
-        parsedInput.items.map((i) => ({
-          serviceOrderId: order.id,
-          description: i.description,
-          itemType: i.itemType,
-          quantity: i.quantity,
-          unitPrice: String(i.unitPrice),
-          serviceId: i.serviceId ?? null,
-          approved: true,
-        })),
-      );
+      await db.transaction(async (tx) => {
+        await tx.insert(serviceOrderItems).values(
+          parsedInput.items.map((i) => ({
+            serviceOrderId: order.id,
+            description: i.description,
+            itemType: i.itemType,
+            quantity: i.quantity,
+            unitPrice: String(i.unitPrice),
+            serviceId: i.serviceId ?? null,
+            approved: true,
+          })),
+        );
+
+        // Decrement stock for part items that reference a service/part record
+        const partItems = parsedInput.items.filter(
+          (i) => i.itemType === "part" && i.serviceId,
+        );
+        for (const item of partItems) {
+          await tx
+            .update(services)
+            .set({
+              stockQuantity: sql`greatest(0, ${services.stockQuantity} - ${item.quantity})`,
+              updatedAt: new Date(),
+            })
+            .where(eq(services.id, item.serviceId!));
+        }
+      });
     }
 
     revalidatePath("/orders");
+    revalidatePath("/inventory");
     return { id: order.id, orderNumber: order.orderNumber };
   });
 
@@ -153,11 +172,36 @@ export const updateOrderStatusAction = authActionClient
 export const deleteOrderAction = authActionClient
   .schema(z.object({ id: z.uuid() }))
   .action(async ({ parsedInput }) => {
-    await db
-      .delete(serviceOrderItems)
-      .where(eq(serviceOrderItems.serviceOrderId, parsedInput.id));
-    await db.delete(serviceOrders).where(eq(serviceOrders.id, parsedInput.id));
+    await db.transaction(async (tx) => {
+      // Restore stock for part items linked to a service record
+      const items = await tx
+        .select()
+        .from(serviceOrderItems)
+        .where(eq(serviceOrderItems.serviceOrderId, parsedInput.id));
+
+      const partItems = items.filter(
+        (i) => i.itemType === "part" && i.serviceId,
+      );
+      for (const item of partItems) {
+        await tx
+          .update(services)
+          .set({
+            stockQuantity: sql`${services.stockQuantity} + ${item.quantity}`,
+            updatedAt: new Date(),
+          })
+          .where(eq(services.id, item.serviceId!));
+      }
+
+      await tx
+        .delete(serviceOrderItems)
+        .where(eq(serviceOrderItems.serviceOrderId, parsedInput.id));
+      await tx
+        .delete(serviceOrders)
+        .where(eq(serviceOrders.id, parsedInput.id));
+    });
+
     revalidatePath("/orders");
+    revalidatePath("/inventory");
   });
 
 export const getOrderDetailAction = authActionClient

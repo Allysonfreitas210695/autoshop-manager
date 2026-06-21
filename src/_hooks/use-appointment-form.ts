@@ -18,6 +18,8 @@ export const appointmentSchema = z.object({
   mechanicId: z.string().optional(),
   date: z.string().min(1, "Informe a data"),
   time: z.string().min(1, "Informe o horário"),
+  serviceType: z.string().optional(),
+  duration: z.number().int().min(1).optional(),
   notes: z.string().optional(),
 });
 
@@ -37,7 +39,8 @@ export function useAppointmentForm({ customers, onClose }: Params) {
     reset,
     formState: { errors },
   } = useForm<AppointmentFormData>({
-    resolver: zodResolver(appointmentSchema),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    resolver: zodResolver(appointmentSchema) as any,
     defaultValues: { customerId: "", vehicleId: "", mechanicId: "" },
   });
 
@@ -62,6 +65,8 @@ export function useAppointmentForm({ customers, onClose }: Params) {
       vehicleId,
       mechanicId: data.mechanicId || undefined,
       scheduledAt: new Date(`${data.date}T${data.time}:00`).toISOString(),
+      serviceType: data.serviceType || undefined,
+      duration: data.duration || undefined,
       notes: data.notes || undefined,
     });
   }
@@ -69,7 +74,7 @@ export function useAppointmentForm({ customers, onClose }: Params) {
   return {
     control,
     register,
-    handleSubmit,
+    handleSubmit: handleSubmit(onSubmit),
     errors,
     status,
     result,

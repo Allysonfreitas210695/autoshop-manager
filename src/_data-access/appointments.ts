@@ -15,6 +15,8 @@ export type AppointmentRow = {
   mechanic: string | null;
   scheduledAt: Date;
   status: "scheduled" | "confirmed" | "completed" | "cancelled";
+  serviceType: string | null;
+  duration: number | null;
   notes: string | null;
 };
 
@@ -43,6 +45,8 @@ export async function listAppointments(
       id: appointments.id,
       scheduledAt: appointments.scheduledAt,
       status: appointments.status,
+      serviceType: appointments.serviceType,
+      duration: appointments.duration,
       notes: appointments.notes,
       customerName: customer.name,
       customerPhone: customer.phone,
@@ -70,6 +74,8 @@ export async function listAppointments(
     mechanic: row.mechanicName,
     scheduledAt: row.scheduledAt,
     status: row.status,
+    serviceType: row.serviceType,
+    duration: row.duration,
     notes: row.notes,
   }));
 }

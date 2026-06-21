@@ -100,14 +100,28 @@ export function NewOrderDrawer() {
 
             <div className="space-y-1.5">
               <Label
+                htmlFor="vehicleMake"
+                className="text-label-sm text-on-surface-variant font-mono"
+              >
+                MARCA
+              </Label>
+              <Input
+                id="vehicleMake"
+                placeholder="Ex: Toyota"
+                {...register("vehicleMake")}
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <Label
                 htmlFor="vehicleModel"
                 className="text-label-sm text-on-surface-variant font-mono"
               >
-                VEÍCULO *
+                MODELO *
               </Label>
               <Input
                 id="vehicleModel"
-                placeholder="Ex: Toyota Corolla 2022"
+                placeholder="Ex: Corolla 2022"
                 aria-invalid={!!errors.vehicleModel}
                 {...register("vehicleModel")}
               />

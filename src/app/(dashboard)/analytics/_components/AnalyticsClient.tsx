@@ -1,6 +1,6 @@
 "use client";
 
-import { BarChart3, Star, TrendingUp, Users } from "lucide-react";
+import { BarChart3, TrendingUp, Users } from "lucide-react";
 
 import type {
   AnalyticsKpis,
@@ -62,9 +62,12 @@ export function AnalyticsClient({
     },
     {
       label: "NPS",
-      value: analyticsKpis.nps.toString(),
-      sub: `${analyticsKpis.returnRate}% taxa de retorno`,
-      icon: Star,
+      value: analyticsKpis.nps === -1 ? "N/D" : analyticsKpis.nps.toString(),
+      sub:
+        analyticsKpis.returnRate === -1
+          ? "Sem dados de retorno"
+          : `${analyticsKpis.returnRate}% taxa de retorno`,
+      icon: TrendingUp,
       color: "text-secondary",
       bg: "bg-secondary/10",
     },
@@ -224,12 +227,9 @@ export function AnalyticsClient({
                       <p className="text-body-sm text-on-surface font-mono font-medium">
                         {shortBrl(m.revenue)}
                       </p>
-                      <div className="flex items-center justify-end gap-0.5">
-                        <Star className="text-tertiary fill-tertiary size-3" />
-                        <span className="text-label-xs text-tertiary font-mono">
-                          {m.avgRating}
-                        </span>
-                      </div>
+                      <p className="text-label-xs text-on-surface-variant font-mono">
+                        {m.orders} O.S.
+                      </p>
                     </div>
                   </div>
                 ))}

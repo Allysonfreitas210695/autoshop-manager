@@ -177,24 +177,46 @@ export function Step01Client({ defaultValues, customers, onNext }: Step1Props) {
           </div>
         </div>
 
-        <div className="space-y-1.5">
-          <Label
-            htmlFor="vehicleModel"
-            className="text-label-sm text-on-surface-variant font-mono"
-          >
-            MODELO / VERSÃO *
-          </Label>
-          <Input
-            id="vehicleModel"
-            placeholder="Ex: Toyota Corolla XEi 2022"
-            aria-invalid={!!errors.vehicleModel}
-            {...register("vehicleModel")}
-          />
-          {errors.vehicleModel && (
-            <p className="text-label-sm text-error font-mono">
-              {errors.vehicleModel.message}
-            </p>
-          )}
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="space-y-1.5">
+            <Label
+              htmlFor="vehicleMake"
+              className="text-label-sm text-on-surface-variant font-mono"
+            >
+              MARCA
+            </Label>
+            <Input
+              id="vehicleMake"
+              placeholder="Ex: Toyota"
+              aria-invalid={!!errors.vehicleMake}
+              {...register("vehicleMake")}
+            />
+            {errors.vehicleMake && (
+              <p className="text-label-sm text-error font-mono">
+                {errors.vehicleMake.message}
+              </p>
+            )}
+          </div>
+
+          <div className="space-y-1.5">
+            <Label
+              htmlFor="vehicleModel"
+              className="text-label-sm text-on-surface-variant font-mono"
+            >
+              MODELO / VERSÃO *
+            </Label>
+            <Input
+              id="vehicleModel"
+              placeholder="Ex: Corolla XEi 2022"
+              aria-invalid={!!errors.vehicleModel}
+              {...register("vehicleModel")}
+            />
+            {errors.vehicleModel && (
+              <p className="text-label-sm text-error font-mono">
+                {errors.vehicleModel.message}
+              </p>
+            )}
+          </div>
         </div>
 
         {/* Campo hidden para customerName e customerId */}

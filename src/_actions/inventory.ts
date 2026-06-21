@@ -8,6 +8,16 @@ import { db } from "@/_db";
 import { purchaseOrderItems, purchaseOrders, services } from "@/_db/schema";
 import { authActionClient } from "@/_lib/safe-action";
 
+export const searchPartsAction = authActionClient
+  .schema(z.object({ query: z.string() }))
+  .action(async ({ parsedInput }) => {
+    const { searchParts, listParts } = await import("@/_data-access/inventory");
+    if (parsedInput.query.trim().length < 2) {
+      return { parts: await listParts() };
+    }
+    return { parts: await searchParts(parsedInput.query.trim()) };
+  });
+
 const purchaseOrderStatusEnum = z.enum([
   "draft",
   "sent",

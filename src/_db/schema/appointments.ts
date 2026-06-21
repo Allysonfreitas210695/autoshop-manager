@@ -1,4 +1,11 @@
-import { pgEnum, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import {
+  integer,
+  pgEnum,
+  pgTable,
+  text,
+  timestamp,
+  uuid,
+} from "drizzle-orm/pg-core";
 
 import { user } from "./auth";
 import { vehicles } from "./vehicles";
@@ -23,6 +30,8 @@ export const appointments = pgTable("appointments", {
   }),
   scheduledAt: timestamp("scheduled_at").notNull(),
   status: appointmentStatus("status").default("scheduled").notNull(),
+  serviceType: text("service_type"),
+  duration: integer("duration"), // em minutos
   notes: text("notes"),
   createdAt: timestamp("created_at")
     .$defaultFn(() => new Date())

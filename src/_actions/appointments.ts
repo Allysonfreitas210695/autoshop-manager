@@ -15,6 +15,8 @@ export const createAppointmentAction = authActionClient
       vehicleId: z.uuid().optional(),
       mechanicId: z.string().optional(),
       scheduledAt: z.string().datetime(),
+      serviceType: z.string().optional(),
+      duration: z.number().int().min(1).optional(),
       notes: z.string().optional(),
     }),
   )
@@ -26,6 +28,8 @@ export const createAppointmentAction = authActionClient
         vehicleId: parsedInput.vehicleId ?? null,
         mechanicId: parsedInput.mechanicId ?? null,
         scheduledAt: new Date(parsedInput.scheduledAt),
+        serviceType: parsedInput.serviceType ?? null,
+        duration: parsedInput.duration ?? null,
         notes: parsedInput.notes ?? null,
       })
       .returning({ id: appointments.id });

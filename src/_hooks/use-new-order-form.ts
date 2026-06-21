@@ -55,6 +55,7 @@ export function useNewOrderForm(onClose: () => void) {
     execute({
       plate: data.plate,
       customerName: data.customerName,
+      vehicleMake: data.vehicleMake,
       vehicleModel: data.vehicleModel,
       description: data.description,
       status: data.status,

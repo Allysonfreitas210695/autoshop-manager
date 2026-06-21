@@ -19,6 +19,7 @@ export const step1Schema = z.object({
     .max(8)
     .transform((v) => v.toUpperCase().trim()),
   mileage: z.coerce.number().min(0, "KM inválido."),
+  vehicleMake: z.string().optional(),
   vehicleModel: z.string().min(2, "Informe o modelo do veículo."),
 });
 
