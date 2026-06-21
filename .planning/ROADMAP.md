@@ -43,8 +43,15 @@ See: `.planning/milestones/v1.0-ROADMAP.md` for full phase details.
 2. Operator can log in and log out and the session persists across page navigations (Better Auth reads/writes Drizzle)
 3. `scripts/seed.ts` populates all 12 tables with representative relational data without errors
 4. DB connection pattern is serverless-safe (no `pg.Pool` exhaustion under Vercel Lambda invocations)
-   **Plans**: TBD
-   **UI hint**: no
+
+**Plans**: 2 plans
+
+Plans:
+
+- [ ] 05-01-PLAN.md — Harden pg.Pool (max:3 + timeouts), add 'confirmed' enum, generate+apply migration 0003
+- [ ] 05-02-PLAN.md — Fix seed idempotency (add verification to wipe), validate seed runs twice cleanly
+
+**UI hint**: no
 
 ### Phase 6: Orders & Transactions
 
@@ -123,7 +130,7 @@ See: `.planning/milestones/v1.0-ROADMAP.md` for full phase details.
 | 2. Responsividade (Responsiveness)             | v1.0      | 4/4            | Complete    | 2026-06-12 |
 | 3. Usabilidade (Usability)                     | v1.0      | 5/5            | Complete    | 2026-06-14 |
 | 4. Aprimoramento de telas (Screen enhancement) | v1.0      | 5/5            | Complete    | 2026-06-15 |
-| 5. DB Foundation & Auth                        | v1.1      | 0/?            | Not started | -          |
+| 5. DB Foundation & Auth                        | v1.1      | 0/2            | Planned     | -          |
 | 6. Orders & Transactions                       | v1.1      | 0/?            | Not started | -          |
 | 7. Customers & Vehicles                        | v1.1      | 0/?            | Not started | -          |
 | 8. Inventory                                   | v1.1      | 0/?            | Not started | -          |
