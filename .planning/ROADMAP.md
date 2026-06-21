@@ -99,8 +99,14 @@ Plans:
 1. Operator can list all parts and real low-stock alerts appear for items below minimum quantity
 2. Operator can create a purchase order with all valid statuses (including "confirmed") without DB errors
 3. Adding a part to an O.S. decrements the `quantity` field in the DB for that part
-   **Plans**: TBD
-   **UI hint**: no
+
+**Plans**: 1 plan
+Plans:
+**Wave 1**
+
+- [ ] 08-01-PLAN.md — Forward serviceId through wizard, wrap createOrderAction/deleteOrderAction in db.transaction (atomic stock decrement/restore), verify INV-01/INV-02 seed-backed pages
+
+**UI hint**: no
 
 ### Phase 9: Appointments
 
@@ -142,7 +148,7 @@ Plans:
 | 5. DB Foundation & Auth                        | v1.1      | 2/2            | Complete    | 2026-06-21 |
 | 6. Orders & Transactions                       | v1.1      | 1/1            | Complete    | 2026-06-21 |
 | 7. Customers & Vehicles                        | v1.1      | 1/1            | Complete    | 2026-06-21 |
-| 8. Inventory                                   | v1.1      | 0/?            | Not started | -          |
+| 8. Inventory                                   | v1.1      | 0/1            | Planned     | -          |
 | 9. Appointments                                | v1.1      | 0/?            | Not started | -          |
 | 10. Finance & Analytics                        | v1.1      | 0/?            | Not started | -          |
 
