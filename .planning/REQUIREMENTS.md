@@ -18,9 +18,9 @@
 
 ### Clientes & Veículos
 
-- [ ] **CLI-01**: Operador pode criar, listar, editar e buscar clientes do banco
+- [x] **CLI-01**: Operador pode criar, listar, editar e buscar clientes do banco
 - [ ] **CLI-02**: Operador pode ver e gerenciar veículos vinculados a clientes com histórico de O.S.
-- [ ] **CLI-03**: Sistema rejeita criação de cliente com email já existente (sem crash PG)
+- [x] **CLI-03**: Sistema rejeita criação de cliente com email já existente (sem crash PG)
 
 ### Inventário
 
@@ -63,9 +63,9 @@
 | OS-01    | Phase 6  | Complete |
 | OS-02    | Phase 6  | Complete |
 | OS-03    | Phase 6  | Complete |
-| CLI-01   | Phase 7  | Pending  |
+| CLI-01   | Phase 7  | Complete |
 | CLI-02   | Phase 7  | Pending  |
-| CLI-03   | Phase 7  | Pending  |
+| CLI-03   | Phase 7  | Complete |
 | INV-01   | Phase 8  | Pending  |
 | INV-02   | Phase 8  | Pending  |
 | INV-03   | Phase 8  | Pending  |
