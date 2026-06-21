@@ -49,8 +49,8 @@ describe("Phase 7 customers actions wiring (D-01..D-07)", () => {
     ).toBe(true);
   });
 
-  // D-02: email guard with ne() in updateCustomerAction
-  it("D-02: updateCustomerAction contém email guard com ne()", () => {
+  // D-02: email guard in updateCustomerAction (atomic via constraint catch, not pre-check)
+  it("D-02: updateCustomerAction contém email guard via catch de constraint", () => {
     expect(
       updateBlock?.body.includes("ActionError"),
       "updateCustomerAction must contain ActionError",
@@ -62,8 +62,8 @@ describe("Phase 7 customers actions wiring (D-01..D-07)", () => {
     ).toBe(true);
 
     expect(
-      updateBlock?.body.includes("ne("),
-      "updateCustomerAction must use ne() to exclude own id",
+      updateBlock?.body.includes("isUniqueConstraintError"),
+      "updateCustomerAction must use isUniqueConstraintError for atomic email guard",
     ).toBe(true);
   });
 
