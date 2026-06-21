@@ -12,9 +12,9 @@
 
 ### Ordens de Serviço
 
-- [ ] **OS-01**: Operador pode criar, listar e atualizar status de O.S. com dados persistidos no banco
-- [ ] **OS-02**: Ao fechar/aprovar uma O.S., sistema cria automaticamente registro em `transactions`
-- [ ] **OS-03**: Todas as ações de update incluem `updatedAt: new Date()` (dados de auditoria corretos)
+- [x] **OS-01**: Operador pode criar, listar e atualizar status de O.S. com dados persistidos no banco
+- [x] **OS-02**: Ao fechar/aprovar uma O.S., sistema cria automaticamente registro em `transactions`
+- [x] **OS-03**: Todas as ações de update incluem `updatedAt: new Date()` (dados de auditoria corretos)
 
 ### Clientes & Veículos
 
@@ -60,9 +60,9 @@
 | FOUND-01 | Phase 5  | Complete |
 | FOUND-02 | Phase 5  | Complete |
 | FOUND-03 | Phase 5  | Complete |
-| OS-01    | Phase 6  | Pending  |
-| OS-02    | Phase 6  | Pending  |
-| OS-03    | Phase 6  | Pending  |
+| OS-01    | Phase 6  | Complete |
+| OS-02    | Phase 6  | Complete |
+| OS-03    | Phase 6  | Complete |
 | CLI-01   | Phase 7  | Pending  |
 | CLI-02   | Phase 7  | Pending  |
 | CLI-03   | Phase 7  | Pending  |
