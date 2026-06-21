@@ -23,7 +23,7 @@ See: `.planning/milestones/v1.0-ROADMAP.md` for full phase details.
 
 - [x] **Phase 5: DB Foundation & Auth** — Migrations applied, Better Auth wired to Drizzle, seed script operational, connection safe for Vercel serverless (completed 2026-06-21)
 - [x] **Phase 6: Orders & Transactions** — O.S. CRUD on real DB, budget approval, auto-transaction insert on O.S. close, updatedAt audit (completed 2026-06-21)
-- [ ] **Phase 7: Customers & Vehicles** — Customer/vehicle CRUD real, vehicle history, email uniqueness guard
+- [x] **Phase 7: Customers & Vehicles** — Customer/vehicle CRUD real, vehicle history, email uniqueness guard (completed 2026-06-21)
 - [ ] **Phase 8: Inventory** — Parts list, low-stock alerts, purchase orders CRUD with correct enum, stock auto-decrement
 - [ ] **Phase 9: Appointments** — Appointment CRUD on real DB, schema migration for serviceType + duration
 - [ ] **Phase 10: Finance & Analytics** — Finance metrics from real transactions, analytics sentinel fix, N+1 dashboard refactor
@@ -141,7 +141,7 @@ Plans:
 | 4. Aprimoramento de telas (Screen enhancement) | v1.0      | 5/5            | Complete    | 2026-06-15 |
 | 5. DB Foundation & Auth                        | v1.1      | 2/2            | Complete    | 2026-06-21 |
 | 6. Orders & Transactions                       | v1.1      | 1/1            | Complete    | 2026-06-21 |
-| 7. Customers & Vehicles                        | v1.1      | 0/?            | Not started | -          |
+| 7. Customers & Vehicles                        | v1.1      | 1/1            | Complete    | 2026-06-21 |
 | 8. Inventory                                   | v1.1      | 0/?            | Not started | -          |
 | 9. Appointments                                | v1.1      | 0/?            | Not started | -          |
 | 10. Finance & Analytics                        | v1.1      | 0/?            | Not started | -          |
