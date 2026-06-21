@@ -1,12 +1,4 @@
-import {
-  ArrowLeft,
-  Car,
-  Edit,
-  FileText,
-  Mail,
-  MapPin,
-  Phone,
-} from "lucide-react";
+import { ArrowLeft, Car, FileText, Mail, MapPin, Phone } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -15,6 +7,8 @@ import { StatusChip } from "@/_components/ui/status-chip";
 import { getCustomerById } from "@/_data-access/customers";
 import { getOrdersByCustomer } from "@/_data-access/orders";
 import { formatCurrency, formatDate } from "@/_helpers/format";
+
+import { CustomerActions } from "./customer-actions";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -117,12 +111,9 @@ export default async function CustomerProfilePage({ params }: Props) {
           </p>
         </div>
         <div className="flex gap-2">
-          <button className="border-outline-variant bg-surface-container text-label-sm text-on-surface-variant hover:bg-surface-container-highest flex items-center gap-2 rounded-md border px-4 py-2 font-mono transition-colors">
-            <Edit className="size-4" />
-            Editar Cadastro
-          </button>
+          <CustomerActions customer={customer} />
           <Link
-            href="/orders/new"
+            href={`/orders/new?customerId=${customer.id}`}
             className="bg-secondary text-label-sm text-surface hover:bg-secondary/90 flex items-center gap-2 rounded-md px-4 py-2 font-mono font-bold transition-colors"
           >
             <FileText className="size-4" />

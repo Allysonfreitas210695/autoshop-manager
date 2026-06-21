@@ -1,12 +1,14 @@
 import "server-only";
 
-import { and, desc, eq } from "drizzle-orm";
+import { and, count, desc, eq } from "drizzle-orm";
 
 import { db } from "@/_db";
 import {
   serviceOrderItems,
   serviceOrders,
   serviceOrderStatus,
+  user,
+  vehicles,
 } from "@/_db/schema";
 
 export type OrderRow = {
@@ -53,71 +55,83 @@ export type OrderDetail = {
   }[];
 };
 
+export type ListOrdersResult = {
+  rows: OrderRow[];
+  total: number;
+  page: number;
+  pageSize: number;
+  pageCount: number;
+};
+
 export async function listOrders(
   status?: (typeof serviceOrderStatus.enumValues)[number],
-): Promise<OrderRow[]> {
-  const rows = await db
+  page = 1,
+  pageSize = 20,
+): Promise<ListOrdersResult> {
+  const customerAlias = user;
+  const where = status ? eq(serviceOrders.status, status) : undefined;
+
+  const [{ total }] = await db
+    .select({ total: count() })
+    .from(serviceOrders)
+    .where(where);
+
+  const offset = (page - 1) * pageSize;
+
+  const rawRows = await db
     .select({
       id: serviceOrders.id,
       orderNumber: serviceOrders.orderNumber,
       status: serviceOrders.status,
       totalAmount: serviceOrders.totalAmount,
       updatedAt: serviceOrders.updatedAt,
-      vehicleId: serviceOrders.vehicleId,
-      customerId: serviceOrders.customerId,
+      plate: vehicles.plate,
+      make: vehicles.make,
+      model: vehicles.model,
+      customerName: customerAlias.name,
       mechanicId: serviceOrders.mechanicId,
     })
     .from(serviceOrders)
-    .where(status ? eq(serviceOrders.status, status) : undefined)
-    .orderBy(desc(serviceOrders.openedAt));
+    .leftJoin(vehicles, eq(serviceOrders.vehicleId, vehicles.id))
+    .leftJoin(customerAlias, eq(serviceOrders.customerId, customerAlias.id))
+    .where(where)
+    .orderBy(desc(serviceOrders.openedAt))
+    .limit(pageSize)
+    .offset(offset);
 
-  // Fetch related data separately to avoid complex joins
-  const { user, vehicles } = await import("@/_db/schema");
-
-  const results: OrderRow[] = [];
-  for (const row of rows) {
-    const [vehicle] = row.vehicleId
-      ? await db
-          .select({
-            make: vehicles.make,
-            model: vehicles.model,
-            plate: vehicles.plate,
-          })
-          .from(vehicles)
-          .where(eq(vehicles.id, row.vehicleId))
-          .limit(1)
-      : [null];
-
-    const [customer] = row.customerId
-      ? await db
-          .select({ name: user.name })
-          .from(user)
-          .where(eq(user.id, row.customerId))
-          .limit(1)
-      : [null];
-
-    const [mechanic] = row.mechanicId
-      ? await db
-          .select({ name: user.name })
-          .from(user)
-          .where(eq(user.id, row.mechanicId))
-          .limit(1)
-      : [null];
-
-    results.push({
-      id: row.id,
-      orderNumber: row.orderNumber,
-      plate: vehicle?.plate ?? "—",
-      customer: customer?.name ?? null,
-      vehicle: vehicle ? `${vehicle.make} ${vehicle.model}` : "—",
-      mechanic: mechanic?.name ?? null,
-      status: row.status,
-      totalAmount: row.totalAmount,
-      updatedAt: row.updatedAt,
-    });
+  // Fetch mechanic names for rows that have a mechanicId
+  const mechanicIds = [
+    ...new Set(rawRows.map((r) => r.mechanicId).filter(Boolean) as string[]),
+  ];
+  let mechanicMap: Record<string, string> = {};
+  if (mechanicIds.length > 0) {
+    const { inArray } = await import("drizzle-orm");
+    const mechanics = await db
+      .select({ id: user.id, name: user.name })
+      .from(user)
+      .where(inArray(user.id, mechanicIds));
+    mechanicMap = Object.fromEntries(mechanics.map((m) => [m.id, m.name]));
   }
 
-  return results;
+  const rows: OrderRow[] = rawRows.map((r) => ({
+    id: r.id,
+    orderNumber: r.orderNumber,
+    plate: r.plate ?? "—",
+    customer: r.customerName ?? null,
+    vehicle: r.make && r.model ? `${r.make} ${r.model}` : "—",
+    mechanic: r.mechanicId ? (mechanicMap[r.mechanicId] ?? null) : null,
+    status: r.status,
+    totalAmount: r.totalAmount,
+    updatedAt: r.updatedAt,
+  }));
+
+  return {
+    rows,
+    total,
+    page,
+    pageSize,
+    pageCount: Math.max(1, Math.ceil(total / pageSize)),
+  };
 }
 
 export async function getOrderById(id: string): Promise<OrderDetail | null> {
@@ -194,7 +208,8 @@ export async function getOrderById(id: string): Promise<OrderDetail | null> {
 }
 
 export async function getDashboardOrders(): Promise<OrderRow[]> {
-  return listOrders();
+  const result = await listOrders(undefined, 1, 10);
+  return result.rows;
 }
 
 export async function getOrdersByCustomer(customerId: string) {

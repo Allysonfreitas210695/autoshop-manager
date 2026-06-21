@@ -680,18 +680,7 @@ export const mockParts: MockPart[] = [
   },
 ];
 
-export const inventoryCategories = [
-  "Todos",
-  "Filtros",
-  "Freios",
-  "Motor",
-  "Suspensão",
-  "Ignição",
-  "Lubrificantes",
-  "Elétrica",
-] as const;
-
-export type InventoryCategory = (typeof inventoryCategories)[number];
+export { inventoryCategories, type InventoryCategory } from "./constants";
 
 export const mockInventoryMetrics = {
   totalItems: mockParts.length,

@@ -137,7 +137,7 @@ export async function getMechanicPerformance(): Promise<MechanicPerformance[]> {
       completed: sql<number>`count(case when ${serviceOrders.status} = 'completed' then 1 end)`,
     })
     .from(serviceOrders)
-    .innerJoin(user, sql`${user.id} = ${serviceOrders.mechanicId}`)
+    .leftJoin(user, sql`${user.id} = ${serviceOrders.mechanicId}`)
     .groupBy(serviceOrders.mechanicId, user.name)
     .orderBy(desc(sql`sum(${serviceOrders.totalAmount}::numeric)`))
     .limit(5);
@@ -146,7 +146,7 @@ export async function getMechanicPerformance(): Promise<MechanicPerformance[]> {
     const orders = Number(r.orders);
     const completed = Number(r.completed);
     return {
-      name: r.mechanicName ?? "Mecânico",
+      name: r.mechanicName ?? "Sem mecânico",
       orders,
       revenue: Number(r.totalAmount),
       completionRate: orders > 0 ? Math.round((completed / orders) * 100) : 0,
@@ -200,10 +200,17 @@ export async function getAnalyticsKpis(): Promise<AnalyticsKpis> {
       sql`${serviceOrders.openedAt} >= current_date - interval '12 months'`,
     );
 
+  // Clientes criados nos últimos 12 meses (query real)
+  const [newCustomersResult] = await db
+    .select({ cnt: count() })
+    .from(user)
+    .where(sql`${user.createdAt} >= current_date - interval '12 months'`);
+
   const revenue = Number(txMetrics?.revenue ?? 0);
   const expenses = Number(txMetrics?.expenses ?? 0);
   const totalOrders = Number(orderMetrics?.total ?? 0);
   const activeCustomers = Number(orderMetrics?.customers ?? 0);
+  const newCustomers = Number(newCustomersResult?.cnt ?? 0);
 
   return {
     totalRevenue12m: revenue,
@@ -211,9 +218,10 @@ export async function getAnalyticsKpis(): Promise<AnalyticsKpis> {
     avgTicket: totalOrders > 0 ? revenue / totalOrders : 0,
     netMargin:
       revenue > 0 ? Math.round(((revenue - expenses) / revenue) * 100) : 0,
-    nps: 72,
-    returnRate: 68,
+    // nps e returnRate não possuem tabela de origem — retornamos -1 para sinalizar "indisponível"
+    nps: -1,
+    returnRate: -1,
     activeCustomers,
-    newCustomers: Math.round(activeCustomers * 0.3),
+    newCustomers,
   };
 }

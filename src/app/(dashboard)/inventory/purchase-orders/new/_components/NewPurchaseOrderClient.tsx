@@ -3,7 +3,7 @@
 import { ArrowLeft, Package, Plus, ShoppingCart, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useAction } from "next-safe-action/hooks";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { createPurchaseOrderAction } from "@/_actions/inventory";
 import { Button } from "@/_components/ui/button";
@@ -20,16 +20,9 @@ type OrderItem = {
   unitPrice: number;
 };
 
-const suppliers = [
-  "AutoPeças Brasil Ltda",
-  "Distribuidora FreiMax",
-  "MotoForce Distribuidora",
-  "Peças & Cia",
-];
+type Props = { parts: Part[]; preselectedPartId?: string };
 
-type Props = { parts: Part[] };
-
-export function NewPurchaseOrderClient({ parts }: Props) {
+export function NewPurchaseOrderClient({ parts, preselectedPartId }: Props) {
   const [supplier, setSupplier] = useState("");
   const [deliveryDate, setDeliveryDate] = useState("");
   const [notes, setNotes] = useState("");
@@ -44,6 +37,16 @@ export function NewPurchaseOrderClient({ parts }: Props) {
       setCreatedId(data?.id ?? "ok");
     },
   });
+
+  // Pre-populate item from partId query param
+  useEffect(() => {
+    if (preselectedPartId) {
+      const part = parts.find((p) => p.id === preselectedPartId);
+      if (part) addItem(part);
+    }
+    // Only on mount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const filteredParts =
     search.length > 1
@@ -158,19 +161,12 @@ export function NewPurchaseOrderClient({ parts }: Props) {
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-1.5">
                 <Label htmlFor="supplier">Fornecedor</Label>
-                <select
+                <Input
                   id="supplier"
                   value={supplier}
                   onChange={(e) => setSupplier(e.target.value)}
-                  className="bg-surface border-outline-variant/50 text-body-sm text-on-surface focus:ring-secondary w-full rounded-lg border px-3 py-2 focus:ring-1 focus:outline-none"
-                >
-                  <option value="">Selecione...</option>
-                  {suppliers.map((s) => (
-                    <option key={s} value={s}>
-                      {s}
-                    </option>
-                  ))}
-                </select>
+                  placeholder="Ex: AutoPeças Brasil Ltda"
+                />
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="deliveryDate">Previsão de Entrega</Label>
@@ -221,7 +217,7 @@ export function NewPurchaseOrderClient({ parts }: Props) {
                           {p.name}
                         </p>
                         <p className="text-label-xs text-on-surface-variant font-mono">
-                          {p.sku ?? "—"} · {p.category}
+                          {p.sku ?? "—"} · {p.category ?? "—"}
                         </p>
                       </div>
                       <div className="shrink-0 text-right">
@@ -395,7 +391,7 @@ export function NewPurchaseOrderClient({ parts }: Props) {
             {(!supplier || items.length === 0) && (
               <p className="text-label-xs text-on-surface-variant/60 text-center">
                 {!supplier
-                  ? "Selecione um fornecedor"
+                  ? "Informe o fornecedor"
                   : "Adicione ao menos um item"}
               </p>
             )}

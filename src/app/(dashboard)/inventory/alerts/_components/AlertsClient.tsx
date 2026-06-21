@@ -181,7 +181,7 @@ function AlertRow({
           </p>
           <p className="text-label-xs text-on-surface-variant">faltando</p>
         </div>
-        <Link href="/inventory/purchase-orders/new">
+        <Link href={`/inventory/purchase-orders/new?partId=${part.id}`}>
           <Button
             size="sm"
             variant="outline"

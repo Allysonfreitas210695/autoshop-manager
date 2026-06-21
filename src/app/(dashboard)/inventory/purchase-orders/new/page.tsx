@@ -4,7 +4,11 @@ import { NewPurchaseOrderClient } from "./_components/NewPurchaseOrderClient";
 
 export const metadata = { title: "Nova Ordem de Compra — Precision Auto" };
 
-export default async function NewPurchaseOrderPage() {
-  const parts = await listParts();
-  return <NewPurchaseOrderClient parts={parts} />;
+export default async function NewPurchaseOrderPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ partId?: string }>;
+}) {
+  const [parts, { partId }] = await Promise.all([listParts(), searchParams]);
+  return <NewPurchaseOrderClient parts={parts} preselectedPartId={partId} />;
 }

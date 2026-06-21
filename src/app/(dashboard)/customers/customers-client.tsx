@@ -1,12 +1,16 @@
 "use client";
 
 import { Download, Filter, Search, UserPlus } from "lucide-react";
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useCallback, useState } from "react";
 
 import { Button } from "@/_components/ui/button";
 import { DataTable, type DataTableColumn } from "@/_components/ui/data-table";
 import { Input } from "@/_components/ui/input";
-import type { CustomerRow } from "@/_data-access/customers";
+import type {
+  CustomerRow,
+  ListCustomersResult,
+} from "@/_data-access/customers";
 import { formatCurrency, formatDate } from "@/_helpers/format";
 
 import { NewCustomerDrawer } from "./_components/NewCustomerDrawer";
@@ -85,10 +89,15 @@ const columns: DataTableColumn<CustomerRow>[] = [
   },
 ];
 
-type Props = { customers: CustomerRow[] };
+type Props = { result: ListCustomersResult };
 
-export function CustomersClient({ customers }: Props) {
+export function CustomersClient({ result }: Props) {
+  const { customers, total, page, pageCount } = result;
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
   const [search, setSearch] = useState("");
+  const [filterOpen, setFilterOpen] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState<CustomerRow | null>(
     null,
   );
@@ -110,6 +119,48 @@ export function CustomersClient({ customers }: Props) {
     setPanelOpen(true);
   }
 
+  const goToPage = useCallback(
+    (p: number) => {
+      const params = new URLSearchParams(searchParams.toString());
+      params.set("page", String(p));
+      router.push(`?${params.toString()}`);
+    },
+    [router, searchParams],
+  );
+
+  function exportCsv() {
+    const headers = [
+      "Nome",
+      "Email",
+      "Telefone",
+      "CPF",
+      "Veículo",
+      "Placa",
+      "Total Gasto",
+      "Visitas",
+    ];
+    const rows = customers.map((c) => [
+      c.name,
+      c.email,
+      c.phone ?? "",
+      c.cpf ?? "",
+      c.lastVehicle ?? "",
+      c.lastPlate ?? "",
+      c.totalSpent.toFixed(2),
+      String(c.visits),
+    ]);
+    const csv = [headers, ...rows]
+      .map((r) => r.map((v) => `"${v.replace(/"/g, '""')}"`).join(","))
+      .join("\n");
+    const blob = new Blob(["﻿" + csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "clientes.csv";
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
   return (
     <>
       <div className="space-y-6">
@@ -119,8 +170,8 @@ export function CustomersClient({ customers }: Props) {
               Gestão de Clientes
             </h1>
             <p className="text-label-md text-on-surface-variant mt-1 font-mono">
-              {filtered.length} cliente{filtered.length !== 1 ? "s" : ""}{" "}
-              encontrado{filtered.length !== 1 ? "s" : ""}
+              {total} cliente{total !== 1 ? "s" : ""} cadastrado
+              {total !== 1 ? "s" : ""}
             </p>
           </div>
           <Button onClick={() => setDrawerOpen(true)} className="gap-2">
@@ -145,6 +196,7 @@ export function CustomersClient({ customers }: Props) {
               variant="ghost"
               className="text-on-surface-variant gap-2"
               aria-label="Filtros"
+              onClick={() => setFilterOpen((v) => !v)}
             >
               <Filter className="size-4" />
               <span className="hidden sm:inline">Filtros</span>
@@ -153,12 +205,27 @@ export function CustomersClient({ customers }: Props) {
               variant="ghost"
               className="text-on-surface-variant gap-2"
               aria-label="Exportar"
+              onClick={exportCsv}
             >
               <Download className="size-4" />
               <span className="hidden sm:inline">Exportar</span>
             </Button>
           </div>
         </div>
+
+        {filterOpen && (
+          <div className="border-outline-variant bg-surface-container rounded-lg border p-4">
+            <p className="text-label-sm text-on-surface-variant mb-2 font-mono">
+              Filtrar por nome / e-mail
+            </p>
+            <Input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Digite para filtrar..."
+              aria-label="Filtro por nome"
+            />
+          </div>
+        )}
 
         <div className="border-outline-variant overflow-hidden rounded-lg border">
           <DataTable
@@ -172,20 +239,28 @@ export function CustomersClient({ customers }: Props) {
 
         <div className="border-outline-variant flex flex-col gap-3 border-t pt-4 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-label-sm text-on-surface-variant font-mono">
-            Exibindo {filtered.length} de {customers.length} clientes
+            Exibindo {filtered.length} de {total} clientes
           </p>
           <div className="flex items-center gap-2">
             <button
-              disabled
+              disabled={page <= 1}
+              onClick={() => goToPage(page - 1)}
               className="border-outline-variant text-label-sm text-on-surface-variant rounded border px-3 py-1 font-mono disabled:opacity-40"
             >
               ← Ant.
             </button>
-            <span className="border-secondary bg-secondary/10 text-label-sm text-secondary rounded border px-3 py-1 font-mono">
-              1
-            </span>
+            {Array.from({ length: pageCount }, (_, i) => i + 1).map((p) => (
+              <button
+                key={p}
+                onClick={() => goToPage(p)}
+                className={`text-label-sm rounded border px-3 py-1 font-mono ${p === page ? "border-secondary bg-secondary/10 text-secondary" : "border-outline-variant text-on-surface-variant"}`}
+              >
+                {p}
+              </button>
+            ))}
             <button
-              disabled
+              disabled={page >= pageCount}
+              onClick={() => goToPage(page + 1)}
               className="border-outline-variant text-label-sm text-on-surface-variant rounded border px-3 py-1 font-mono disabled:opacity-40"
             >
               Próx. →

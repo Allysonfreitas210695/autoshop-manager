@@ -2,6 +2,9 @@ import { notFound } from "next/navigation";
 
 import { getOrderById } from "@/_data-access/orders";
 import { formatCurrency, formatDate } from "@/_helpers/format";
+import { getShopSettings } from "@/_lib/shop-settings";
+
+import { QrCodePix } from "./_components/QrCodePix";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -27,7 +30,8 @@ export default async function PrintPage({ params }: Props) {
   );
   const total = subtotalParts + subtotalLabor;
 
-  const pixKey = "12.345.678/0001-99";
+  const shop = getShopSettings();
+  const pixKey = shop.pixKey;
   const pixAmount = total;
 
   return (
@@ -53,19 +57,23 @@ export default async function PrintPage({ params }: Props) {
         {/* Cabeçalho da oficina */}
         <div className="flex items-start justify-between border-b border-gray-300 pb-4">
           <div>
-            <h1 className="text-xl font-bold tracking-tight">PRECISION AUTO</h1>
+            <h1 className="text-xl font-bold tracking-tight">
+              {shop.name.toUpperCase()}
+            </h1>
             <p className="mt-0.5 text-sm text-gray-500">
               Oficina Mecânica Especializada
             </p>
             <p className="text-xs text-gray-400">
-              CNPJ: 12.345.678/0001-99 · Rua das Oficinas, 500 — SP
+              CNPJ: {shop.cnpj} · {shop.address}
             </p>
           </div>
           <div className="text-right">
             <p className="font-mono text-xs tracking-wider text-gray-400 uppercase">
               Ordem de Serviço
             </p>
-            <p className="text-2xl font-bold text-gray-800">{order.id}</p>
+            <p className="text-2xl font-bold text-gray-800">
+              #{order.orderNumber}
+            </p>
             <p className="font-mono text-xs text-gray-500">
               Entrada: {formatDate(order.openedAt)}
             </p>
@@ -224,20 +232,8 @@ export default async function PrintPage({ params }: Props) {
         {/* QR Code PIX */}
         <div className="rounded-md border border-gray-200 bg-gray-50 p-4">
           <div className="flex items-center gap-4">
-            {/* QR Code placeholder */}
-            <div className="flex size-20 shrink-0 items-center justify-center rounded-md border border-gray-300 bg-white">
-              <div className="grid grid-cols-4 gap-0.5">
-                {Array.from({ length: 16 }).map((_, i) => (
-                  <div
-                    key={i}
-                    className={`size-3.5 rounded-sm ${
-                      [0, 1, 4, 5, 6, 7, 8, 9, 10, 12, 14, 15].includes(i)
-                        ? "bg-gray-800"
-                        : "bg-white"
-                    }`}
-                  />
-                ))}
-              </div>
+            <div className="shrink-0 rounded-md border border-gray-300 bg-white p-1">
+              <QrCodePix value={pixKey} size={80} />
             </div>
             <div className="min-w-0">
               <p className="font-mono text-[10px] tracking-wider text-gray-400 uppercase">
@@ -286,7 +282,7 @@ export default async function PrintPage({ params }: Props) {
 
         {/* Rodapé */}
         <p className="text-center font-mono text-[10px] text-gray-400">
-          Precision Auto · precisionauto.com.br · (11) 3000-0000 · Emitido em{" "}
+          {shop.name} · {shop.url} · {shop.phone} · Emitido em{" "}
           {formatDate(new Date())}
         </p>
       </div>

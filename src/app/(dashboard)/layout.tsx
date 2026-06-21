@@ -7,6 +7,7 @@ export const metadata: Metadata = {
 
 import { Header } from "@/_components/shared/header";
 import { Sidebar } from "@/_components/shared/sidebar";
+import { getNotifications } from "@/_data-access/dashboard";
 import { getSession } from "@/_lib/session";
 
 export default async function DashboardLayout({
@@ -20,6 +21,8 @@ export default async function DashboardLayout({
     redirect("/login");
   }
 
+  const notifications = await getNotifications();
+
   return (
     <div className="bg-surface min-h-screen">
       <Sidebar />
@@ -30,6 +33,7 @@ export default async function DashboardLayout({
             email: session.user.email,
             image: session.user.image,
           }}
+          notifications={notifications}
         />
         <main className="flex-1 p-4 md:p-6">{children}</main>
       </div>

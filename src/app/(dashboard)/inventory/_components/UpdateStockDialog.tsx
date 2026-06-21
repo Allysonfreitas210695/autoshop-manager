@@ -35,6 +35,7 @@ export function UpdateStockDialog({
   onClose,
 }: Props) {
   const [qty, setQty] = useState(currentStock);
+  const isNegative = Number(qty) < 0;
 
   const { execute, status } = useAction(updateStockAction, {
     onSuccess: () => {
@@ -84,8 +85,14 @@ export function UpdateStockDialog({
               inputMode="numeric"
               value={qty}
               onChange={(e) => setQty(Number(e.target.value))}
-              className="font-mono"
+              className={`font-mono ${isNegative ? "border-error focus:ring-error" : ""}`}
+              aria-invalid={isNegative}
             />
+            {isNegative && (
+              <p className="text-error mt-1 font-mono text-[11px]">
+                Quantidade não pode ser negativa.
+              </p>
+            )}
           </div>
         </div>
 

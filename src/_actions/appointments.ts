@@ -1,5 +1,6 @@
 "use server";
 
+import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
@@ -31,4 +32,21 @@ export const createAppointmentAction = authActionClient
 
     revalidatePath("/appointments");
     return { id: apt.id };
+  });
+
+export const updateAppointmentStatusAction = authActionClient
+  .schema(
+    z.object({
+      id: z.uuid(),
+      status: z.enum(["scheduled", "confirmed", "completed", "cancelled"]),
+    }),
+  )
+  .action(async ({ parsedInput }) => {
+    await db
+      .update(appointments)
+      .set({ status: parsedInput.status, updatedAt: new Date() })
+      .where(eq(appointments.id, parsedInput.id));
+
+    revalidatePath("/appointments");
+    return { id: parsedInput.id };
   });

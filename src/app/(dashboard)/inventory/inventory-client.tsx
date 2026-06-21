@@ -65,7 +65,9 @@ type Props = { initialParts: Part[]; metrics: InventoryMetrics };
 
 export function InventoryClient({ initialParts, metrics }: Props) {
   const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
   const [editingPart, setEditingPart] = useState<Part | null>(null);
+  const PAGE_SIZE = 20;
 
   const columns: DataTableColumn<Part>[] = [
     {
@@ -146,6 +148,13 @@ export function InventoryClient({ initialParts, metrics }: Props) {
       (part.sku ?? "").toLowerCase().includes(q)
     );
   });
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const safePage = Math.min(page, totalPages);
+  const paginated = filtered.slice(
+    (safePage - 1) * PAGE_SIZE,
+    safePage * PAGE_SIZE,
+  );
 
   const filteredLowStock = filtered.filter((p) => p.stock <= p.minStock).length;
   const filteredValue = filtered.reduce(
@@ -240,7 +249,10 @@ export function InventoryClient({ initialParts, metrics }: Props) {
         <Search className="text-on-surface-variant absolute top-1/2 left-3 size-4 -translate-y-1/2" />
         <Input
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e) => {
+            setSearch(e.target.value);
+            setPage(1);
+          }}
           placeholder="Nome ou SKU..."
           className="w-full pl-9 sm:max-w-sm"
           aria-label="Buscar peças"
@@ -250,11 +262,37 @@ export function InventoryClient({ initialParts, metrics }: Props) {
       <div className="border-outline-variant overflow-hidden rounded-lg border">
         <DataTable
           columns={columns}
-          data={filtered}
+          data={paginated}
           getRowId={(row) => row.id}
           emptyMessage="Nenhuma peça encontrada."
         />
       </div>
+
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between">
+          <p className="text-label-sm text-on-surface-variant font-mono">
+            Página {safePage} de {totalPages}
+          </p>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={safePage <= 1}
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+            >
+              Anterior
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={safePage >= totalPages}
+              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+            >
+              Próxima
+            </Button>
+          </div>
+        </div>
+      )}
 
       {filteredLowStock > 0 && (
         <p className="text-label-sm text-on-surface-variant font-mono">

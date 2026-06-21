@@ -1,7 +1,7 @@
 import { formatCurrency } from "@/_helpers/format";
 export const metadata = { title: "Relatórios Financeiros — Precision Auto" };
 
-import { ArrowLeft, Download, TrendingDown, TrendingUp } from "lucide-react";
+import { ArrowLeft, TrendingDown, TrendingUp } from "lucide-react";
 import Link from "next/link";
 
 import { Card } from "@/_components/ui/card";
@@ -13,8 +13,10 @@ import {
   listTransactions,
   type Transaction,
 } from "@/_data-access/finance";
+import { getReportOrderCount } from "@/_data-access/finance";
 
 import { CostDonutChart, MonthlyLineChart } from "../finance-charts";
+import { ExportPdfButton } from "./export-pdf-button";
 
 type StatusKey = "positive" | "neutral" | "negative";
 
@@ -124,12 +126,13 @@ function buildCategoryRows(transactions: Transaction[]): CategoryRow[] {
 }
 
 export default async function FinanceReportsPage() {
-  const [monthlyCashFlow, costBreakdown, metrics, allTransactions] =
+  const [monthlyCashFlow, costBreakdown, metrics, allTransactions, orderCount] =
     await Promise.all([
       getMonthlyCashFlow(6),
       getCostBreakdown(),
       getFinanceMetrics(),
       listTransactions(500),
+      getReportOrderCount(6),
     ]);
 
   const categoryRows = buildCategoryRows(allTransactions);
@@ -138,16 +141,15 @@ export default async function FinanceReportsPage() {
   const totalExpenses = lastMonth?.despesas ?? 0;
   const totalProfit = lastMonth?.lucro ?? metrics.monthlyProfit;
 
-  const totalOrders = categoryRows.length;
-  const avgTicket =
-    totalOrders > 0 ? totalRevenue / Math.max(totalOrders, 1) : 0;
+  // M10: usar contagem real de O.S. como denominador do ticket médio
+  const avgTicket = orderCount > 0 ? totalRevenue / orderCount : 0;
   const netMargin =
     totalRevenue > 0 ? ((totalProfit / totalRevenue) * 100).toFixed(1) : "0.0";
 
   const reportKpis = [
     { label: "Ticket Médio O.S.", value: formatCurrency(avgTicket) },
     { label: "Margem Líquida", value: `${netMargin}%` },
-    { label: "Categorias", value: String(categoryRows.length) },
+    { label: "O.S. no Período", value: String(orderCount) },
     { label: "Lucro Líquido", value: formatCurrency(totalProfit) },
   ];
 
@@ -170,10 +172,7 @@ export default async function FinanceReportsPage() {
             Últimos 6 meses
           </p>
         </div>
-        <button className="border-outline-variant bg-surface-container text-label-sm text-on-surface-variant hover:bg-surface-container-highest flex items-center gap-2 rounded-md border px-4 py-2 font-mono transition-colors">
-          <Download className="size-4" />
-          Exportar PDF
-        </button>
+        <ExportPdfButton />
       </div>
 
       {/* KPI Cards */}
