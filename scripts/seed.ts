@@ -26,6 +26,7 @@ import {
   transactions,
   user as userTable,
   vehicles,
+  verification as verificationTable,
 } from "@/_db/schema";
 import { auth } from "@/_lib/auth";
 
@@ -84,6 +85,7 @@ async function wipe() {
   await db.delete(services);
   await db.delete(sessionTable);
   await db.delete(accountTable);
+  await db.delete(verificationTable);
   await db.delete(userTable);
 }
 

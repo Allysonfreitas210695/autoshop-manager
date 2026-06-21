@@ -42,6 +42,8 @@ export const serviceOrders = pgTable("service_orders", {
   description: text("description"),
   serviceType: text("service_type"),
   priority: text("priority").default("normal").notNull(),
+  checklist: text("checklist"),
+  signatureUrl: text("signature_url"),
   totalAmount: numeric("total_amount", { precision: 12, scale: 2 })
     .default("0")
     .notNull(),

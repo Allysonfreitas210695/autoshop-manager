@@ -1,138 +1,178 @@
 # Roadmap: AutoShop Manager (Precision Auto)
 
-## Overview
+## Milestones
 
-This is a **Hardening & Polish** milestone over the already-shipped AutoShop Manager app — not a greenfield build. The existing screens work on mock data; this milestone makes the full operator flow (intake → service order → budget approval → print/PIX → inventory/finance) secure, responsive, pleasant to use, and visually complete. Work proceeds in four ordered phases — Security first (highest risk), then Responsiveness, Usability, and Screen enhancement — each respecting the LOCKED design-system, TypeScript, Base UI, and mock-data-first decisions, and each closing only after the locked completion checklist (tsc/lint/build + render + responsiveness + design patterns) passes.
+- ✅ **v1.0 Hardening & Polish** — Phases 1-4 (shipped 2026-06-20)
+- 🔄 **v1.1 DB Integration & Live Data** — Phases 5-10 (in progress)
 
 ## Phases
 
-**Phase Numbering:**
+<details>
+<summary>✅ v1.0 Hardening & Polish (Phases 1-4) — SHIPPED 2026-06-20</summary>
 
-- Integer phases (1, 2, 3): Planned milestone work
-- Decimal phases (2.1, 2.2): Urgent insertions (marked with INSERTED)
+- [x] Phase 1: Segurança (Security) — 5/5 plans — completed 2026-06-15
+- [x] Phase 2: Responsividade (Responsiveness) — 4/4 plans — completed 2026-06-12
+- [x] Phase 3: Usabilidade (Usability) — 5/5 plans — completed 2026-06-14
+- [x] Phase 4: Aprimoramento de telas (Screen enhancement) — 5/5 plans — completed 2026-06-15
 
-The four phases are ordered 1→4 by risk/priority. They are largely independent improvements over existing screens; the order is a recommended sequence, not a hard technical dependency chain.
+See: `.planning/milestones/v1.0-ROADMAP.md` for full phase details.
 
-- [ ] **Phase 1: Segurança (Security)** - Harden auth, validate all server actions, lock down route access, add security headers, rate-limit auth, verify no leaked secrets
-- [x] **Phase 2: Responsividade (Responsiveness)** - Collapsible mobile sidebar, horizontal-scroll tables, adaptive layouts, touch targets, verified breakpoints (completed 2026-06-12)
-- [x] **Phase 3: Usabilidade (Usability)** - Loading/error/empty states, consistent validation feedback, toasts/confirmations, optimistic UI (completed 2026-06-14)
-- [ ] **Phase 4: Aprimoramento de telas (Screen enhancement)** - Implement pending design screens, resolve placeholder routes, apply design-system consistency polish
+</details>
+
+### v1.1 DB Integration & Live Data
+
+- [x] **Phase 5: DB Foundation & Auth** — Migrations applied, Better Auth wired to Drizzle, seed script operational, connection safe for Vercel serverless (completed 2026-06-21)
+- [x] **Phase 6: Orders & Transactions** — O.S. CRUD on real DB, budget approval, auto-transaction insert on O.S. close, updatedAt audit (completed 2026-06-21)
+- [ ] **Phase 7: Customers & Vehicles** — Customer/vehicle CRUD real, vehicle history, email uniqueness guard
+- [ ] **Phase 8: Inventory** — Parts list, low-stock alerts, purchase orders CRUD with correct enum, stock auto-decrement
+- [ ] **Phase 9: Appointments** — Appointment CRUD on real DB, schema migration for serviceType + duration
+- [ ] **Phase 10: Finance & Analytics** — Finance metrics from real transactions, analytics sentinel fix, N+1 dashboard refactor
+
+---
 
 ## Phase Details
 
-### Phase 1: Segurança (Security)
+### Phase 5: DB Foundation & Auth
 
-**Goal**: The operator's app is verifiably secure — authentication, server-side input validation, route access control, transport/header protections, and abuse resistance are all enforced, with no secrets reaching the client.
-**Depends on**: Nothing (first phase — highest risk)
-**Requirements**: SEC-01, SEC-02, SEC-03, SEC-04, SEC-05, SEC-06
+**Goal**: The database is live, auth works against real Drizzle tables, and the project can be safely deployed to Vercel without connection exhaustion
+**Depends on**: Nothing (foundation phase)
+**Requirements**: FOUND-01, FOUND-02, FOUND-03
 **Success Criteria** (what must be TRUE):
 
-1. An unauthenticated user is redirected away from dashboard routes by `src/proxy.ts`; public routes (e.g. `/track/[id]`) stay reachable and authenticated users hitting auth routes are redirected appropriately.
-2. Every server action in `src/_actions/` rejects malformed input via a server-side Zod schema (validation does not rely on the client).
-3. Auth sessions use secure/HttpOnly cookies and a password policy is enforced (Better Auth configured accordingly).
-4. Responses carry security headers (CSP, HSTS, X-Frame-Options, X-Content-Type-Options, Referrer-Policy), and repeated hits to login/register/forgot/reset are rate-limited.
-5. A bundle/env audit confirms no server-only secret is exposed to the client.
-6. Locked completion checklist passes: `npx tsc --noEmit` zero errors, `npm run lint` zero errors, `npm run build` succeeds, all touched routes render without crash.
-   **Plans**: 5 plans
+1. `npx drizzle-kit migrate` runs successfully against the production DB with all 12 tables created
+2. Operator can log in and log out and the session persists across page navigations (Better Auth reads/writes Drizzle)
+3. `scripts/seed.ts` populates all 12 tables with representative relational data without errors
+4. DB connection pattern is serverless-safe (no `pg.Pool` exhaustion under Vercel Lambda invocations)
 
+**Plans**: 2 plans
 Plans:
+**Wave 1**
 
-- [ ] 01-01-PLAN.md — SEC-01 password policy (shared passwordSchema, minPasswordLength, prod reset-link guard)
-- [ ] 01-02-PLAN.md — SEC-03 proxy route gating (recovery routes + /track public)
-- [ ] 01-03-PLAN.md — SEC-04 security headers + report-only CSP + csp-report sink
-- [ ] 01-04-PLAN.md — SEC-05 Upstash per-IP rate limiting on auth endpoints (generic 429)
-- [ ] 01-05-PLAN.md — SEC-02 server-action validation audit + SEC-06 secret-boundary guard
-
-### Phase 2: Responsividade (Responsiveness)
-
-**Goal**: The full operator flow is usable on mobile and desktop — navigation, tables, forms, and detail screens reflow cleanly at every breakpoint with touch-friendly controls.
-**Depends on**: Phase 1 (recommended order; not a hard technical dependency)
-**Requirements**: RESP-01, RESP-02, RESP-03, RESP-04, RESP-05
-**Success Criteria** (what must be TRUE):
-
-1. On a phone-width viewport the sidebar collapses into a drawer that opens/closes (Base UI `render` prop, not `asChild`).
-2. Every `DataTable` scrolls horizontally on small screens without breaking page layout or clipping content.
-3. Dashboard, the order wizard steps, and detail screens reflow to single-column / stacked layouts at mobile breakpoints.
-4. Interactive controls meet touch-friendly target sizing on mobile.
-5. A breakpoint pass across all existing routes shows no horizontal overflow or clipped content.
-6. Locked completion checklist passes: `npx tsc --noEmit` zero errors, `npm run lint` zero errors, `npm run build` succeeds, all routes render without crash, responsiveness tested (mobile sidebar + horizontal-scroll tables), design patterns applied.
-   **Plans**: 4 plans
-   **UI hint**: yes
-   Plans:
-   **Wave 1**
-
-- [x] 02-01-PLAN.md — RESP-01/RESP-04 navigation: icon-touch Button variant, w-[85vw] mobile drawer, py-3 touch targets
-- [x] 02-02-PLAN.md — RESP-02/RESP-03 responsive column hiding on orders + dashboard tables (totalAmount hidden at sm)
-- [x] 02-03-PLAN.md — RESP-03 adaptive layouts: horizontal-scroll step indicator + finance chart scroll wrappers
+- [x] 05-01-PLAN.md — Harden pg.Pool (max:3 + timeouts), add 'confirmed' enum, generate+apply migration 0003
 
 **Wave 2** _(blocked on Wave 1 completion)_
 
-- [x] 02-04-PLAN.md — RESP-05 breakpoint verification pass + locked completion gate (tsc/lint/build)
+- [x] 05-02-PLAN.md — Fix seed idempotency (add verification to wipe), validate seed runs twice cleanly
 
-### Phase 3: Usabilidade (Usability)
+**UI hint**: no
 
-**Goal**: Every interaction gives clear feedback — screens communicate loading, error, and empty states, forms validate consistently, and create/update/delete actions confirm what happened.
-**Depends on**: Phase 2 (recommended order; not a hard technical dependency)
-**Requirements**: USAB-01, USAB-02, USAB-03, USAB-04, USAB-05, USAB-06
+### Phase 6: Orders & Transactions
+
+**Goal**: Service orders are fully CRUD on the real database, and closing an O.S. automatically creates a transaction record
+**Depends on**: Phase 5
+**Requirements**: OS-01, OS-02, OS-03
 **Success Criteria** (what must be TRUE):
 
-1. Data-fetching screens show a skeleton/spinner while loading instead of a blank flash.
-2. Error conditions render a friendly message (no raw stack/blank screen) and lists/tables with no data show an empty state.
-3. Forms show consistent inline validation feedback across the app (driven by the existing Zod + react-hook-form pattern).
-4. Create, update, and delete actions surface a toast/confirmation, with optimistic UI applied where appropriate.
-5. Locked completion checklist passes: `npx tsc --noEmit` zero errors, `npm run lint` zero errors, `npm run build` succeeds, all routes render without crash, responsiveness still holds, design patterns applied.
-   **Plans**: 5 plans
-   **UI hint**: yes
-   Plans:
-   **Wave 1**
+1. Operator can create a new O.S. via the 4-step wizard and it persists in the DB (survives page refresh)
+2. Operator can list all O.S., change status, and see status reflected immediately after revalidation
+3. Approving/closing an O.S. automatically creates a row in `transactions` with the correct amount
+4. All update actions (status change, budget approval) include `updatedAt: new Date()` and the field is correct in the DB
 
-- [x] 03-01-PLAN.md — USAB-03/05 wiring de criação de O.S. (schema createOrderAction + vehicle inline + wizard via useAction)
-- [x] 03-02-PLAN.md — USAB-03/05 wiring de clientes (NewCustomerDrawer + fix de rota errada do botão)
-- [x] 03-03-PLAN.md — USAB-03/05 wiring de inventário (use-new-part-form → createPartAction + UpdateStockDialog → updateStockAction)
-- [x] 03-05-PLAN.md — USAB-01/02/04 loading.tsx + error.tsx (unstable_retry) em todos os segmentos + verificação de empty states
+**Plans**: 1 plan
+Plans:
+**Wave 1**
 
-**Wave 2**
+- [x] 06-01-PLAN.md — Atomic transaction insert on O.S. close + totalAmount recalc on budget approval (surgical edits to src/\_actions/orders.ts)
 
-- [x] 03-04-PLAN.md — USAB-05/06 status otimista de O.S. (useOptimisticAction) + split Server/Client da budget page para approveOrderItemAction
+**UI hint**: no
 
-### Phase 4: Aprimoramento de telas (Screen enhancement)
+### Phase 7: Customers & Vehicles
 
-**Goal**: The remaining pending design screens are built, placeholder routes become real features, and design-system consistency is applied everywhere — the app is visually complete.
-**Depends on**: Phase 3 (recommended order; not a hard technical dependency)
-**Requirements**: SCRN-01, SCRN-02, SCRN-03, SCRN-04, SCRN-05, SCRN-06, SCRN-07
+**Goal**: Customer and vehicle data is fully managed from the real database with proper constraint handling
+**Depends on**: Phase 5
+**Requirements**: CLI-01, CLI-02, CLI-03
 **Success Criteria** (what must be TRUE):
 
-1. The strategic dashboard renders advanced metrics (per `dashboard_estrat_gico_precision_auto`) at `/analytics` or a dashboard tab.
-2. `/inventory/alerts` shows low-stock items with CRÍTICO/ATENÇÃO highlighting, and `/inventory/purchase-orders` supports generating a purchase order including a delivery forecast.
-3. The new-O.S. flow includes a vehicle intake checklist (per `nova_ordem_de_servi_o_com_checklist`).
-4. `/appointments` renders a working calendar (custom date-fns implementation — month + week + list views, per D-10) and `/track/[id]` renders public O.S. tracking with a QR code (qrcode.react) — both no longer placeholders.
-5. Design-system polish (font-mono labels, status chips, system colors) is applied consistently across all screens.
-6. Locked completion checklist passes: `npx tsc --noEmit` zero errors, `npm run lint` zero errors, `npm run build` succeeds, all new/updated routes render without crash, responsiveness tested, design patterns applied.
-   **Plans**: 5 plans
+1. Operator can create, list, edit, and search customers and data persists in the DB
+2. Customer detail page shows real linked vehicles and real O.S. history from DB
+3. Attempting to create a customer with a duplicate email shows a user-friendly error (no generic crash or PG exception surfaces)
+   **Plans**: TBD
+   **UI hint**: no
+
+### Phase 8: Inventory
+
+**Goal**: Parts inventory, low-stock alerts, and purchase orders all operate against the real database with correct enum values and stock auto-decrement
+**Depends on**: Phase 5
+**Requirements**: INV-01, INV-02, INV-03
+**Success Criteria** (what must be TRUE):
+
+1. Operator can list all parts and real low-stock alerts appear for items below minimum quantity
+2. Operator can create a purchase order with all valid statuses (including "confirmed") without DB errors
+3. Adding a part to an O.S. decrements the `quantity` field in the DB for that part
+   **Plans**: TBD
+   **UI hint**: no
+
+### Phase 9: Appointments
+
+**Goal**: Appointments are persisted to and loaded from the real database, with the schema matching the form fields
+**Depends on**: Phase 5, Phase 7
+**Requirements**: APPT-01, APPT-02
+**Success Criteria** (what must be TRUE):
+
+1. Operator can create an appointment via the form and it appears on the calendar after page reload (DB-persisted)
+2. Operator can cancel an appointment and the change persists in the DB
+3. No form data is lost: `serviceType` and `duration` submitted in the form are stored and retrieved correctly from the DB
+   **Plans**: TBD
    **UI hint**: yes
-   Plans:
-   **Wave 1**
 
-- [x] 04-01-PLAN.md — SCRN-06 real QR code on /track/[id] (qrcode.react encoding the tracking URL)
-- [ ] 04-02-PLAN.md — SCRN-06 weekly view in the appointments calendar (custom date-fns, third switcher option)
-- [ ] 04-03-PLAN.md — SCRN-01..05 audit + completeness fixes (analytics, alerts, purchase-orders + delivery forecast, intake checklist)
+### Phase 10: Finance & Analytics
 
-**Wave 2**
+**Goal**: Finance reports and analytics dashboard display real metrics calculated from live transaction data, with no sentinel values or N+1 query performance issues
+**Depends on**: Phase 6
+**Requirements**: FIN-01, FIN-02, FIN-03, FIN-04
+**Success Criteria** (what must be TRUE):
 
-- [ ] 04-04-PLAN.md — SCRN-07 design-system polish: status-heavy screens (appointments, purchase-orders, alerts, analytics)
+1. Finance overview and reports pages show revenue, expenses, and profit calculated from real `transactions` rows (not zero or mock data)
+2. Analytics dashboard displays all KPIs with real values; fields without a data source show "N/D" (not "-1%" or "-1")
+3. Dashboard page loads without N+1 query patterns; batch/JOIN queries replace per-row loops in `getUpcomingDeliveries` and similar functions
+4. All numeric values from `numeric(12,2)` Drizzle columns are converted to JS `number` before reaching UI components (no "R$ NaN" rendered anywhere)
+   **Plans**: TBD
+   **UI hint**: no
 
-**Wave 3**
-
-- [ ] 04-05-PLAN.md — SCRN-07 design-system polish: remaining screens (home, inventory, customers, orders, finance, finance/reports) + locked completion gate (tsc/lint/build)
+---
 
 ## Progress
 
-**Execution Order:**
-Phases execute in numeric order: 1 → 2 → 3 → 4
+| Phase                                          | Milestone | Plans Complete | Status      | Completed  |
+| ---------------------------------------------- | --------- | -------------- | ----------- | ---------- |
+| 1. Segurança (Security)                        | v1.0      | 5/5            | Complete    | 2026-06-15 |
+| 2. Responsividade (Responsiveness)             | v1.0      | 4/4            | Complete    | 2026-06-12 |
+| 3. Usabilidade (Usability)                     | v1.0      | 5/5            | Complete    | 2026-06-14 |
+| 4. Aprimoramento de telas (Screen enhancement) | v1.0      | 5/5            | Complete    | 2026-06-15 |
+| 5. DB Foundation & Auth                        | v1.1      | 2/2            | Complete    | 2026-06-21 |
+| 6. Orders & Transactions                       | v1.1      | 1/1            | Complete    | 2026-06-21 |
+| 7. Customers & Vehicles                        | v1.1      | 0/?            | Not started | -          |
+| 8. Inventory                                   | v1.1      | 0/?            | Not started | -          |
+| 9. Appointments                                | v1.1      | 0/?            | Not started | -          |
+| 10. Finance & Analytics                        | v1.1      | 0/?            | Not started | -          |
 
-| Phase                                          | Plans Complete | Status      | Completed  |
-| ---------------------------------------------- | -------------- | ----------- | ---------- |
-| 1. Segurança (Security)                        | 0/5            | Not started | -          |
-| 2. Responsividade (Responsiveness)             | 4/4            | Complete    | 2026-06-12 |
-| 3. Usabilidade (Usability)                     | 5/5            | Complete    | 2026-06-14 |
-| 4. Aprimoramento de telas (Screen enhancement) | 1/5            | In progress | -          |
+---
+
+## Coverage — v1.1
+
+| REQ-ID   | Phase    | Status  |
+| -------- | -------- | ------- |
+| FOUND-01 | Phase 5  | Pending |
+| FOUND-02 | Phase 5  | Pending |
+| FOUND-03 | Phase 5  | Pending |
+| OS-01    | Phase 6  | Pending |
+| OS-02    | Phase 6  | Pending |
+| OS-03    | Phase 6  | Pending |
+| CLI-01   | Phase 7  | Pending |
+| CLI-02   | Phase 7  | Pending |
+| CLI-03   | Phase 7  | Pending |
+| INV-01   | Phase 8  | Pending |
+| INV-02   | Phase 8  | Pending |
+| INV-03   | Phase 8  | Pending |
+| APPT-01  | Phase 9  | Pending |
+| APPT-02  | Phase 9  | Pending |
+| FIN-01   | Phase 10 | Pending |
+| FIN-02   | Phase 10 | Pending |
+| FIN-03   | Phase 10 | Pending |
+| FIN-04   | Phase 10 | Pending |
+
+**18/18 requirements mapped. No orphans.**
+
+---
+
+_v1.0 shipped: 2026-06-20 — v1.1 roadmap created: 2026-06-20_

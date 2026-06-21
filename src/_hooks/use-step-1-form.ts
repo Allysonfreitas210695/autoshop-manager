@@ -51,7 +51,10 @@ export function useStep1Form({ defaultValues, customers, onNext }: Params) {
     setQuery(customer.name);
     setValue("customerId", customer.id);
     setValue("customerName", customer.name);
-    setValue("plate", formatPlate(customer.lastPlate ?? ""));
+    setValue(
+      "plate",
+      customer.lastPlate ? formatPlate(customer.lastPlate) : "",
+    );
     setValue("vehicleModel", customer.lastVehicle ?? "");
   }
 

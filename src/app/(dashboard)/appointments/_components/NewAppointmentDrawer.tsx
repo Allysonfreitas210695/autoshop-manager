@@ -146,18 +146,25 @@ export function NewAppointmentDrawer({
                   name="mechanicId"
                   control={control}
                   render={({ field }) => (
-                    <select
-                      {...field}
-                      id="mechanicId"
-                      className="bg-surface-container border-outline-variant/50 text-body-sm text-on-surface focus:ring-secondary w-full rounded-lg border px-3 py-2 focus:ring-1 focus:outline-none"
-                    >
-                      <option value="">Selecione...</option>
-                      {mechanics.map((m) => (
-                        <option key={m.id} value={m.id}>
-                          {m.name}
-                        </option>
-                      ))}
-                    </select>
+                    <>
+                      <select
+                        {...field}
+                        id="mechanicId"
+                        className="bg-surface-container border-outline-variant/50 text-body-sm text-on-surface focus:ring-secondary w-full rounded-lg border px-3 py-2 focus:ring-1 focus:outline-none"
+                      >
+                        <option value="">Selecione...</option>
+                        {mechanics.map((m) => (
+                          <option key={m.id} value={m.id}>
+                            {m.name}
+                          </option>
+                        ))}
+                      </select>
+                      {mechanics.length === 0 && (
+                        <p className="text-label-xs text-on-surface-variant">
+                          Nenhum mecânico cadastrado ainda.
+                        </p>
+                      )}
+                    </>
                   )}
                 />
               </div>

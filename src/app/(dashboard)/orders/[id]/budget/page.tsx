@@ -8,6 +8,8 @@ import { formatCurrency, formatDate } from "@/_helpers/format";
 import {
   ApproveItemButton,
   ConfirmApprovalButton,
+  DownloadPdfButton,
+  DownloadPdfButtonFull,
 } from "./_components/BudgetClient";
 
 type Props = { params: Promise<{ id: string }> };

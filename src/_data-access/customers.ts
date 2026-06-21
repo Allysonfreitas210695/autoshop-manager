@@ -1,6 +1,6 @@
 import "server-only";
 
-import { count, desc, eq, sql } from "drizzle-orm";
+import { count, desc, eq, inArray, sql } from "drizzle-orm";
 
 import { db } from "@/_db";
 import { serviceOrders, user, vehicles } from "@/_db/schema";
@@ -33,7 +33,25 @@ export type CustomerDetail = CustomerRow & {
   vehicles: CustomerVehicle[];
 };
 
-export async function listCustomers(): Promise<CustomerRow[]> {
+export type ListCustomersResult = {
+  customers: CustomerRow[];
+  total: number;
+  page: number;
+  pageSize: number;
+  pageCount: number;
+};
+
+export async function listCustomers(
+  page = 1,
+  pageSize = 20,
+): Promise<ListCustomersResult> {
+  const offset = (page - 1) * pageSize;
+
+  const [{ total }] = await db
+    .select({ total: count() })
+    .from(user)
+    .where(eq(user.role, "customer"));
+
   const rows = await db
     .select({
       id: user.id,
@@ -50,33 +68,67 @@ export async function listCustomers(): Promise<CustomerRow[]> {
     .leftJoin(serviceOrders, eq(serviceOrders.customerId, user.id))
     .where(eq(user.role, "customer"))
     .groupBy(user.id)
-    .orderBy(user.name);
+    .orderBy(user.name)
+    .limit(pageSize)
+    .offset(offset);
 
-  const result: CustomerRow[] = [];
-
-  for (const row of rows) {
-    const [lastVehicleRow] = await db
-      .select({
-        make: vehicles.make,
-        model: vehicles.model,
-        plate: vehicles.plate,
-      })
-      .from(vehicles)
-      .where(eq(vehicles.ownerId, row.id))
-      .orderBy(desc(vehicles.createdAt))
-      .limit(1);
-
-    result.push({
-      ...row,
-      totalSpent: Number(row.totalSpent),
-      lastVehicle: lastVehicleRow
-        ? `${lastVehicleRow.make} ${lastVehicleRow.model}`
-        : null,
-      lastPlate: lastVehicleRow?.plate ?? null,
-    });
+  if (rows.length === 0) {
+    return {
+      customers: [],
+      total: Number(total),
+      page,
+      pageSize,
+      pageCount: Math.max(1, Math.ceil(Number(total) / pageSize)),
+    };
   }
 
-  return result;
+  const ownerIds = rows.map((r) => r.id);
+  const allVehicles = await db
+    .select({
+      ownerId: vehicles.ownerId,
+      make: vehicles.make,
+      model: vehicles.model,
+      plate: vehicles.plate,
+      createdAt: vehicles.createdAt,
+    })
+    .from(vehicles)
+    .where(inArray(vehicles.ownerId, ownerIds))
+    .orderBy(desc(vehicles.createdAt));
+
+  const vehicleByOwner = new Map<
+    string,
+    { make: string; model: string; plate: string }
+  >();
+  for (const v of allVehicles) {
+    if (!v.ownerId) continue;
+    if (!vehicleByOwner.has(v.ownerId)) {
+      vehicleByOwner.set(v.ownerId, {
+        make: v.make,
+        model: v.model,
+        plate: v.plate,
+      });
+    }
+  }
+
+  const customers: CustomerRow[] = rows.map((row) => {
+    const lastVehicle = vehicleByOwner.get(row.id);
+    return {
+      ...row,
+      totalSpent: Number(row.totalSpent),
+      lastVehicle: lastVehicle
+        ? `${lastVehicle.make} ${lastVehicle.model}`
+        : null,
+      lastPlate: lastVehicle?.plate ?? null,
+    };
+  });
+
+  return {
+    customers,
+    total: Number(total),
+    page,
+    pageSize,
+    pageCount: Math.max(1, Math.ceil(Number(total) / pageSize)),
+  };
 }
 
 export async function getCustomerById(

@@ -8,12 +8,23 @@ import { db } from "@/_db";
 import { purchaseOrderItems, purchaseOrders, services } from "@/_db/schema";
 import { authActionClient } from "@/_lib/safe-action";
 
+const purchaseOrderStatusEnum = z.enum([
+  "draft",
+  "sent",
+  "received",
+  "cancelled",
+  "confirmed",
+]);
+
 export const createPartAction = authActionClient
   .schema(
     z.object({
       name: z.string().min(1),
       description: z.string().optional(),
       sku: z.string().optional(),
+      category: z.string().optional(),
+      supplier: z.string().optional(),
+      location: z.string().optional(),
       price: z.number().min(0),
       stockQuantity: z.number().int().min(0).default(0),
       minStock: z.number().int().min(0).default(0),
@@ -26,6 +37,9 @@ export const createPartAction = authActionClient
         name: parsedInput.name,
         description: parsedInput.description ?? null,
         sku: parsedInput.sku ?? null,
+        category: parsedInput.category ?? null,
+        supplier: parsedInput.supplier ?? null,
+        location: parsedInput.location ?? null,
         type: "part",
         price: String(parsedInput.price),
         stockQuantity: parsedInput.stockQuantity,
@@ -101,4 +115,27 @@ export const createPurchaseOrderAction = authActionClient
 
     revalidatePath("/inventory/purchase-orders");
     return { id: po.id };
+  });
+
+export const getPurchaseOrderItemsAction = authActionClient
+  .schema(z.object({ id: z.uuid() }))
+  .action(async ({ parsedInput }) => {
+    const { getPurchaseOrderItems } = await import("@/_data-access/inventory");
+    return { items: await getPurchaseOrderItems(parsedInput.id) };
+  });
+
+export const updatePurchaseOrderStatusAction = authActionClient
+  .schema(
+    z.object({
+      id: z.uuid(),
+      status: purchaseOrderStatusEnum,
+    }),
+  )
+  .action(async ({ parsedInput }) => {
+    await db
+      .update(purchaseOrders)
+      .set({ status: parsedInput.status, updatedAt: new Date() })
+      .where(eq(purchaseOrders.id, parsedInput.id));
+
+    revalidatePath("/inventory/purchase-orders");
   });

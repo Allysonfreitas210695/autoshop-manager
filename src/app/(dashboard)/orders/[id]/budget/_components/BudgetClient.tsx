@@ -38,6 +38,28 @@ export function ApproveItemButton({
   );
 }
 
+export function DownloadPdfButton({ orderId }: { orderId: string }) {
+  return (
+    <button
+      onClick={() => window.open(`/orders/${orderId}/print`, "_blank")}
+      className="border-outline-variant bg-surface text-label-sm text-on-surface-variant hover:bg-surface-container-highest flex items-center gap-2 rounded-md border px-3 py-2 font-mono transition-colors"
+    >
+      Baixar PDF
+    </button>
+  );
+}
+
+export function DownloadPdfButtonFull({ orderId }: { orderId: string }) {
+  return (
+    <button
+      onClick={() => window.open(`/orders/${orderId}/print`, "_blank")}
+      className="border-outline-variant bg-surface-container text-label-sm text-on-surface-variant hover:bg-surface-container-highest w-full rounded-md border px-4 py-2.5 font-mono transition-colors"
+    >
+      Baixar PDF do Orçamento
+    </button>
+  );
+}
+
 export function ConfirmApprovalButton({
   orderId,
   itemIds,

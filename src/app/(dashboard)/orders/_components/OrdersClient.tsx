@@ -1,10 +1,11 @@
 "use client";
 
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 
 import { DataTable, type DataTableColumn } from "@/_components/ui/data-table";
 import { StatusChip } from "@/_components/ui/status-chip";
-import type { OrderRow } from "@/_data-access/orders";
+import type { ListOrdersResult, OrderRow } from "@/_data-access/orders";
 import { formatCurrency, formatDateTime } from "@/_helpers/format";
 import { useUpdateOrderStatus } from "@/_hooks/use-update-order-status";
 
@@ -120,9 +121,12 @@ const columns: DataTableColumn<OrderRow>[] = [
   },
 ];
 
-type Props = { orders: OrderRow[] };
+type Props = { result: ListOrdersResult };
 
-export function OrdersClient({ orders }: Props) {
+export function OrdersClient({ result }: Props) {
+  const { rows: orders, page, pageCount, total } = result;
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [activeFilter, setActiveFilter] = useState<OrderStatus | "all">("all");
   const [selectedOrder, setSelectedOrder] = useState<OrderRow | null>(null);
   const [panelOpen, setPanelOpen] = useState(false);
@@ -135,6 +139,12 @@ export function OrdersClient({ orders }: Props) {
   function openPanel(order: OrderRow) {
     setSelectedOrder(order);
     setPanelOpen(true);
+  }
+
+  function navigatePage(newPage: number) {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("page", String(newPage));
+    router.push(`/orders?${params.toString()}`);
   }
 
   return (
@@ -204,20 +214,32 @@ export function OrdersClient({ orders }: Props) {
 
         <div className="border-outline-variant flex flex-col gap-3 border-t pt-4 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-label-sm text-on-surface-variant font-mono">
-            Exibindo {filtered.length} de {orders.length} resultados
+            Exibindo {orders.length} de {total} resultados
           </p>
           <div className="flex items-center gap-2">
             <button
-              disabled
+              disabled={page <= 1}
+              onClick={() => navigatePage(page - 1)}
               className="border-outline-variant text-label-sm text-on-surface-variant rounded border px-3 py-1 font-mono disabled:opacity-40"
             >
               ← Ant.
             </button>
-            <span className="border-secondary bg-secondary/10 text-label-sm text-secondary rounded border px-3 py-1 font-mono">
-              1
-            </span>
+            {Array.from({ length: pageCount }, (_, i) => i + 1).map((p) => (
+              <button
+                key={p}
+                onClick={() => navigatePage(p)}
+                className={`text-label-sm rounded border px-3 py-1 font-mono ${
+                  p === page
+                    ? "border-secondary bg-secondary/10 text-secondary"
+                    : "border-outline-variant text-on-surface-variant"
+                }`}
+              >
+                {p}
+              </button>
+            ))}
             <button
-              disabled
+              disabled={page >= pageCount}
+              onClick={() => navigatePage(page + 1)}
               className="border-outline-variant text-label-sm text-on-surface-variant rounded border px-3 py-1 font-mono disabled:opacity-40"
             >
               Próx. →

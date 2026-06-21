@@ -9,7 +9,7 @@ import { toast } from "sonner";
 import { z } from "zod";
 
 import { createPartAction } from "@/_actions/inventory";
-import { inventoryCategories } from "@/_helpers/mock-data";
+import { inventoryCategories } from "@/_helpers/constants";
 
 export const newPartSchema = z.object({
   name: z.string().min(2, { message: "Nome deve ter ao menos 2 caracteres." }),
@@ -64,6 +64,9 @@ export function useNewPartForm() {
       execute({
         name: data.name,
         sku: data.sku,
+        category: data.category,
+        supplier: data.supplier,
+        location: data.location,
         price: data.unitPrice,
         stockQuantity: data.stock,
         minStock: data.minStock,

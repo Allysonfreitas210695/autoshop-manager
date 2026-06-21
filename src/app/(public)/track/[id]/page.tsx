@@ -15,6 +15,7 @@ import { ServiceTimeline } from "@/_components/ui/service-timeline";
 import { getOrderById } from "@/_data-access/orders";
 import type { serviceOrderStatus } from "@/_db/schema";
 import { formatCurrency, formatLongDate } from "@/_helpers/format";
+import { getShopSettings } from "@/_lib/shop-settings";
 
 import { TrackQrCode } from "./_components/TrackQrCode";
 
@@ -104,7 +105,10 @@ export async function generateMetadata({ params }: Props) {
 
 export default async function TrackPage({ params }: Props) {
   const { id } = await params;
-  const order = await getOrderById(id);
+  const [order, shop] = await Promise.all([
+    getOrderById(id),
+    Promise.resolve(getShopSettings()),
+  ]);
   if (!order) notFound();
 
   const timelineNodes = getTimelineNodes(order.status);
@@ -301,12 +305,12 @@ export default async function TrackPage({ params }: Props) {
           <div className="flex items-center gap-1.5">
             <Clock className="text-secondary size-3.5" />
             <span className="text-label-xs text-on-surface-variant font-mono">
-              Seg–Sex 8h–18h
+              {shop.hours}
             </span>
           </div>
           <div className="flex items-center gap-1.5">
             <span className="text-label-xs text-on-surface-variant font-mono">
-              (11) 3456-7890
+              {shop.phone}
             </span>
           </div>
         </div>

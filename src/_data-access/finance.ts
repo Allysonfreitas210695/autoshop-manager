@@ -3,7 +3,7 @@ import "server-only";
 import { desc, sql } from "drizzle-orm";
 
 import { db } from "@/_db";
-import { transactions } from "@/_db/schema";
+import { serviceOrders, transactions } from "@/_db/schema";
 
 const COST_COLORS: Record<string, string> = {
   Serviço: "#adc6ff",
@@ -65,13 +65,13 @@ export type MonthlyCashFlow = {
 };
 export type CostBreakdownEntry = { name: string; value: number; fill: string };
 
-export async function getFinanceMetrics(): Promise<FinanceMetrics> {
+export async function getFinanceMetrics(days = 30): Promise<FinanceMetrics> {
   const [metrics] = await db
     .select({
-      monthlyRevenue: sql<number>`coalesce(sum(case when ${transactions.type} = 'income' and ${transactions.status} = 'paid' then ${transactions.amount}::numeric else 0 end), 0)`,
+      monthlyRevenue: sql<number>`coalesce(sum(case when ${transactions.type} = 'income' and ${transactions.status} = 'paid' and ${transactions.date} >= current_date - interval '${sql.raw(String(days))} days' then ${transactions.amount}::numeric else 0 end), 0)`,
       receivable: sql<number>`coalesce(sum(case when ${transactions.type} = 'income' and ${transactions.status} = 'pending' then ${transactions.amount}::numeric else 0 end), 0)`,
       pendingExpenses: sql<number>`coalesce(sum(case when ${transactions.type} = 'expense' and ${transactions.status} != 'paid' then ${transactions.amount}::numeric else 0 end), 0)`,
-      totalExpenses: sql<number>`coalesce(sum(case when ${transactions.type} = 'expense' and ${transactions.status} = 'paid' then ${transactions.amount}::numeric else 0 end), 0)`,
+      totalExpenses: sql<number>`coalesce(sum(case when ${transactions.type} = 'expense' and ${transactions.status} = 'paid' and ${transactions.date} >= current_date - interval '${sql.raw(String(days))} days' then ${transactions.amount}::numeric else 0 end), 0)`,
     })
     .from(transactions);
 
@@ -178,6 +178,16 @@ export async function getMonthlyCashFlow(
       despesas: d.despesas,
       lucro: d.receitas - d.despesas,
     }));
+}
+
+export async function getReportOrderCount(months = 6): Promise<number> {
+  const [result] = await db
+    .select({ cnt: sql<number>`count(*)` })
+    .from(serviceOrders)
+    .where(
+      sql`${serviceOrders.openedAt} >= date_trunc('month', current_date) - interval '${sql.raw(String(months - 1))} months'`,
+    );
+  return Number(result?.cnt ?? 0);
 }
 
 export async function getCostBreakdown(): Promise<CostBreakdownEntry[]> {

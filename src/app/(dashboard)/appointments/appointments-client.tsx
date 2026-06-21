@@ -12,6 +12,7 @@ import {
   isToday,
   startOfMonth,
   startOfWeek,
+  subDays,
   subMonths,
 } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -27,8 +28,11 @@ import {
   User,
   XCircle,
 } from "lucide-react";
+import { useAction } from "next-safe-action/hooks";
 import { useState } from "react";
+import { toast } from "sonner";
 
+import { updateAppointmentStatusAction } from "@/_actions/appointments";
 import { Button } from "@/_components/ui/button";
 import type {
   AppointmentRow,
@@ -83,7 +87,13 @@ function AppointmentBadge({ appt }: { appt: AppointmentRow }) {
   );
 }
 
-function AppointmentCard({ appt }: { appt: AppointmentRow }) {
+function AppointmentCard({
+  appt,
+  onStatusChange,
+}: {
+  appt: AppointmentRow;
+  onStatusChange: (id: string, status: AppointmentStatus) => void;
+}) {
   return (
     <div className="bg-surface-container border-outline-variant/30 hover:border-secondary/40 space-y-3 rounded-xl border p-4 transition-colors">
       <div className="flex items-start justify-between gap-2">
@@ -125,6 +135,32 @@ function AppointmentCard({ appt }: { appt: AppointmentRow }) {
           {appt.notes}
         </p>
       )}
+      {appt.status !== "cancelled" && appt.status !== "completed" && (
+        <div className="border-outline-variant/20 flex gap-2 border-t pt-2">
+          {appt.status === "scheduled" && (
+            <button
+              onClick={() => onStatusChange(appt.id, "confirmed")}
+              className="text-label-xs bg-status-completed/10 text-status-completed hover:bg-status-completed/20 rounded px-2 py-1 font-mono transition-colors"
+            >
+              Confirmar
+            </button>
+          )}
+          {appt.status === "confirmed" && (
+            <button
+              onClick={() => onStatusChange(appt.id, "completed")}
+              className="text-label-xs bg-secondary/10 text-secondary hover:bg-secondary/20 rounded px-2 py-1 font-mono transition-colors"
+            >
+              Concluir
+            </button>
+          )}
+          <button
+            onClick={() => onStatusChange(appt.id, "cancelled")}
+            className="text-label-xs bg-error/10 text-error hover:bg-error/20 rounded px-2 py-1 font-mono transition-colors"
+          >
+            Cancelar
+          </button>
+        </div>
+      )}
     </div>
   );
 }
@@ -143,6 +179,8 @@ export function AppointmentsClient({
   customers,
 }: Props) {
   const today = new Date();
+  const [appointments, setAppointments] =
+    useState<AppointmentRow[]>(initialAppointments);
   const [currentMonth, setCurrentMonth] = useState(startOfMonth(today));
   const [selectedDate, setSelectedDate] = useState(today);
   const [currentWeek, setCurrentWeek] = useState(
@@ -150,6 +188,39 @@ export function AppointmentsClient({
   );
   const [view, setView] = useState<View>("calendar");
   const [drawerOpen, setDrawerOpen] = useState(false);
+
+  // M12 — list view date range state
+  const [listStart, setListStart] = useState(subDays(today, 7));
+  const [listEnd, setListEnd] = useState(addDays(today, 14));
+
+  const { execute: execStatus } = useAction(updateAppointmentStatusAction, {
+    onSuccess: ({ data }) => {
+      if (!data) return;
+      setAppointments((prev) =>
+        prev.map((a) =>
+          a.id === data.id
+            ? {
+                ...a,
+                status:
+                  appointments.find((x) => x.id === data.id)?.status ??
+                  a.status,
+              }
+            : a,
+        ),
+      );
+    },
+    onError: ({ error }) => {
+      toast.error(error.serverError ?? "Erro ao atualizar status.");
+    },
+  });
+
+  function handleStatusChange(id: string, status: AppointmentStatus) {
+    setAppointments((prev) =>
+      prev.map((a) => (a.id === id ? { ...a, status } : a)),
+    );
+    execStatus({ id, status });
+    toast.success(`Agendamento ${statusLabels[status].toLowerCase()}.`);
+  }
 
   const prevWeek = () => setCurrentWeek((w) => addDays(w, -7));
   const nextWeek = () => setCurrentWeek((w) => addDays(w, 7));
@@ -163,30 +234,33 @@ export function AppointmentsClient({
   const byTime = (a: AppointmentRow, b: AppointmentRow) =>
     new Date(a.scheduledAt).getTime() - new Date(b.scheduledAt).getTime();
 
-  const selectedDayAppts = initialAppointments
+  const selectedDayAppts = appointments
     .filter((a) => isSameDay(new Date(a.scheduledAt), selectedDate))
     .sort(byTime);
 
   const weekDays = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
 
   const countByDate = (date: Date) =>
-    initialAppointments.filter((a) => isSameDay(new Date(a.scheduledAt), date));
+    appointments.filter((a) => isSameDay(new Date(a.scheduledAt), date));
 
-  const todayTotal = initialAppointments.filter(
+  const todayTotal = appointments.filter(
     (a) =>
       isSameDay(new Date(a.scheduledAt), today) && a.status !== "cancelled",
   ).length;
 
   const weekStart = startOfWeek(today, { weekStartsOn: 0 });
   const weekEnd = endOfWeek(today, { weekStartsOn: 0 });
-  const weekTotal = initialAppointments.filter((a) => {
+  const weekTotal = appointments.filter((a) => {
     const d = new Date(a.scheduledAt);
     return d >= weekStart && d <= weekEnd && a.status !== "cancelled";
   }).length;
 
-  const pendingTotal = initialAppointments.filter(
+  const pendingTotal = appointments.filter(
     (a) => a.status === "scheduled",
   ).length;
+
+  // M12 — list view days from listStart to listEnd
+  const listDays = eachDayOfInterval({ start: listStart, end: listEnd });
 
   return (
     <div className="space-y-6">
@@ -380,7 +454,11 @@ export function AppointmentsClient({
             ) : (
               <div className="max-h-130 space-y-3 overflow-y-auto pr-1">
                 {selectedDayAppts.map((appt) => (
-                  <AppointmentCard key={appt.id} appt={appt} />
+                  <AppointmentCard
+                    key={appt.id}
+                    appt={appt}
+                    onStatusChange={handleStatusChange}
+                  />
                 ))}
               </div>
             )}
@@ -454,10 +532,74 @@ export function AppointmentsClient({
           </div>
         </div>
       ) : (
-        /* List View */
-        <div className="space-y-6">
-          {Array.from({ length: 14 }, (_, i) => addDays(today, i)).map(
-            (day) => {
+        /* List View — M12: date range controls */
+        <div className="space-y-4">
+          {/* Date range controls */}
+          <div className="bg-surface-container border-outline-variant/30 flex flex-wrap items-center gap-3 rounded-xl border p-4">
+            <span className="text-label-sm text-on-surface-variant font-mono">
+              Período:
+            </span>
+            <div className="flex items-center gap-2">
+              <label className="text-label-xs text-on-surface-variant font-mono">
+                De
+              </label>
+              <input
+                type="date"
+                value={format(listStart, "yyyy-MM-dd")}
+                onChange={(e) =>
+                  e.target.value &&
+                  setListStart(new Date(e.target.value + "T00:00:00"))
+                }
+                className="bg-surface border-outline-variant/50 text-label-sm text-on-surface focus:ring-secondary rounded-lg border px-2 py-1 font-mono focus:ring-1 focus:outline-none"
+              />
+            </div>
+            <div className="flex items-center gap-2">
+              <label className="text-label-xs text-on-surface-variant font-mono">
+                Até
+              </label>
+              <input
+                type="date"
+                value={format(listEnd, "yyyy-MM-dd")}
+                onChange={(e) =>
+                  e.target.value &&
+                  setListEnd(new Date(e.target.value + "T23:59:59"))
+                }
+                className="bg-surface border-outline-variant/50 text-label-sm text-on-surface focus:ring-secondary rounded-lg border px-2 py-1 font-mono focus:ring-1 focus:outline-none"
+              />
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={() => {
+                  setListStart(subDays(today, 7));
+                  setListEnd(addDays(today, 14));
+                }}
+                className="text-label-xs border-outline-variant/50 text-on-surface-variant hover:bg-outline-variant/10 rounded border px-2 py-1 font-mono"
+              >
+                Padrão
+              </button>
+              <button
+                onClick={() => {
+                  setListStart(subDays(today, 30));
+                  setListEnd(today);
+                }}
+                className="text-label-xs border-outline-variant/50 text-on-surface-variant hover:bg-outline-variant/10 rounded border px-2 py-1 font-mono"
+              >
+                Últimos 30d
+              </button>
+              <button
+                onClick={() => {
+                  setListStart(today);
+                  setListEnd(addDays(today, 30));
+                }}
+                className="text-label-xs border-outline-variant/50 text-on-surface-variant hover:bg-outline-variant/10 rounded border px-2 py-1 font-mono"
+              >
+                Próximos 30d
+              </button>
+            </div>
+          </div>
+
+          <div className="space-y-6">
+            {listDays.map((day) => {
               const appts = countByDate(day).sort(byTime);
               if (appts.length === 0) return null;
               return (
@@ -486,13 +628,17 @@ export function AppointmentsClient({
                   </div>
                   <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
                     {appts.map((appt) => (
-                      <AppointmentCard key={appt.id} appt={appt} />
+                      <AppointmentCard
+                        key={appt.id}
+                        appt={appt}
+                        onStatusChange={handleStatusChange}
+                      />
                     ))}
                   </div>
                 </div>
               );
-            },
-          )}
+            })}
+          </div>
         </div>
       )}
 

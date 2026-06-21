@@ -1,5 +1,6 @@
 "use server";
 
+import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
@@ -64,4 +65,32 @@ export const createVehicleAction = authActionClient
 
     revalidatePath("/customers");
     return { id: vehicle.id };
+  });
+
+export const updateCustomerAction = authActionClient
+  .schema(
+    z.object({
+      id: z.string().min(1),
+      name: z.string().min(2),
+      email: z.string().email(),
+      phone: z.string().optional(),
+      cpf: z.string().optional(),
+      address: z.string().optional(),
+    }),
+  )
+  .action(async ({ parsedInput }) => {
+    await db
+      .update(user)
+      .set({
+        name: parsedInput.name,
+        email: parsedInput.email,
+        phone: parsedInput.phone ?? null,
+        cpf: parsedInput.cpf ?? null,
+        address: parsedInput.address ?? null,
+      })
+      .where(eq(user.id, parsedInput.id));
+
+    revalidatePath("/customers");
+    revalidatePath(`/customers/${parsedInput.id}`);
+    return { id: parsedInput.id };
   });

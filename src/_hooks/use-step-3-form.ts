@@ -46,7 +46,7 @@ export function useStep3Form({ defaultValues, parts, onNext }: Params) {
           (p) =>
             p.name.toLowerCase().includes(partsQuery.toLowerCase()) ||
             (p.sku ?? "").toLowerCase().includes(partsQuery.toLowerCase()) ||
-            p.category.toLowerCase().includes(partsQuery.toLowerCase()),
+            (p.category ?? "").toLowerCase().includes(partsQuery.toLowerCase()),
         )
       : [];
 

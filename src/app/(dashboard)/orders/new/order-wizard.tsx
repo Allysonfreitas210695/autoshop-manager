@@ -46,15 +46,44 @@ const INITIAL_STATE: WizardState = {
 type OrderWizardProps = {
   customers: CustomerRow[];
   parts: Part[];
+  defaultStep1?: Partial<Step1Values>;
 };
 
-export function OrderWizard({ customers, parts }: OrderWizardProps) {
+const DRAFT_KEY = "order-wizard-draft";
+
+function loadDraft(): WizardState {
+  if (typeof window === "undefined") return INITIAL_STATE;
+  try {
+    const raw = localStorage.getItem(DRAFT_KEY);
+    if (!raw) return INITIAL_STATE;
+    return { ...INITIAL_STATE, ...(JSON.parse(raw) as Partial<WizardState>) };
+  } catch {
+    return INITIAL_STATE;
+  }
+}
+
+export function OrderWizard({
+  customers,
+  parts,
+  defaultStep1,
+}: OrderWizardProps) {
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(1);
-  const [wizardData, setWizardData] = useState<WizardState>(INITIAL_STATE);
+  const [wizardData, setWizardData] = useState<WizardState>(() => {
+    const draft = loadDraft();
+    if (defaultStep1) {
+      return { ...draft, step1: { ...draft.step1, ...defaultStep1 } };
+    }
+    return draft;
+  });
 
   const { execute, status } = useAction(createOrderAction, {
     onSuccess: ({ data }) => {
+      try {
+        localStorage.removeItem(DRAFT_KEY);
+      } catch {
+        /* noop */
+      }
       toast.success(`O.S. #${data?.orderNumber} criada com sucesso.`);
       router.push("/orders");
     },
@@ -85,7 +114,7 @@ export function OrderWizard({ customers, parts }: OrderWizardProps) {
 
   function handleFinalSubmit(
     _data: Step4Values,
-    _signatureDataUrl: string | null,
+    signatureDataUrl: string | null,
   ) {
     const partItems = (
       (wizardData.step3.parts as PartItem[] | undefined) ?? []
@@ -105,16 +134,23 @@ export function OrderWizard({ customers, parts }: OrderWizardProps) {
       unitPrice: l.price,
     }));
 
+    const checklistJson = wizardData.stepChecklist.items
+      ? JSON.stringify(wizardData.stepChecklist)
+      : undefined;
+
     execute({
       plate: wizardData.step1.plate ?? "",
       customerName: wizardData.step1.customerName ?? "",
       vehicleModel: wizardData.step1.vehicleModel ?? "",
       mileage: wizardData.step1.mileage,
+      customerId: wizardData.step1.customerId,
       clientReport: wizardData.step2.customerReport,
       diagnosis: wizardData.step2.initialDiagnosis,
       serviceType: wizardData.step2.serviceType,
       priority: wizardData.step2.priority ?? "normal",
       items: [...partItems, ...laborItems],
+      checklist: checklistJson,
+      signatureUrl: signatureDataUrl ?? undefined,
     });
   }
 
@@ -232,7 +268,14 @@ export function OrderWizard({ customers, parts }: OrderWizardProps) {
             <Button
               variant="ghost"
               className="text-label-sm text-on-surface-variant hidden font-mono sm:flex"
-              onClick={() => toast.info("Rascunho salvo.")}
+              onClick={() => {
+                try {
+                  localStorage.setItem(DRAFT_KEY, JSON.stringify(wizardData));
+                  toast.success("Rascunho salvo.");
+                } catch {
+                  toast.error("Não foi possível salvar o rascunho.");
+                }
+              }}
             >
               Salvar Rascunho
             </Button>

@@ -53,6 +53,6 @@ describe("SEC-02 server-action coverage audit (D-09)", () => {
       const source = readFileSync(join(ACTIONS_DIR, `${file}.ts`), "utf8");
       return sum + exportBlocks(source).length;
     }, 0);
-    expect(total).toBe(9);
+    expect(total).toBe(15);
   });
 });

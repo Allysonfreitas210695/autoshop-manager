@@ -39,14 +39,28 @@ export function useNewOrderForm(onClose: () => void) {
   });
 
   function onSubmit(data: OrderFormValues) {
+    const totalAmount = Number(data.totalAmount ?? 0);
+    const items =
+      totalAmount > 0
+        ? [
+            {
+              description: data.description || "Serviço",
+              itemType: "labor" as const,
+              quantity: 1,
+              unitPrice: totalAmount,
+            },
+          ]
+        : [];
+
     execute({
       plate: data.plate,
       customerName: data.customerName,
       vehicleModel: data.vehicleModel,
-      clientReport: data.description,
+      description: data.description,
       status: data.status,
       priority: "normal",
       dueAt: data.dueAt ? new Date(data.dueAt).toISOString() : undefined,
+      items,
     });
   }
 

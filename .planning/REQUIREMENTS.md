@@ -1,108 +1,77 @@
-# Requirements: AutoShop Manager (Precision Auto)
+# Requirements — v1.1 DB Integration & Live Data
 
-**Defined:** 2026-06-11
-**Core Value:** A workshop operator can run the full day-to-day flow (intake → service order → budget approval → print/PIX → inventory/finance) on desktop AND mobile, securely, without rough edges.
+> Milestone goal: Substituir todo o mock data por queries Drizzle ORM reais em todos os módulos, conectando Better Auth ao banco de dados.
 
-> Milestone: **Hardening & Polish** over the existing app. Requirements below are improvement requirements over already-shipped screens — not a greenfield build. The Drizzle/live-DB integration is explicitly out of scope (see below).
+## v1.1 Requirements
 
-## v1 Requirements
+### Foundation & Auth
 
-Requirements for the Hardening & Polish milestone. Each maps to exactly one phase.
+- [x] **FOUND-01**: Operador pode rodar migrations e ter o banco de produção com schema atualizado
+- [x] **FOUND-02**: Sistema autentica usuários contra o banco Drizzle (login, sessão, logout verificados)
+- [x] **FOUND-03**: Desenvolvedor pode popular banco com seed script de dados representativos
 
-### Security (Segurança)
+### Ordens de Serviço
 
-- [ ] **SEC-01**: Authentication is hardened (Better Auth: secure session handling, secure/HttpOnly cookies, password policy enforced)
-- [ ] **SEC-02**: All server actions in `src/_actions/` enforce server-side Zod validation on their inputs
-- [ ] **SEC-03**: Route access control in `src/proxy.ts` correctly protects dashboard routes, allows public routes, and gates auth routes (dashboard vs public vs auth route groups)
-- [ ] **SEC-04**: Security headers are applied (CSP, HSTS, X-Frame-Options, X-Content-Type-Options, Referrer-Policy)
-- [ ] **SEC-05**: Auth endpoints (login, register, forgot, reset) are rate-limited against brute force
-- [ ] **SEC-06**: No secrets leak into client bundles; env var boundaries are verified (server-only secrets stay server-side)
+- [x] **OS-01**: Operador pode criar, listar e atualizar status de O.S. com dados persistidos no banco
+- [x] **OS-02**: Ao fechar/aprovar uma O.S., sistema cria automaticamente registro em `transactions`
+- [x] **OS-03**: Todas as ações de update incluem `updatedAt: new Date()` (dados de auditoria corretos)
 
-### Responsiveness (Responsividade)
+### Clientes & Veículos
 
-- [x] **RESP-01**: Sidebar collapses into a mobile-friendly drawer on small screens
-- [x] **RESP-02**: `DataTable` instances scroll horizontally without breaking layout on small screens
-- [x] **RESP-03**: Dashboard, order wizard steps, and detail screens use adaptive layouts that reflow at breakpoints
-- [x] **RESP-04**: Interactive controls meet touch-friendly target sizing on mobile
-- [x] **RESP-05**: Breakpoints are verified across all existing routes (no horizontal overflow or clipped content)
+- [ ] **CLI-01**: Operador pode criar, listar, editar e buscar clientes do banco
+- [ ] **CLI-02**: Operador pode ver e gerenciar veículos vinculados a clientes com histórico de O.S.
+- [ ] **CLI-03**: Sistema rejeita criação de cliente com email já existente (sem crash PG)
 
-### Usability (Usabilidade)
+### Inventário
 
-- [ ] **USAB-01**: Data-fetching screens show loading states (skeletons/spinners)
-- [ ] **USAB-02**: Error states render user-friendly messages instead of crashing or blank screens
-- [x] **USAB-03**: Forms give consistent inline validation feedback across all forms
-- [ ] **USAB-04**: Lists/tables with no data show empty states
-- [x] **USAB-05**: Create/update/delete actions give toast/confirmation feedback
-- [ ] **USAB-06**: Optimistic UI is applied where appropriate (e.g., create/update interactions)
+- [ ] **INV-01**: Operador pode listar peças, ver alertas de estoque mínimo real e atualizar quantidades
+- [ ] **INV-02**: Operador pode criar e listar ordens de compra com todos os status válidos (incluindo "confirmed")
+- [ ] **INV-03**: Ao adicionar peça a uma O.S., sistema decrementa `quantity` no banco automaticamente
 
-### Screen enhancement (Aprimoramento de telas)
+### Agendamentos
 
-- [ ] **SCRN-01**: Strategic dashboard implemented (`dashboard_estrat_gico_precision_auto` — advanced metrics) at `/analytics` or dashboard tab
-- [ ] **SCRN-02**: Low-stock alerts screen implemented at `/inventory/alerts` (`estoque_alerta_de_itens_baixos`) with CRÍTICO/ATENÇÃO highlighting
-- [ ] **SCRN-03**: Purchase-order generation implemented under `/inventory/purchase-orders` (`gerar_ordem_de_compra`)
-- [ ] **SCRN-04**: Purchase order with delivery forecast implemented (`ordem_de_compra_com_previs_o_de_entrega`)
-- [ ] **SCRN-05**: New O.S. with intake checklist implemented (`nova_ordem_de_servi_o_com_checklist`) as part of the order flow
-- [ ] **SCRN-06**: Placeholder routes resolved — `/appointments` (react-big-calendar + date-fns) and `/track/[id]` (public tracking with qrcode.react)
-- [ ] **SCRN-07**: Design-system consistency polish (font-mono labels, status chips, system colors) applied across all screens
+- [ ] **APPT-01**: Operador pode criar, listar e cancelar agendamentos com dados persistidos no banco
+- [ ] **APPT-02**: Schema de agendamentos inclui `serviceType` e `duration` (sem perda de dados do formulário)
 
-## v2 Requirements
+### Finance & Analytics
 
-Deferred to future release. Tracked but not in current roadmap.
+- [ ] **FIN-01**: Relatórios financeiros exibem receita/despesas/lucro calculados de `transactions` reais
+- [ ] **FIN-02**: Dashboard analítico exibe métricas reais (sem valores sentinel "-1" visíveis ao usuário)
+- [ ] **FIN-03**: Queries do dashboard usam joins/batch em vez de N+1 loops
+- [ ] **FIN-04**: Colunas `numeric` do Drizzle são convertidas para `number` em toda a camada de apresentação
 
-### Database integration
+## Future Requirements
 
-- **DB-01**: Replace mock data with real Drizzle ORM queries across all modules
-- **DB-02**: Implement full CRUD server actions for Customers/Vehicles, O.S., Inventory, Finance, Appointments
-- **DB-03**: Connect Better Auth to the database
+- Driver swap: substituir pg.Pool por @neondatabase/serverless ou similar (connection pooling serverless-nativo)
+- Seção `nextServices` em /customers/[id] com fonte de dados real
+- Paginação server-side para listas grandes (O.S., clientes, inventário)
 
 ## Out of Scope
 
-Explicitly excluded. Documented to prevent scope creep.
-
-| Feature                                                       | Reason                                                           |
-| ------------------------------------------------------------- | ---------------------------------------------------------------- |
-| Drizzle / live DB integration                                 | Mock-data-first until MVP validated; separate deferred milestone |
-| Re-architecture of existing screens                           | This milestone improves screens, does not redesign structure     |
-| New business modules beyond the listed pending design screens | Scope limited to documented pending screens                      |
+- Re-arquitetura de telas existentes — UI validada em v1.0, apenas camada de dados muda
+- Driver swap para Neon/serverless (deferido — pg.Pool com max=3 é suficiente para v1.1)
+- Remoção da seção `nextServices` (comportamento atual mantido)
+- Novas features de produto (relatórios extras, notificações, etc.)
 
 ## Traceability
 
-Which phases cover which requirements.
-
-| Requirement | Phase   | Status   |
-| ----------- | ------- | -------- |
-| SEC-01      | Phase 1 | Pending  |
-| SEC-02      | Phase 1 | Pending  |
-| SEC-03      | Phase 1 | Pending  |
-| SEC-04      | Phase 1 | Pending  |
-| SEC-05      | Phase 1 | Pending  |
-| SEC-06      | Phase 1 | Pending  |
-| RESP-01     | Phase 2 | Complete |
-| RESP-02     | Phase 2 | Complete |
-| RESP-03     | Phase 2 | Complete |
-| RESP-04     | Phase 2 | Complete |
-| RESP-05     | Phase 2 | Complete |
-| USAB-01     | Phase 3 | Pending  |
-| USAB-02     | Phase 3 | Pending  |
-| USAB-03     | Phase 3 | Complete |
-| USAB-04     | Phase 3 | Pending  |
-| USAB-05     | Phase 3 | Complete |
-| USAB-06     | Phase 3 | Pending  |
-| SCRN-01     | Phase 4 | Pending  |
-| SCRN-02     | Phase 4 | Pending  |
-| SCRN-03     | Phase 4 | Pending  |
-| SCRN-04     | Phase 4 | Pending  |
-| SCRN-05     | Phase 4 | Pending  |
-| SCRN-06     | Phase 4 | Pending  |
-| SCRN-07     | Phase 4 | Pending  |
-
-**Coverage:**
-
-- v1 requirements: 24 total
-- Mapped to phases: 24
-- Unmapped: 0 ✓
-
----
-
-_Requirements defined: 2026-06-11_
-_Last updated: 2026-06-11 after Hardening & Polish milestone bootstrap_
+| REQ-ID   | Phase    | Status   |
+| -------- | -------- | -------- |
+| FOUND-01 | Phase 5  | Complete |
+| FOUND-02 | Phase 5  | Complete |
+| FOUND-03 | Phase 5  | Complete |
+| OS-01    | Phase 6  | Complete |
+| OS-02    | Phase 6  | Complete |
+| OS-03    | Phase 6  | Complete |
+| CLI-01   | Phase 7  | Pending  |
+| CLI-02   | Phase 7  | Pending  |
+| CLI-03   | Phase 7  | Pending  |
+| INV-01   | Phase 8  | Pending  |
+| INV-02   | Phase 8  | Pending  |
+| INV-03   | Phase 8  | Pending  |
+| APPT-01  | Phase 9  | Pending  |
+| APPT-02  | Phase 9  | Pending  |
+| FIN-01   | Phase 10 | Pending  |
+| FIN-02   | Phase 10 | Pending  |
+| FIN-03   | Phase 10 | Pending  |
+| FIN-04   | Phase 10 | Pending  |

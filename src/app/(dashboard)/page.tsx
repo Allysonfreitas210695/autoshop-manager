@@ -13,6 +13,7 @@ import { StatusChip } from "@/_components/ui/status-chip";
 import {
   getDashboardMetrics,
   getStatusDistribution,
+  getUpcomingDeliveries,
 } from "@/_data-access/dashboard";
 import { listOrders, type OrderRow } from "@/_data-access/orders";
 
@@ -75,11 +76,13 @@ const orderColumns: DataTableColumn<OrderRow>[] = [
 ];
 
 export default async function DashboardPage() {
-  const [metrics, orders, statusDist] = await Promise.all([
+  const [metrics, ordersResult, statusDist, upcomingRaw] = await Promise.all([
     getDashboardMetrics(),
-    listOrders(),
+    listOrders(undefined, 1, 10),
     getStatusDistribution(),
+    getUpcomingDeliveries(4),
   ]);
+  const orders = ordersResult.rows;
 
   const statusChartData = statusDist.map((s) => ({
     status: s.status,
@@ -94,15 +97,20 @@ export default async function DashboardPage() {
     value: s.count,
   }));
 
-  const upcomingDeliveries: TimelineNode[] = orders
-    .filter((o) => o.status !== "completed")
-    .slice(0, 4)
-    .map((o, i) => ({
+  const upcomingDeliveries: TimelineNode[] = upcomingRaw.map((o, i) => {
+    const timeStr = o.dueAt
+      ? o.dueAt.toLocaleTimeString("pt-BR", {
+          hour: "2-digit",
+          minute: "2-digit",
+        })
+      : "—";
+    return {
       id: o.id,
-      title: o.plate,
-      subtitle: o.customer ?? o.vehicle,
+      title: timeStr,
+      subtitle: `${o.plate} · ${o.customer ?? o.vehicle}`,
       state: i === 0 ? "active" : "upcoming",
-    }));
+    };
+  });
 
   return (
     <div className="space-y-6">
