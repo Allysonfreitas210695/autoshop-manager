@@ -6,9 +6,9 @@
 
 ### Foundation & Auth
 
-- [ ] **FOUND-01**: Operador pode rodar migrations e ter o banco de produção com schema atualizado
-- [ ] **FOUND-02**: Sistema autentica usuários contra o banco Drizzle (login, sessão, logout verificados)
-- [ ] **FOUND-03**: Desenvolvedor pode popular banco com seed script de dados representativos
+- [x] **FOUND-01**: Operador pode rodar migrations e ter o banco de produção com schema atualizado
+- [x] **FOUND-02**: Sistema autentica usuários contra o banco Drizzle (login, sessão, logout verificados)
+- [x] **FOUND-03**: Desenvolvedor pode popular banco com seed script de dados representativos
 
 ### Ordens de Serviço
 
@@ -55,23 +55,23 @@
 
 ## Traceability
 
-| REQ-ID   | Phase    | Status  |
-| -------- | -------- | ------- |
-| FOUND-01 | Phase 5  | Pending |
-| FOUND-02 | Phase 5  | Pending |
-| FOUND-03 | Phase 5  | Pending |
-| OS-01    | Phase 6  | Pending |
-| OS-02    | Phase 6  | Pending |
-| OS-03    | Phase 6  | Pending |
-| CLI-01   | Phase 7  | Pending |
-| CLI-02   | Phase 7  | Pending |
-| CLI-03   | Phase 7  | Pending |
-| INV-01   | Phase 8  | Pending |
-| INV-02   | Phase 8  | Pending |
-| INV-03   | Phase 8  | Pending |
-| APPT-01  | Phase 9  | Pending |
-| APPT-02  | Phase 9  | Pending |
-| FIN-01   | Phase 10 | Pending |
-| FIN-02   | Phase 10 | Pending |
-| FIN-03   | Phase 10 | Pending |
-| FIN-04   | Phase 10 | Pending |
+| REQ-ID   | Phase    | Status   |
+| -------- | -------- | -------- |
+| FOUND-01 | Phase 5  | Complete |
+| FOUND-02 | Phase 5  | Complete |
+| FOUND-03 | Phase 5  | Complete |
+| OS-01    | Phase 6  | Pending  |
+| OS-02    | Phase 6  | Pending  |
+| OS-03    | Phase 6  | Pending  |
+| CLI-01   | Phase 7  | Pending  |
+| CLI-02   | Phase 7  | Pending  |
+| CLI-03   | Phase 7  | Pending  |
+| INV-01   | Phase 8  | Pending  |
+| INV-02   | Phase 8  | Pending  |
+| INV-03   | Phase 8  | Pending  |
+| APPT-01  | Phase 9  | Pending  |
+| APPT-02  | Phase 9  | Pending  |
+| FIN-01   | Phase 10 | Pending  |
+| FIN-02   | Phase 10 | Pending  |
+| FIN-03   | Phase 10 | Pending  |
+| FIN-04   | Phase 10 | Pending  |

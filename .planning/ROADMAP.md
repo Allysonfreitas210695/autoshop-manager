@@ -21,7 +21,7 @@ See: `.planning/milestones/v1.0-ROADMAP.md` for full phase details.
 
 ### v1.1 DB Integration & Live Data
 
-- [ ] **Phase 5: DB Foundation & Auth** — Migrations applied, Better Auth wired to Drizzle, seed script operational, connection safe for Vercel serverless
+- [x] **Phase 5: DB Foundation & Auth** — Migrations applied, Better Auth wired to Drizzle, seed script operational, connection safe for Vercel serverless (completed 2026-06-21)
 - [ ] **Phase 6: Orders & Transactions** — O.S. CRUD on real DB, budget approval, auto-transaction insert on O.S. close, updatedAt audit
 - [ ] **Phase 7: Customers & Vehicles** — Customer/vehicle CRUD real, vehicle history, email uniqueness guard
 - [ ] **Phase 8: Inventory** — Parts list, low-stock alerts, purchase orders CRUD with correct enum, stock auto-decrement
@@ -52,7 +52,7 @@ Plans:
 
 **Wave 2** _(blocked on Wave 1 completion)_
 
-- [ ] 05-02-PLAN.md — Fix seed idempotency (add verification to wipe), validate seed runs twice cleanly
+- [x] 05-02-PLAN.md — Fix seed idempotency (add verification to wipe), validate seed runs twice cleanly
 
 **UI hint**: no
 
@@ -133,7 +133,7 @@ Plans:
 | 2. Responsividade (Responsiveness)             | v1.0      | 4/4            | Complete    | 2026-06-12 |
 | 3. Usabilidade (Usability)                     | v1.0      | 5/5            | Complete    | 2026-06-14 |
 | 4. Aprimoramento de telas (Screen enhancement) | v1.0      | 5/5            | Complete    | 2026-06-15 |
-| 5. DB Foundation & Auth                        | v1.1      | 1/2            | In Progress |            |
+| 5. DB Foundation & Auth                        | v1.1      | 2/2            | Complete    | 2026-06-21 |
 | 6. Orders & Transactions                       | v1.1      | 0/?            | Not started | -          |
 | 7. Customers & Vehicles                        | v1.1      | 0/?            | Not started | -          |
 | 8. Inventory                                   | v1.1      | 0/?            | Not started | -          |
