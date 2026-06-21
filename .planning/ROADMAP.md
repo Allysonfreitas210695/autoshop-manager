@@ -45,10 +45,13 @@ See: `.planning/milestones/v1.0-ROADMAP.md` for full phase details.
 4. DB connection pattern is serverless-safe (no `pg.Pool` exhaustion under Vercel Lambda invocations)
 
 **Plans**: 2 plans
-
 Plans:
+**Wave 1**
 
 - [ ] 05-01-PLAN.md — Harden pg.Pool (max:3 + timeouts), add 'confirmed' enum, generate+apply migration 0003
+
+**Wave 2** _(blocked on Wave 1 completion)_
+
 - [ ] 05-02-PLAN.md — Fix seed idempotency (add verification to wipe), validate seed runs twice cleanly
 
 **UI hint**: no
