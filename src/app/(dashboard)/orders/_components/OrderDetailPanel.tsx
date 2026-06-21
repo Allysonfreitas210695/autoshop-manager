@@ -37,6 +37,8 @@ import { StatusChip } from "@/_components/ui/status-chip";
 import type { OrderDetail, OrderRow } from "@/_data-access/orders";
 import { formatCurrency, formatDate, formatDateTime } from "@/_helpers/format";
 
+import { AddOrderItemModal } from "./AddOrderItemModal";
+
 type Props = {
   order: OrderRow | null;
   open: boolean;
@@ -172,6 +174,11 @@ export function OrderDetailPanel({ order, open, onOpenChange }: Props) {
                     <div key={item.id} className="flex justify-between">
                       <span className="text-body-sm text-on-surface max-w-[60%] truncate">
                         {item.description}
+                        {!item.approved && (
+                          <span className="text-tertiary ml-2 text-[10px]">
+                            (Pendente)
+                          </span>
+                        )}
                       </span>
                       <span className="text-label-sm text-on-surface-variant shrink-0 font-mono">
                         {item.quantity}×{" "}
@@ -179,6 +186,21 @@ export function OrderDetailPanel({ order, open, onOpenChange }: Props) {
                       </span>
                     </div>
                   ))}
+                  <AddOrderItemModal
+                    orderId={order.id}
+                    orderStatus={order.status}
+                  />
+                </div>
+              )}
+              {detail && detail.items.length === 0 && (
+                <div className="space-y-2 px-6 py-4">
+                  <p className="text-on-surface-variant/60 font-mono text-[10px] tracking-wider uppercase">
+                    Itens (0)
+                  </p>
+                  <AddOrderItemModal
+                    orderId={order.id}
+                    orderStatus={order.status}
+                  />
                 </div>
               )}
 
@@ -249,6 +271,21 @@ export function OrderDetailPanel({ order, open, onOpenChange }: Props) {
                   </AlertDialogFooter>
                 </AlertDialogContent>
               </AlertDialog>
+
+              {order.status === "completed" && (
+                <Button
+                  variant="outline"
+                  className="border-secondary/30 text-secondary hover:bg-secondary/10 mt-2 w-full gap-2"
+                  onClick={() => {
+                    const url = `${window.location.origin}/feedback/${order.id}`;
+                    navigator.clipboard.writeText(url);
+                    toast.success("Link de pesquisa copiado!");
+                  }}
+                >
+                  <Clipboard className="size-4" />
+                  Copiar Link de Pesquisa de NPS
+                </Button>
+              )}
             </div>
           </>
         ) : (

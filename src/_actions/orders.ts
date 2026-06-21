@@ -12,7 +12,7 @@ import {
   transactions,
   vehicles,
 } from "@/_db/schema";
-import { authActionClient } from "@/_lib/safe-action";
+import { ActionError, authActionClient } from "@/_lib/safe-action";
 
 export const createOrderAction = authActionClient
   .schema(
@@ -247,4 +247,75 @@ export const approveOrderItemAction = authActionClient
 
     revalidatePath(`/orders/${parsedInput.orderId}/budget`);
     revalidatePath(`/orders/${parsedInput.orderId}`);
+  });
+
+export const addOrderItemAction = authActionClient
+  .schema(
+    z.object({
+      orderId: z.uuid(),
+      itemType: z.enum(["part", "labor"]),
+      serviceId: z.uuid().optional(),
+      description: z.string().min(2, "A descrição é obrigatória"),
+      quantity: z.coerce.number().min(1),
+      unitPrice: z.coerce.number().min(0),
+    }),
+  )
+  .action(async ({ parsedInput }) => {
+    await db.transaction(async (tx) => {
+      const [order] = await tx
+        .select({
+          id: serviceOrders.id,
+          status: serviceOrders.status,
+          totalAmount: serviceOrders.totalAmount,
+        })
+        .from(serviceOrders)
+        .where(eq(serviceOrders.id, parsedInput.orderId));
+
+      if (!order) throw new ActionError("O.S. não encontrada.");
+
+      // Check stock if part
+      if (parsedInput.itemType === "part" && parsedInput.serviceId) {
+        const [part] = await tx
+          .select({ stock: services.stockQuantity })
+          .from(services)
+          .where(eq(services.id, parsedInput.serviceId));
+
+        if (!part) throw new ActionError("Peça não encontrada.");
+        if (part.stock < parsedInput.quantity) {
+          throw new ActionError(
+            "Estoque insuficiente para a quantidade solicitada.",
+          );
+        }
+
+        // If order is in_progress, deduct stock immediately
+        if (order.status === "in_progress") {
+          await tx
+            .update(services)
+            .set({
+              stockQuantity: sql`${services.stockQuantity} - ${parsedInput.quantity}`,
+              updatedAt: new Date(),
+            })
+            .where(eq(services.id, parsedInput.serviceId));
+        }
+      }
+
+      await tx.insert(serviceOrderItems).values({
+        serviceOrderId: parsedInput.orderId,
+        itemType: parsedInput.itemType,
+        serviceId: parsedInput.serviceId,
+        description: parsedInput.description,
+        quantity: parsedInput.quantity,
+        unitPrice: String(parsedInput.unitPrice),
+        approved: false, // Default to false so client can approve in budget
+      });
+
+      // We do NOT update order.totalAmount here. It's updated when the item is approved.
+      // Wait, getOrderById handles total calculation, actually no, the order has a totalAmount field.
+      // The totalAmount is updated when items are approved. Let's just re-calculate it based on approved items?
+      // For now, leave it alone since it's not approved yet.
+    });
+
+    revalidatePath(`/orders/${parsedInput.orderId}`);
+    revalidatePath(`/orders/${parsedInput.orderId}/budget`);
+    revalidatePath("/inventory");
   });

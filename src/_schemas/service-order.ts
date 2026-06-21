@@ -25,3 +25,14 @@ export const createServiceOrderSchema = z.object({
 });
 
 export type CreateServiceOrderInput = z.infer<typeof createServiceOrderSchema>;
+
+export const addOrderItemSchema = z.object({
+  orderId: z.uuid(),
+  itemType: z.enum(["part", "labor"]),
+  serviceId: z.uuid().optional(),
+  description: z.string().min(2, "A descrição é obrigatória"),
+  quantity: z.coerce.number().min(1, "Quantidade deve ser maior que zero"),
+  unitPrice: z.coerce.number().min(0),
+});
+
+export type AddOrderItemInput = z.infer<typeof addOrderItemSchema>;
