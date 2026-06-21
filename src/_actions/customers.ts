@@ -1,12 +1,12 @@
 "use server";
 
-import { eq } from "drizzle-orm";
+import { and, eq, ne } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
 import { db } from "@/_db";
 import { user, vehicles } from "@/_db/schema";
-import { authActionClient } from "@/_lib/safe-action";
+import { ActionError, authActionClient } from "@/_lib/safe-action";
 
 export const createCustomerAction = authActionClient
   .schema(
@@ -19,6 +19,18 @@ export const createCustomerAction = authActionClient
     }),
   )
   .action(async ({ parsedInput }) => {
+    const existing = await db
+      .select({ id: user.id })
+      .from(user)
+      .where(eq(user.email, parsedInput.email))
+      .limit(1);
+
+    if (existing.length > 0) {
+      throw new ActionError(
+        "E-mail já cadastrado. Use outro ou acesse o perfil do cliente existente.",
+      );
+    }
+
     const id = crypto.randomUUID();
     await db.insert(user).values({
       id,
@@ -79,6 +91,20 @@ export const updateCustomerAction = authActionClient
     }),
   )
   .action(async ({ parsedInput }) => {
+    const existing = await db
+      .select({ id: user.id })
+      .from(user)
+      .where(
+        and(eq(user.email, parsedInput.email), ne(user.id, parsedInput.id)),
+      )
+      .limit(1);
+
+    if (existing.length > 0) {
+      throw new ActionError(
+        "E-mail já cadastrado. Use outro ou acesse o perfil do cliente existente.",
+      );
+    }
+
     await db
       .update(user)
       .set({
