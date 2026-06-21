@@ -1,12 +1,22 @@
 "use server";
 
-import { and, eq, ne } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
 import { db } from "@/_db";
 import { user, vehicles } from "@/_db/schema";
 import { ActionError, authActionClient } from "@/_lib/safe-action";
+
+function isUniqueConstraintError(e: unknown, constraintName: string): boolean {
+  if (typeof e !== "object" || e === null) return false;
+  const err = e as Record<string, unknown>;
+  return (
+    err["code"] === "23505" &&
+    typeof err["constraint"] === "string" &&
+    err["constraint"].includes(constraintName)
+  );
+}
 
 export const createCustomerAction = authActionClient
   .schema(
@@ -19,29 +29,26 @@ export const createCustomerAction = authActionClient
     }),
   )
   .action(async ({ parsedInput }) => {
-    const existing = await db
-      .select({ id: user.id })
-      .from(user)
-      .where(eq(user.email, parsedInput.email))
-      .limit(1);
-
-    if (existing.length > 0) {
-      throw new ActionError(
-        "E-mail já cadastrado. Use outro ou acesse o perfil do cliente existente.",
-      );
-    }
-
     const id = crypto.randomUUID();
-    await db.insert(user).values({
-      id,
-      name: parsedInput.name,
-      email: parsedInput.email,
-      emailVerified: false,
-      role: "customer",
-      phone: parsedInput.phone ?? null,
-      cpf: parsedInput.cpf ?? null,
-      address: parsedInput.address ?? null,
-    });
+    try {
+      await db.insert(user).values({
+        id,
+        name: parsedInput.name,
+        email: parsedInput.email,
+        emailVerified: false,
+        role: "customer",
+        phone: parsedInput.phone ?? null,
+        cpf: parsedInput.cpf ?? null,
+        address: parsedInput.address ?? null,
+      });
+    } catch (e: unknown) {
+      if (isUniqueConstraintError(e, "user_email_unique")) {
+        throw new ActionError(
+          "E-mail já cadastrado. Use outro ou acesse o perfil do cliente existente.",
+        );
+      }
+      throw e;
+    }
 
     revalidatePath("/customers");
     return { id };
@@ -61,6 +68,16 @@ export const createVehicleAction = authActionClient
     }),
   )
   .action(async ({ parsedInput }) => {
+    const owner = await db
+      .select({ role: user.role })
+      .from(user)
+      .where(eq(user.id, parsedInput.ownerId))
+      .limit(1);
+
+    if (!owner[0] || owner[0].role !== "customer") {
+      throw new ActionError("Cliente não encontrado.");
+    }
+
     const [vehicle] = await db
       .insert(vehicles)
       .values({
@@ -91,30 +108,32 @@ export const updateCustomerAction = authActionClient
     }),
   )
   .action(async ({ parsedInput }) => {
-    const existing = await db
-      .select({ id: user.id })
-      .from(user)
-      .where(
-        and(eq(user.email, parsedInput.email), ne(user.id, parsedInput.id)),
-      )
-      .limit(1);
+    try {
+      const [updated] = await db
+        .update(user)
+        .set({
+          name: parsedInput.name,
+          email: parsedInput.email,
+          phone: parsedInput.phone ?? null,
+          cpf: parsedInput.cpf ?? null,
+          address: parsedInput.address ?? null,
+          updatedAt: new Date(),
+        })
+        .where(and(eq(user.id, parsedInput.id), eq(user.role, "customer")))
+        .returning({ id: user.id });
 
-    if (existing.length > 0) {
-      throw new ActionError(
-        "E-mail já cadastrado. Use outro ou acesse o perfil do cliente existente.",
-      );
+      if (!updated) {
+        throw new ActionError("Cliente não encontrado.");
+      }
+    } catch (e: unknown) {
+      if (e instanceof ActionError) throw e;
+      if (isUniqueConstraintError(e, "user_email_unique")) {
+        throw new ActionError(
+          "E-mail já cadastrado. Use outro ou acesse o perfil do cliente existente.",
+        );
+      }
+      throw e;
     }
-
-    await db
-      .update(user)
-      .set({
-        name: parsedInput.name,
-        email: parsedInput.email,
-        phone: parsedInput.phone ?? null,
-        cpf: parsedInput.cpf ?? null,
-        address: parsedInput.address ?? null,
-      })
-      .where(eq(user.id, parsedInput.id));
 
     revalidatePath("/customers");
     revalidatePath(`/customers/${parsedInput.id}`);
