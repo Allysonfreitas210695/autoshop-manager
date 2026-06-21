@@ -48,7 +48,7 @@ See: `.planning/milestones/v1.0-ROADMAP.md` for full phase details.
 Plans:
 **Wave 1**
 
-- [ ] 05-01-PLAN.md — Harden pg.Pool (max:3 + timeouts), add 'confirmed' enum, generate+apply migration 0003
+- [x] 05-01-PLAN.md — Harden pg.Pool (max:3 + timeouts), add 'confirmed' enum, generate+apply migration 0003
 
 **Wave 2** _(blocked on Wave 1 completion)_
 
@@ -133,7 +133,7 @@ Plans:
 | 2. Responsividade (Responsiveness)             | v1.0      | 4/4            | Complete    | 2026-06-12 |
 | 3. Usabilidade (Usability)                     | v1.0      | 5/5            | Complete    | 2026-06-14 |
 | 4. Aprimoramento de telas (Screen enhancement) | v1.0      | 5/5            | Complete    | 2026-06-15 |
-| 5. DB Foundation & Auth                        | v1.1      | 0/2            | Planned     | -          |
+| 5. DB Foundation & Auth                        | v1.1      | 1/2            | In Progress |            |
 | 6. Orders & Transactions                       | v1.1      | 0/?            | Not started | -          |
 | 7. Customers & Vehicles                        | v1.1      | 0/?            | Not started | -          |
 | 8. Inventory                                   | v1.1      | 0/?            | Not started | -          |
