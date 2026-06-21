@@ -93,6 +93,7 @@ export const createVehicleAction = authActionClient
       .returning({ id: vehicles.id });
 
     revalidatePath("/customers");
+    revalidatePath(`/customers/${parsedInput.ownerId}`);
     return { id: vehicle.id };
   });
 
