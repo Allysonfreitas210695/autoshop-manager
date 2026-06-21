@@ -10,7 +10,9 @@ export type Part = {
   name: string;
   description: string | null;
   sku: string | null;
-  category: string;
+  category: string | null;
+  supplier: string | null;
+  location: string | null;
   stock: number;
   minStock: number;
   unitPrice: number;
@@ -21,7 +23,7 @@ export type Part = {
 export type PurchaseOrderRow = {
   id: string;
   supplier: string;
-  status: "draft" | "sent" | "received" | "cancelled";
+  status: "draft" | "sent" | "received" | "cancelled" | "confirmed";
   totalAmount: number;
   expectedDelivery: Date | null;
   itemCount: number;
@@ -118,11 +120,39 @@ function partFromRow(row: typeof services.$inferSelect): Part {
     name: row.name,
     description: row.description,
     sku: row.sku,
-    category: "Peças",
+    category: row.category,
+    supplier: row.supplier,
+    location: row.location,
     stock: row.stockQuantity,
     minStock: row.minStock,
     unitPrice: Number(row.price),
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,
   };
+}
+
+export type PurchaseOrderItem = {
+  id: string;
+  description: string;
+  quantity: number;
+  unitPrice: number;
+  serviceId: string | null;
+};
+
+export async function getPurchaseOrderItems(
+  purchaseOrderId: string,
+): Promise<PurchaseOrderItem[]> {
+  const rows = await db
+    .select()
+    .from(purchaseOrderItems)
+    .where(eq(purchaseOrderItems.purchaseOrderId, purchaseOrderId))
+    .orderBy(asc(purchaseOrderItems.id));
+
+  return rows.map((r) => ({
+    id: r.id,
+    description: r.description,
+    quantity: r.quantity,
+    unitPrice: Number(r.unitPrice),
+    serviceId: r.serviceId,
+  }));
 }

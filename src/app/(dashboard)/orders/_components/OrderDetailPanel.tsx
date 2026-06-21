@@ -11,9 +11,10 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useAction } from "next-safe-action/hooks";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
-import { deleteOrderAction } from "@/_actions/orders";
+import { deleteOrderAction, getOrderDetailAction } from "@/_actions/orders";
 import {
   AlertDialog,
   AlertDialogClose,
@@ -33,8 +34,8 @@ import {
   SheetTitle,
 } from "@/_components/ui/sheet";
 import { StatusChip } from "@/_components/ui/status-chip";
-import type { OrderRow } from "@/_data-access/orders";
-import { formatCurrency, formatDateTime } from "@/_helpers/format";
+import type { OrderDetail, OrderRow } from "@/_data-access/orders";
+import { formatCurrency, formatDate, formatDateTime } from "@/_helpers/format";
 
 type Props = {
   order: OrderRow | null;
@@ -43,6 +44,17 @@ type Props = {
 };
 
 export function OrderDetailPanel({ order, open, onOpenChange }: Props) {
+  const [detail, setDetail] = useState<OrderDetail | null>(null);
+
+  const { execute: execDetail } = useAction(getOrderDetailAction, {
+    onSuccess: ({ data }) => setDetail(data ?? null),
+  });
+
+  useEffect(() => {
+    if (!open || !order) return;
+    execDetail({ id: order.id });
+  }, [open, order?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const { execute: execDelete, status: deleteStatus } = useAction(
     deleteOrderAction,
     {
@@ -117,6 +129,58 @@ export function OrderDetailPanel({ order, open, onOpenChange }: Props) {
                   </div>
                 </div>
               </div>
+
+              {/* Diagnóstico / relato */}
+              {detail &&
+                (detail.diagnosis ||
+                  detail.clientReport ||
+                  detail.description) && (
+                  <div className="space-y-2 px-6 py-4">
+                    <p className="text-on-surface-variant/60 font-mono text-[10px] tracking-wider uppercase">
+                      Detalhes
+                    </p>
+                    {detail.description && (
+                      <p className="text-body-sm text-on-surface">
+                        {detail.description}
+                      </p>
+                    )}
+                    {detail.clientReport && (
+                      <p className="text-body-sm text-on-surface-variant">
+                        {detail.clientReport}
+                      </p>
+                    )}
+                    {detail.diagnosis && (
+                      <p className="text-body-sm text-on-surface italic">
+                        {detail.diagnosis}
+                      </p>
+                    )}
+                    {detail.dueAt && (
+                      <p className="text-label-sm text-on-surface-variant font-mono">
+                        Prazo: {formatDate(detail.dueAt)}
+                      </p>
+                    )}
+                  </div>
+                )}
+
+              {/* Itens */}
+              {detail && detail.items.length > 0 && (
+                <div className="space-y-2 px-6 py-4">
+                  <p className="text-on-surface-variant/60 font-mono text-[10px] tracking-wider uppercase">
+                    Itens ({detail.items.length})
+                  </p>
+                  {detail.items.map((item) => (
+                    <div key={item.id} className="flex justify-between">
+                      <span className="text-body-sm text-on-surface max-w-[60%] truncate">
+                        {item.description}
+                      </span>
+                      <span className="text-label-sm text-on-surface-variant shrink-0 font-mono">
+                        {item.quantity}×{" "}
+                        {formatCurrency(Number(item.unitPrice))}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
 
               {/* Total */}
               <div className="px-6 py-4">

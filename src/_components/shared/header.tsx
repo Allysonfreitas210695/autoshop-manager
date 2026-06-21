@@ -25,6 +25,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/_components/ui/sheet";
+import type { Notification } from "@/_data-access/dashboard";
 import { useBreadcrumb } from "@/_hooks/use-breadcrumb";
 import { signOut } from "@/_lib/auth-client";
 
@@ -34,31 +35,19 @@ type HeaderUser = {
   image?: string | null;
 };
 
-const NOTIFICATIONS = [
-  {
-    id: "1",
-    title: "Estoque crítico",
-    description: "3 peças abaixo do estoque mínimo",
-    icon: Info,
-    color: "text-error",
-    time: "Agora",
-  },
-  {
-    id: "2",
-    title: "O.S. #42 concluída",
-    description: "Honda Civic · ABC-1234",
-    icon: CheckCircle2,
-    color: "text-status-completed",
-    time: "2h atrás",
-  },
-];
-
-export function Header({ user }: { user: HeaderUser }) {
+export function Header({
+  user,
+  notifications = [],
+}: {
+  user: HeaderUser;
+  notifications?: Notification[];
+}) {
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
   const [avatarError, setAvatarError] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const crumbs = useBreadcrumb();
 
   const initials = user.name
@@ -74,6 +63,22 @@ export function Header({ user }: { user: HeaderUser }) {
     router.refresh();
   }
 
+  function handleSearch(q: string) {
+    const trimmed = q.trim();
+    if (!trimmed) return;
+    router.push(`/orders?q=${encodeURIComponent(trimmed)}`);
+    setSearchOpen(false);
+    setSearchQuery("");
+  }
+
+  function handleSearchKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.key === "Enter") {
+      handleSearch((e.target as HTMLInputElement).value);
+    }
+  }
+
+  const hasNotifications = notifications.length > 0;
+
   return (
     <header className="border-outline-variant bg-surface sticky top-0 z-30 border-b">
       {/* Barra de busca mobile */}
@@ -86,6 +91,9 @@ export function Header({ user }: { user: HeaderUser }) {
               placeholder="Pesquisar placa ou cliente..."
               className="pl-9"
               aria-label="Pesquisar"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={handleSearchKeyDown}
             />
           </div>
           <Button
@@ -151,6 +159,9 @@ export function Header({ user }: { user: HeaderUser }) {
               placeholder="Pesquisar placa ou cliente..."
               className="pl-9"
               aria-label="Pesquisar"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={handleSearchKeyDown}
             />
           </div>
         </div>
@@ -177,7 +188,9 @@ export function Header({ user }: { user: HeaderUser }) {
               }
             >
               <Bell className="size-5" />
-              <span className="bg-tertiary absolute top-2 right-2 size-2 rounded-full" />
+              {hasNotifications && (
+                <span className="bg-tertiary absolute top-2 right-2 size-2 rounded-full" />
+              )}
             </SheetTrigger>
             <SheetContent
               side="right"
@@ -192,28 +205,41 @@ export function Header({ user }: { user: HeaderUser }) {
                 </SheetDescription>
               </SheetHeader>
               <div className="divide-outline-variant/30 divide-y">
-                {NOTIFICATIONS.map((n) => {
-                  const Icon = n.icon;
-                  return (
-                    <div
-                      key={n.id}
-                      className="flex items-start gap-3 px-6 py-4"
-                    >
-                      <Icon className={`mt-0.5 size-4 shrink-0 ${n.color}`} />
-                      <div className="min-w-0 flex-1">
-                        <p className="text-body-sm text-on-surface font-medium">
-                          {n.title}
-                        </p>
-                        <p className="text-label-sm text-on-surface-variant font-mono">
-                          {n.description}
-                        </p>
+                {notifications.length === 0 ? (
+                  <div className="px-6 py-8 text-center">
+                    <p className="text-label-sm text-on-surface-variant font-mono">
+                      Nenhuma notificação
+                    </p>
+                  </div>
+                ) : (
+                  notifications.map((n) => {
+                    const Icon =
+                      n.type === "critical_stock" ? Info : CheckCircle2;
+                    const color =
+                      n.type === "critical_stock"
+                        ? "text-error"
+                        : "text-status-completed";
+                    return (
+                      <div
+                        key={n.id}
+                        className="flex items-start gap-3 px-6 py-4"
+                      >
+                        <Icon className={`mt-0.5 size-4 shrink-0 ${color}`} />
+                        <div className="min-w-0 flex-1">
+                          <p className="text-body-sm text-on-surface font-medium">
+                            {n.title}
+                          </p>
+                          <p className="text-label-sm text-on-surface-variant font-mono">
+                            {n.description}
+                          </p>
+                        </div>
+                        <span className="text-label-xs text-on-surface-variant/60 shrink-0 font-mono">
+                          {n.time}
+                        </span>
                       </div>
-                      <span className="text-label-xs text-on-surface-variant/60 shrink-0 font-mono">
-                        {n.time}
-                      </span>
-                    </div>
-                  );
-                })}
+                    );
+                  })
+                )}
               </div>
             </SheetContent>
           </Sheet>

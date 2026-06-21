@@ -19,6 +19,7 @@ import {
   type Transaction,
 } from "@/_data-access/finance";
 
+import { FinanceActions } from "./finance-actions";
 import { CashFlowBarChart } from "./finance-charts";
 
 type TransactionStatus = Transaction["status"];
@@ -103,12 +104,33 @@ const columns: DataTableColumn<Transaction>[] = [
   },
 ];
 
-export default async function FinancePage() {
+type Period = "mensal" | "trimestral" | "anual";
+
+function getPeriodDays(period: Period): number {
+  if (period === "trimestral") return 90;
+  if (period === "anual") return 365;
+  return 30;
+}
+
+type Props = { searchParams: Promise<{ periodo?: string }> };
+
+export default async function FinancePage({ searchParams }: Props) {
+  const { periodo } = await searchParams;
+  const activePeriod: Period =
+    periodo === "trimestral" || periodo === "anual" ? periodo : "mensal";
+  const days = getPeriodDays(activePeriod);
+
   const [metrics, transactions, cashFlow] = await Promise.all([
-    getFinanceMetrics(),
+    getFinanceMetrics(days),
     listTransactions(50),
     getWeeklyCashFlow(),
   ]);
+
+  const PERIODS: { key: Period; label: string }[] = [
+    { key: "mensal", label: "Mensal" },
+    { key: "trimestral", label: "Trimestral" },
+    { key: "anual", label: "Anual" },
+  ];
 
   return (
     <div className="space-y-6">
@@ -129,25 +151,24 @@ export default async function FinancePage() {
           >
             Ver Relatórios
           </Link>
-          <button className="bg-secondary text-label-sm text-surface hover:bg-secondary/90 rounded-md px-4 py-2 font-mono font-bold transition-colors">
-            Quick Actions
-          </button>
+          <FinanceActions />
         </div>
       </div>
 
       {/* Filtros de período */}
       <div className="-mx-4 flex [scrollbar-width:none] gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:flex-wrap sm:px-0 [&::-webkit-scrollbar]:hidden">
-        {["Mensal", "Trimestral", "Anual"].map((p) => (
-          <button
-            key={p}
+        {PERIODS.map(({ key, label }) => (
+          <Link
+            key={key}
+            href={`/finance?periodo=${key}`}
             className={`text-label-sm shrink-0 rounded-full border px-4 py-1.5 font-mono transition-colors ${
-              p === "Mensal"
+              activePeriod === key
                 ? "border-secondary bg-secondary/10 text-secondary"
                 : "border-outline-variant text-on-surface-variant hover:bg-surface-container"
             }`}
           >
-            {p}
-          </button>
+            {label}
+          </Link>
         ))}
       </div>
 

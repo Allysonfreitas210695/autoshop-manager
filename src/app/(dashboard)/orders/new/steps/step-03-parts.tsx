@@ -62,7 +62,7 @@ export function Step03Parts({ defaultValues, parts, onNext }: Step3Props) {
       appendPart({
         id: part.id,
         name: part.name,
-        category: part.category,
+        category: part.category ?? "",
         quantity: 1,
         unitPrice: part.unitPrice,
       });

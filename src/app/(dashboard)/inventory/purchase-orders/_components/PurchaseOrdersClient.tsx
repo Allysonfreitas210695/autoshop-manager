@@ -2,8 +2,14 @@
 
 import { FileText, Package, Plus, Truck } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useAction } from "next-safe-action/hooks";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
+import {
+  getPurchaseOrderItemsAction,
+  updatePurchaseOrderStatusAction,
+} from "@/_actions/inventory";
 import { Button } from "@/_components/ui/button";
 import {
   Sheet,
@@ -12,7 +18,10 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/_components/ui/sheet";
-import type { PurchaseOrderRow } from "@/_data-access/inventory";
+import type {
+  PurchaseOrderItem,
+  PurchaseOrderRow,
+} from "@/_data-access/inventory";
 import { formatCurrency, formatDate } from "@/_helpers/format";
 
 type PurchaseOrderStatus = PurchaseOrderRow["status"];
@@ -22,6 +31,7 @@ const statusLabels: Record<PurchaseOrderStatus, string> = {
   sent: "Enviada",
   received: "Recebida",
   cancelled: "Cancelada",
+  confirmed: "Confirmada",
 };
 
 const statusColor: Record<PurchaseOrderStatus, string> = {
@@ -31,18 +41,94 @@ const statusColor: Record<PurchaseOrderStatus, string> = {
   received:
     "bg-status-completed/20 text-status-completed border-status-completed/30",
   cancelled: "bg-error/20 text-error border-error/30",
+  confirmed:
+    "bg-status-completed/20 text-status-completed border-status-completed/30",
 };
+
+type StatusTransition = {
+  from: PurchaseOrderStatus[];
+  to: PurchaseOrderStatus;
+  label: string;
+  variant: "default" | "outline" | "ghost" | "destructive";
+};
+
+const statusTransitions: StatusTransition[] = [
+  {
+    from: ["draft"],
+    to: "sent",
+    label: "Marcar como Enviada",
+    variant: "default",
+  },
+  {
+    from: ["sent"],
+    to: "received",
+    label: "Marcar como Recebida",
+    variant: "default",
+  },
+  {
+    from: ["draft", "sent"],
+    to: "cancelled",
+    label: "Cancelar",
+    variant: "destructive",
+  },
+];
 
 function PurchaseOrderDetailPanel({
   order,
   open,
   onOpenChange,
+  onStatusChange,
 }: {
   order: PurchaseOrderRow | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onStatusChange: (id: string, status: PurchaseOrderStatus) => void;
 }) {
+  const [items, setItems] = useState<PurchaseOrderItem[]>([]);
+  const [loadingItems, setLoadingItems] = useState(false);
+
+  const { execute: fetchItems } = useAction(getPurchaseOrderItemsAction, {
+    onSuccess: ({ data }) => {
+      setItems(data?.items ?? []);
+      setLoadingItems(false);
+    },
+    onError: () => setLoadingItems(false),
+  });
+
+  const [pendingStatus, setPendingStatus] =
+    useState<PurchaseOrderStatus | null>(null);
+
+  const { execute: updateStatus, status: updateStatus_ } = useAction(
+    updatePurchaseOrderStatusAction,
+    {
+      onSuccess: () => {
+        if (pendingStatus) {
+          toast.success(
+            `Status atualizado para ${statusLabels[pendingStatus]}.`,
+          );
+          onStatusChange(order!.id, pendingStatus);
+          setPendingStatus(null);
+        }
+      },
+      onError: ({ error }) => {
+        toast.error(error.serverError ?? "Erro ao atualizar status.");
+        setPendingStatus(null);
+      },
+    },
+  );
+
+  useEffect(() => {
+    if (!open || !order) return;
+    setLoadingItems(true); // eslint-disable-line react-hooks/set-state-in-effect
+    fetchItems({ id: order.id });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, order?.id]);
+
   if (!order) return null;
+
+  const availableTransitions = statusTransitions.filter((t) =>
+    t.from.includes(order.status),
+  );
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -100,6 +186,70 @@ function PurchaseOrderDetailPanel({
               </div>
             </div>
           </div>
+
+          {/* Items list */}
+          <div className="space-y-3 px-6 py-4">
+            <p className="text-on-surface-variant/60 font-mono text-[10px] tracking-wider uppercase">
+              Itens do Pedido
+            </p>
+            {loadingItems && (
+              <p className="text-label-sm text-on-surface-variant font-mono">
+                Carregando...
+              </p>
+            )}
+            {!loadingItems && items.length === 0 && (
+              <p className="text-label-sm text-on-surface-variant font-mono">
+                Nenhum item.
+              </p>
+            )}
+            {!loadingItems && items.length > 0 && (
+              <div className="space-y-2">
+                {items.map((item) => (
+                  <div
+                    key={item.id}
+                    className="border-outline-variant/30 flex items-center justify-between gap-2 rounded-lg border px-3 py-2"
+                  >
+                    <div className="min-w-0">
+                      <p className="text-body-sm text-on-surface truncate font-medium">
+                        {item.description}
+                      </p>
+                      <p className="text-label-xs text-on-surface-variant font-mono">
+                        {item.quantity} × {formatCurrency(item.unitPrice)}
+                      </p>
+                    </div>
+                    <span className="text-label-sm text-on-surface shrink-0 font-mono font-semibold">
+                      {formatCurrency(item.quantity * item.unitPrice)}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Status transitions */}
+          {availableTransitions.length > 0 && (
+            <div className="space-y-2 px-6 py-4">
+              <p className="text-on-surface-variant/60 font-mono text-[10px] tracking-wider uppercase">
+                Ações
+              </p>
+              <div className="flex flex-col gap-2">
+                {availableTransitions.map((t) => (
+                  <Button
+                    key={t.to}
+                    variant={t.variant}
+                    size="sm"
+                    disabled={updateStatus_ === "executing"}
+                    onClick={() => {
+                      setPendingStatus(t.to);
+                      updateStatus({ id: order.id, status: t.to });
+                    }}
+                  >
+                    {t.label}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </SheetContent>
     </Sheet>
@@ -108,7 +258,8 @@ function PurchaseOrderDetailPanel({
 
 type Props = { orders: PurchaseOrderRow[] };
 
-export function PurchaseOrdersClient({ orders }: Props) {
+export function PurchaseOrdersClient({ orders: initialOrders }: Props) {
+  const [orders, setOrders] = useState<PurchaseOrderRow[]>(initialOrders);
   const [selectedOrder, setSelectedOrder] = useState<PurchaseOrderRow | null>(
     null,
   );
@@ -120,6 +271,11 @@ export function PurchaseOrdersClient({ orders }: Props) {
     received: orders.filter((o) => o.status === "received").length,
     cancelled: orders.filter((o) => o.status === "cancelled").length,
   };
+
+  function handleStatusChange(id: string, status: PurchaseOrderStatus) {
+    setOrders((prev) => prev.map((o) => (o.id === id ? { ...o, status } : o)));
+    setSelectedOrder((prev) => (prev?.id === id ? { ...prev, status } : prev));
+  }
 
   return (
     <div className="space-y-6">
@@ -275,6 +431,7 @@ export function PurchaseOrdersClient({ orders }: Props) {
         order={selectedOrder}
         open={panelOpen}
         onOpenChange={setPanelOpen}
+        onStatusChange={handleStatusChange}
       />
     </div>
   );
