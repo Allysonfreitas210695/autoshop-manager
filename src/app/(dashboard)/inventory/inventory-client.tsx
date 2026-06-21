@@ -35,7 +35,7 @@ export function InventoryClient({ initialParts, metrics }: Props) {
       header: "Peça / SKU",
       cell: (row) => (
         <div className="min-w-0">
-          <p className="text-body-sm text-on-surface max-w-[160px] truncate font-medium sm:max-w-none">
+          <p className="text-body-sm text-on-surface max-w-40 truncate font-medium sm:max-w-none">
             {row.name}
           </p>
           <p className="text-label-sm text-on-surface-variant font-mono">
