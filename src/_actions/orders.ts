@@ -1,6 +1,6 @@
 "use server";
 
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
@@ -181,5 +181,26 @@ export const approveOrderItemAction = authActionClient
       .set({ approved: parsedInput.approved })
       .where(eq(serviceOrderItems.id, parsedInput.itemId));
 
+    const items = await db
+      .select()
+      .from(serviceOrderItems)
+      .where(
+        and(
+          eq(serviceOrderItems.serviceOrderId, parsedInput.orderId),
+          eq(serviceOrderItems.approved, true),
+        ),
+      );
+
+    const newTotal = items.reduce(
+      (s, i) => s + i.quantity * Number(i.unitPrice),
+      0,
+    );
+
+    await db
+      .update(serviceOrders)
+      .set({ totalAmount: String(newTotal), updatedAt: new Date() })
+      .where(eq(serviceOrders.id, parsedInput.orderId));
+
     revalidatePath(`/orders/${parsedInput.orderId}/budget`);
+    revalidatePath(`/orders/${parsedInput.orderId}`);
   });

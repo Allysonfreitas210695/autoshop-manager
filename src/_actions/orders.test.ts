@@ -138,7 +138,7 @@ describe("Phase 6 orders actions wiring (D-01..D-06)", () => {
   // D-03: db.update(serviceOrders) with totalAmount: String( and updatedAt
   it("D-03: approveOrderItemAction calls db.update(serviceOrders) with totalAmount: String( and updatedAt: new Date()", () => {
     expect(
-      approveBlock?.body.includes("db.update(serviceOrders)"),
+      approveBlock?.body.match(/db\s*\.\s*update\(serviceOrders\)/) !== null,
       "approveOrderItemAction must call db.update(serviceOrders)",
     ).toBe(true);
 
