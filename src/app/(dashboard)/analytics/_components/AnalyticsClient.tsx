@@ -62,11 +62,8 @@ export function AnalyticsClient({
     },
     {
       label: "NPS",
-      value: analyticsKpis.nps === -1 ? "N/D" : analyticsKpis.nps.toString(),
-      sub:
-        analyticsKpis.returnRate === -1
-          ? "Sem dados de retorno"
-          : `${analyticsKpis.returnRate}% taxa de retorno`,
+      value: analyticsKpis.nps.toString(),
+      sub: `${analyticsKpis.returnRate}% taxa de retorno`,
       icon: TrendingUp,
       color: "text-secondary",
       bg: "bg-secondary/10",

@@ -36,6 +36,13 @@
       "when": 1782071725984,
       "tag": "0004_appointments_service_type_duration",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1782072866330,
+      "tag": "0005_add_feedbacks_table",
+      "breakpoints": true
     }
   ]
 }

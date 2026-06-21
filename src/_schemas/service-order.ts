@@ -7,6 +7,8 @@ export const serviceOrderStatusValues = [
   "delayed",
 ] as const;
 
+export type OrderStatus = (typeof serviceOrderStatusValues)[number];
+
 export const createServiceOrderSchema = z.object({
   plate: z
     .string()

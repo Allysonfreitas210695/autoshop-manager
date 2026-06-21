@@ -3,7 +3,7 @@ import "server-only";
 import { count, desc, sql } from "drizzle-orm";
 
 import { db } from "@/_db";
-import { serviceOrders, transactions, user } from "@/_db/schema";
+import { feedbacks, serviceOrders, transactions, user } from "@/_db/schema";
 
 const MONTH_ABBR = [
   "Jan",
@@ -204,6 +204,49 @@ export async function getAnalyticsKpis(): Promise<AnalyticsKpis> {
     .from(user)
     .where(sql`${user.createdAt} >= current_date - interval '12 months'`);
 
+  // Taxa de Retorno: % de clientes com mais de 1 O.S. nos últimos 12 meses
+  const returnRateQuery = await db.execute(sql`
+    WITH customer_orders AS (
+      SELECT customer_id, count(id) as ord_count
+      FROM service_orders
+      WHERE opened_at >= current_date - interval '12 months' AND customer_id IS NOT NULL
+      GROUP BY customer_id
+    )
+    SELECT 
+      count(*) as total_customers,
+      count(case when ord_count > 1 then 1 end) as returning_customers
+    FROM customer_orders
+  `);
+
+  const returnStats = returnRateQuery.rows[0] as
+    | { total_customers: string; returning_customers: string }
+    | undefined;
+  const returningCount = Number(returnStats?.returning_customers ?? 0);
+  const totalReturningBase = Number(returnStats?.total_customers ?? 0);
+  const returnRate =
+    totalReturningBase > 0
+      ? Math.round((returningCount / totalReturningBase) * 100)
+      : 0;
+
+  // NPS: (Promotores - Detratores) / Total de respostas
+  const npsQuery = await db.execute(sql`
+    SELECT 
+      count(*) as total_feedbacks,
+      count(case when score >= 9 then 1 end) as promoters,
+      count(case when score <= 6 then 1 end) as detractors
+    FROM feedbacks
+    WHERE created_at >= current_date - interval '12 months'
+  `);
+
+  const npsStats = npsQuery.rows[0] as
+    | { total_feedbacks: string; promoters: string; detractors: string }
+    | undefined;
+  const totalFb = Number(npsStats?.total_feedbacks ?? 0);
+  const promoters = Number(npsStats?.promoters ?? 0);
+  const detractors = Number(npsStats?.detractors ?? 0);
+  const nps =
+    totalFb > 0 ? Math.round(((promoters - detractors) / totalFb) * 100) : 0;
+
   const revenue = Number(txMetrics?.revenue ?? 0);
   const expenses = Number(txMetrics?.expenses ?? 0);
   const totalOrders = Number(orderMetrics?.total ?? 0);
@@ -216,9 +259,8 @@ export async function getAnalyticsKpis(): Promise<AnalyticsKpis> {
     avgTicket: totalOrders > 0 ? revenue / totalOrders : 0,
     netMargin:
       revenue > 0 ? Math.round(((revenue - expenses) / revenue) * 100) : 0,
-    // nps e returnRate não possuem tabela de origem — retornamos -1 para sinalizar "indisponível"
-    nps: -1,
-    returnRate: -1,
+    nps,
+    returnRate,
     activeCustomers,
     newCustomers,
   };
