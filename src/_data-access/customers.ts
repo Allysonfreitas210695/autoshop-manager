@@ -190,8 +190,10 @@ export async function searchCustomers(query: string) {
       cpf: user.cpf,
     })
     .from(user)
+    .leftJoin(vehicles, eq(vehicles.ownerId, user.id))
     .where(
-      sql`${user.role} = 'customer' and (lower(${user.name}) like ${lq} or lower(${user.email}) like ${lq})`,
+      sql`${user.role} = 'customer' and (lower(${user.name}) like ${lq} or lower(${user.email}) like ${lq} or lower(${user.cpf}) like ${lq} or lower(${vehicles.plate}) like ${lq})`,
     )
+    .groupBy(user.id)
     .limit(10);
 }
