@@ -1,6 +1,6 @@
 import "server-only";
 
-import { count, desc, eq, inArray, sql } from "drizzle-orm";
+import { and, count, desc, eq, ilike, inArray, or, sql } from "drizzle-orm";
 
 import { db } from "@/_db";
 import { serviceOrders, user, vehicles } from "@/_db/schema";
@@ -148,7 +148,7 @@ export async function getCustomerById(
     })
     .from(user)
     .leftJoin(serviceOrders, eq(serviceOrders.customerId, user.id))
-    .where(eq(user.id, id))
+    .where(and(eq(user.id, id), eq(user.role, "customer")))
     .groupBy(user.id)
     .limit(1);
 
@@ -180,19 +180,26 @@ export async function getCustomerById(
 }
 
 export async function searchCustomers(query: string) {
-  const lq = `%${query.toLowerCase()}%`;
+  const pattern = `%${query}%`;
   return db
     .select({
       id: user.id,
       name: user.name,
       email: user.email,
       phone: user.phone,
-      cpf: user.cpf,
     })
     .from(user)
     .leftJoin(vehicles, eq(vehicles.ownerId, user.id))
     .where(
-      sql`${user.role} = 'customer' and (lower(${user.name}) like ${lq} or lower(${user.email}) like ${lq} or lower(${user.cpf}) like ${lq} or lower(${vehicles.plate}) like ${lq})`,
+      and(
+        eq(user.role, "customer"),
+        or(
+          ilike(user.name, pattern),
+          ilike(user.email, pattern),
+          ilike(user.cpf, pattern),
+          ilike(vehicles.plate, pattern),
+        ),
+      ),
     )
     .groupBy(user.id)
     .limit(10);
