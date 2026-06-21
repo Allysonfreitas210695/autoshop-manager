@@ -5,7 +5,12 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
 import { db } from "@/_db";
-import { serviceOrderItems, serviceOrders, vehicles } from "@/_db/schema";
+import {
+  serviceOrderItems,
+  serviceOrders,
+  transactions,
+  vehicles,
+} from "@/_db/schema";
 import { authActionClient } from "@/_lib/safe-action";
 
 export const createOrderAction = authActionClient
@@ -17,6 +22,7 @@ export const createOrderAction = authActionClient
       mileage: z.coerce.number().min(0).optional(),
       customerId: z.string().optional(),
       mechanicId: z.string().optional(),
+      description: z.string().optional(),
       clientReport: z.string().optional(),
       diagnosis: z.string().optional(),
       serviceType: z.string().optional(),
@@ -25,6 +31,8 @@ export const createOrderAction = authActionClient
         .enum(["pending", "in_progress", "completed", "delayed"])
         .optional(),
       dueAt: z.string().datetime().optional(),
+      checklist: z.string().optional(),
+      signatureUrl: z.string().optional(),
       items: z
         .array(
           z.object({
@@ -68,12 +76,15 @@ export const createOrderAction = authActionClient
         vehicleId: vehicle.id,
         customerId: parsedInput.customerId ?? null,
         mechanicId: parsedInput.mechanicId ?? null,
+        description: parsedInput.description ?? null,
         clientReport: parsedInput.clientReport ?? null,
         diagnosis: parsedInput.diagnosis ?? null,
         serviceType: parsedInput.serviceType ?? null,
         priority: parsedInput.priority,
         status: parsedInput.status ?? "pending",
         dueAt: parsedInput.dueAt ? new Date(parsedInput.dueAt) : null,
+        checklist: parsedInput.checklist ?? null,
+        signatureUrl: parsedInput.signatureUrl ?? null,
         totalAmount: String(totalAmount),
       })
       .returning({
@@ -107,17 +118,36 @@ export const updateOrderStatusAction = authActionClient
     }),
   )
   .action(async ({ parsedInput }) => {
-    await db
+    const [order] = await db
       .update(serviceOrders)
       .set({
         status: parsedInput.status,
         closedAt: parsedInput.status === "completed" ? new Date() : null,
         updatedAt: new Date(),
       })
-      .where(eq(serviceOrders.id, parsedInput.id));
+      .where(eq(serviceOrders.id, parsedInput.id))
+      .returning({
+        id: serviceOrders.id,
+        orderNumber: serviceOrders.orderNumber,
+        totalAmount: serviceOrders.totalAmount,
+      });
+
+    if (parsedInput.status === "completed") {
+      await db.insert(transactions).values({
+        date: new Date(),
+        description: `O.S. #${order.orderNumber}`,
+        category: "Serviço",
+        type: "income",
+        amount: order.totalAmount,
+        status: "paid",
+        serviceOrderId: order.id,
+      });
+    }
 
     revalidatePath("/orders");
     revalidatePath(`/orders/${parsedInput.id}`);
+    revalidatePath("/finance");
+    revalidatePath("/analytics");
   });
 
 export const deleteOrderAction = authActionClient
@@ -128,6 +158,13 @@ export const deleteOrderAction = authActionClient
       .where(eq(serviceOrderItems.serviceOrderId, parsedInput.id));
     await db.delete(serviceOrders).where(eq(serviceOrders.id, parsedInput.id));
     revalidatePath("/orders");
+  });
+
+export const getOrderDetailAction = authActionClient
+  .schema(z.object({ id: z.uuid() }))
+  .action(async ({ parsedInput }) => {
+    const { getOrderById } = await import("@/_data-access/orders");
+    return getOrderById(parsedInput.id);
   });
 
 export const approveOrderItemAction = authActionClient
