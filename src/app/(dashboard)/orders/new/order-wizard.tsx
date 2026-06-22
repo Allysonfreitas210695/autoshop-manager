@@ -123,6 +123,7 @@ export function OrderWizard({
       itemType: "part" as const,
       quantity: p.quantity,
       unitPrice: p.unitPrice,
+      serviceId: p.serviceId,
     }));
 
     const laborItems = (

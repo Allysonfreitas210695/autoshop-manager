@@ -191,3 +191,84 @@ describe("Phase 6 orders actions wiring (D-01..D-06)", () => {
     ).toBe(true);
   });
 });
+
+describe("Phase 8 INV-03 stock decrement/restore wiring", () => {
+  const source = readFileSync(join(ACTIONS_DIR, "orders.ts"), "utf8");
+  const blocks = exportBlocks(source);
+
+  const createBlock = blocks.find((b) => b.name === "createOrderAction");
+  const deleteBlock = blocks.find((b) => b.name === "deleteOrderAction");
+
+  it("INV-03: createOrderAction wraps inserts and decrement in db.transaction", () => {
+    expect(
+      createBlock?.body.includes("db.transaction("),
+      "createOrderAction must contain db.transaction(",
+    ).toBe(true);
+  });
+
+  it("INV-03: createOrderAction decrements stockQuantity atomically via sql template", () => {
+    expect(
+      createBlock?.body.includes("stockQuantity") &&
+        createBlock?.body.includes("- ${item.quantity}"),
+      "createOrderAction must decrement stockQuantity using sql template subtract",
+    ).toBe(true);
+  });
+
+  it("INV-03 D-03: createOrderAction filters decrement to part items with serviceId != null", () => {
+    expect(
+      createBlock?.body.includes('itemType === "part"'),
+      'createOrderAction decrement must filter by itemType === "part"',
+    ).toBe(true);
+
+    expect(
+      createBlock?.body.includes("serviceId != null"),
+      "createOrderAction decrement must filter by serviceId != null",
+    ).toBe(true);
+  });
+
+  it("INV-03: createOrderAction revalidates /inventory and /inventory/alerts", () => {
+    expect(
+      createBlock?.body.includes('revalidatePath("/inventory")'),
+      'createOrderAction must revalidatePath("/inventory")',
+    ).toBe(true);
+
+    expect(
+      createBlock?.body.includes('revalidatePath("/inventory/alerts")'),
+      'createOrderAction must revalidatePath("/inventory/alerts")',
+    ).toBe(true);
+  });
+
+  it("INV-03 D-05: deleteOrderAction wraps restore and delete in db.transaction", () => {
+    expect(
+      deleteBlock?.body.includes("db.transaction("),
+      "deleteOrderAction must contain db.transaction(",
+    ).toBe(true);
+  });
+
+  it("INV-03 D-05: deleteOrderAction SELECTs serviceOrderItems before delete", () => {
+    expect(
+      deleteBlock?.body.includes(".from(serviceOrderItems)"),
+      "deleteOrderAction must SELECT .from(serviceOrderItems) before deleting",
+    ).toBe(true);
+  });
+
+  it("INV-03 D-05: deleteOrderAction restores stockQuantity atomically via sql template", () => {
+    expect(
+      deleteBlock?.body.includes("stockQuantity") &&
+        deleteBlock?.body.includes("+ ${item.quantity}"),
+      "deleteOrderAction must restore stockQuantity using sql template add",
+    ).toBe(true);
+  });
+
+  it("INV-03: deleteOrderAction revalidates /inventory and /inventory/alerts", () => {
+    expect(
+      deleteBlock?.body.includes('revalidatePath("/inventory")'),
+      'deleteOrderAction must revalidatePath("/inventory")',
+    ).toBe(true);
+
+    expect(
+      deleteBlock?.body.includes('revalidatePath("/inventory/alerts")'),
+      'deleteOrderAction must revalidatePath("/inventory/alerts")',
+    ).toBe(true);
+  });
+});

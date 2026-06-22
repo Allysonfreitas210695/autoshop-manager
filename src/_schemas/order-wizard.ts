@@ -52,6 +52,7 @@ export type StepChecklistValues = z.infer<typeof stepChecklistSchema>;
 
 const partItemSchema = z.object({
   id: z.string(),
+  serviceId: z.string().optional(),
   name: z.string(),
   category: z.string(),
   quantity: z.number().min(1),

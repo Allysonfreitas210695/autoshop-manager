@@ -49,53 +49,53 @@ export const createOrderAction = authActionClient
     }),
   )
   .action(async ({ parsedInput }) => {
-    const [vehicle] = await db
-      .insert(vehicles)
-      .values({
-        plate: parsedInput.plate.toUpperCase(),
-        make: parsedInput.vehicleMake?.trim() || "Não informado",
-        model: parsedInput.vehicleModel,
-        mileage: parsedInput.mileage ?? null,
-      })
-      .onConflictDoUpdate({
-        target: vehicles.plate,
-        set: {
-          model: parsedInput.vehicleModel,
-          mileage: parsedInput.mileage ?? null,
-          updatedAt: new Date(),
-        },
-      })
-      .returning({ id: vehicles.id });
-
     const totalAmount = parsedInput.items.reduce(
       (s, i) => s + i.quantity * i.unitPrice,
       0,
     );
 
-    const [order] = await db
-      .insert(serviceOrders)
-      .values({
-        vehicleId: vehicle.id,
-        customerId: parsedInput.customerId ?? null,
-        mechanicId: parsedInput.mechanicId ?? null,
-        description: parsedInput.description ?? null,
-        clientReport: parsedInput.clientReport ?? null,
-        diagnosis: parsedInput.diagnosis ?? null,
-        serviceType: parsedInput.serviceType ?? null,
-        priority: parsedInput.priority,
-        status: parsedInput.status ?? "pending",
-        dueAt: parsedInput.dueAt ? new Date(parsedInput.dueAt) : null,
-        checklist: parsedInput.checklist ?? null,
-        signatureUrl: parsedInput.signatureUrl ?? null,
-        totalAmount: String(totalAmount),
-      })
-      .returning({
-        id: serviceOrders.id,
-        orderNumber: serviceOrders.orderNumber,
-      });
+    const result = await db.transaction(async (tx) => {
+      const [vehicle] = await tx
+        .insert(vehicles)
+        .values({
+          plate: parsedInput.plate.toUpperCase(),
+          make: parsedInput.vehicleMake?.trim() || "Não informado",
+          model: parsedInput.vehicleModel,
+          mileage: parsedInput.mileage ?? null,
+        })
+        .onConflictDoUpdate({
+          target: vehicles.plate,
+          set: {
+            model: parsedInput.vehicleModel,
+            mileage: parsedInput.mileage ?? null,
+            updatedAt: new Date(),
+          },
+        })
+        .returning({ id: vehicles.id });
 
-    if (parsedInput.items.length > 0) {
-      await db.transaction(async (tx) => {
+      const [order] = await tx
+        .insert(serviceOrders)
+        .values({
+          vehicleId: vehicle.id,
+          customerId: parsedInput.customerId ?? null,
+          mechanicId: parsedInput.mechanicId ?? null,
+          description: parsedInput.description ?? null,
+          clientReport: parsedInput.clientReport ?? null,
+          diagnosis: parsedInput.diagnosis ?? null,
+          serviceType: parsedInput.serviceType ?? null,
+          priority: parsedInput.priority,
+          status: parsedInput.status ?? "pending",
+          dueAt: parsedInput.dueAt ? new Date(parsedInput.dueAt) : null,
+          checklist: parsedInput.checklist ?? null,
+          signatureUrl: parsedInput.signatureUrl ?? null,
+          totalAmount: String(totalAmount),
+        })
+        .returning({
+          id: serviceOrders.id,
+          orderNumber: serviceOrders.orderNumber,
+        });
+
+      if (parsedInput.items.length > 0) {
         await tx.insert(serviceOrderItems).values(
           parsedInput.items.map((i) => ({
             serviceOrderId: order.id,
@@ -107,26 +107,28 @@ export const createOrderAction = authActionClient
             approved: true,
           })),
         );
+      }
 
-        // Decrement stock for part items that reference a service/part record
-        const partItems = parsedInput.items.filter(
-          (i) => i.itemType === "part" && i.serviceId,
-        );
-        for (const item of partItems) {
-          await tx
-            .update(services)
-            .set({
-              stockQuantity: sql`greatest(0, ${services.stockQuantity} - ${item.quantity})`,
-              updatedAt: new Date(),
-            })
-            .where(eq(services.id, item.serviceId!));
-        }
-      });
-    }
+      // INV-03: atomic stock decrement for catalog-linked parts (D-01, D-02, D-03)
+      const partItemsToDecrement = parsedInput.items.filter(
+        (i) => i.itemType === "part" && i.serviceId != null,
+      );
+      for (const item of partItemsToDecrement) {
+        await tx
+          .update(services)
+          .set({
+            stockQuantity: sql`${services.stockQuantity} - ${item.quantity}`,
+          })
+          .where(eq(services.id, item.serviceId!));
+      }
+
+      return { id: order.id, orderNumber: order.orderNumber };
+    });
 
     revalidatePath("/orders");
     revalidatePath("/inventory");
-    return { id: order.id, orderNumber: order.orderNumber };
+    revalidatePath("/inventory/alerts");
+    return result;
   });
 
 export const updateOrderStatusAction = authActionClient
@@ -173,28 +175,25 @@ export const deleteOrderAction = authActionClient
   .schema(z.object({ id: z.uuid() }))
   .action(async ({ parsedInput }) => {
     await db.transaction(async (tx) => {
-      // Restore stock for part items linked to a service record
+      // D-05: SELECT before DELETE — cascade removes items after serviceOrders delete
       const items = await tx
         .select()
         .from(serviceOrderItems)
         .where(eq(serviceOrderItems.serviceOrderId, parsedInput.id));
 
-      const partItems = items.filter(
-        (i) => i.itemType === "part" && i.serviceId,
+      const partItemsToRestore = items.filter(
+        (i) => i.itemType === "part" && i.serviceId != null,
       );
-      for (const item of partItems) {
+      for (const item of partItemsToRestore) {
         await tx
           .update(services)
           .set({
             stockQuantity: sql`${services.stockQuantity} + ${item.quantity}`,
-            updatedAt: new Date(),
           })
           .where(eq(services.id, item.serviceId!));
       }
 
-      await tx
-        .delete(serviceOrderItems)
-        .where(eq(serviceOrderItems.serviceOrderId, parsedInput.id));
+      // Delete order — FK cascade removes serviceOrderItems
       await tx
         .delete(serviceOrders)
         .where(eq(serviceOrders.id, parsedInput.id));
@@ -202,6 +201,7 @@ export const deleteOrderAction = authActionClient
 
     revalidatePath("/orders");
     revalidatePath("/inventory");
+    revalidatePath("/inventory/alerts");
   });
 
 export const getOrderDetailAction = authActionClient

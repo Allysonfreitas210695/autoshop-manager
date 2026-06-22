@@ -61,6 +61,7 @@ export function Step03Parts({ defaultValues, parts, onNext }: Step3Props) {
     } else {
       appendPart({
         id: part.id,
+        serviceId: part.id,
         name: part.name,
         category: part.category ?? "",
         quantity: 1,
