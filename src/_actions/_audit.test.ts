@@ -54,11 +54,11 @@ describe("SEC-02 server-action coverage audit (D-09)", () => {
     });
   }
 
-  it("covers all 18 known server actions across the five files", () => {
+  it("covers all 19 known server actions across the five files", () => {
     const total = ACTION_FILES.reduce((sum, file) => {
       const source = readFileSync(join(ACTIONS_DIR, `${file}.ts`), "utf8");
       return sum + exportBlocks(source).length;
     }, 0);
-    expect(total).toBe(18);
+    expect(total).toBe(19);
   });
 });

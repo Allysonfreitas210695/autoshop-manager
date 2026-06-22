@@ -8,6 +8,9 @@ import { appointments, user, vehicles } from "@/_db/schema";
 
 export type AppointmentRow = {
   id: string;
+  customerId: string | null;
+  vehicleId: string | null;
+  mechanicId: string | null;
   customer: string | null;
   phone: string | null;
   vehicle: string | null;
@@ -43,6 +46,9 @@ export async function listAppointments(
   const rows = await db
     .select({
       id: appointments.id,
+      customerId: appointments.customerId,
+      vehicleId: appointments.vehicleId,
+      mechanicId: appointments.mechanicId,
       scheduledAt: appointments.scheduledAt,
       status: appointments.status,
       serviceType: appointments.serviceType,
@@ -64,6 +70,9 @@ export async function listAppointments(
 
   return rows.map((row) => ({
     id: row.id,
+    customerId: row.customerId,
+    vehicleId: row.vehicleId,
+    mechanicId: row.mechanicId,
     customer: row.customerName,
     phone: row.customerPhone,
     vehicle:
