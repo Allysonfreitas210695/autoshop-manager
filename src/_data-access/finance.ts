@@ -5,6 +5,45 @@ import { desc, sql } from "drizzle-orm";
 import { db } from "@/_db";
 import { serviceOrders, transactions } from "@/_db/schema";
 
+export type CategoryReport = {
+  category: string;
+  grossRevenue: number;
+  totalExpenses: number;
+  netProfit: number;
+  status: "positive" | "neutral" | "negative";
+};
+
+export async function getCategoryReport(days = 30): Promise<CategoryReport[]> {
+  const rows = await db
+    .select({
+      category: transactions.category,
+      grossRevenue: sql<number>`coalesce(sum(case when ${transactions.type} = 'income' and ${transactions.status} = 'paid' then ${transactions.amount}::numeric else 0 end), 0)`,
+      totalExpenses: sql<number>`coalesce(sum(case when ${transactions.type} = 'expense' and ${transactions.status} = 'paid' then ${transactions.amount}::numeric else 0 end), 0)`,
+    })
+    .from(transactions)
+    .where(
+      sql`${transactions.date} >= current_date - interval '${sql.raw(String(days))} days'`,
+    )
+    .groupBy(transactions.category)
+    .orderBy(
+      sql`sum(case when ${transactions.type} = 'income' and ${transactions.status} = 'paid' then ${transactions.amount}::numeric else 0 end) desc`,
+    );
+
+  return rows.map((r) => {
+    const grossRevenue = Number(r.grossRevenue);
+    const totalExpenses = Number(r.totalExpenses);
+    const netProfit = grossRevenue - totalExpenses;
+    return {
+      category: r.category,
+      grossRevenue,
+      totalExpenses,
+      netProfit,
+      status:
+        netProfit > 0 ? "positive" : netProfit < 0 ? "negative" : "neutral",
+    };
+  });
+}
+
 const COST_COLORS: Record<string, string> = {
   Serviço: "#adc6ff",
   Peças: "#ffb690",

@@ -45,10 +45,10 @@ export type ServiceCategory = {
 export type AnalyticsKpis = {
   totalRevenue12m: number;
   totalOrders12m: number;
-  avgTicket: number;
-  netMargin: number;
-  nps: number;
-  returnRate: number;
+  avgTicket: number | null;
+  netMargin: number | null;
+  nps: number | null;
+  returnRate: number | null;
   activeCustomers: number;
   newCustomers: number;
 };
@@ -226,7 +226,7 @@ export async function getAnalyticsKpis(): Promise<AnalyticsKpis> {
   const returnRate =
     totalReturningBase > 0
       ? Math.round((returningCount / totalReturningBase) * 100)
-      : 0;
+      : null;
 
   // NPS: (Promotores - Detratores) / Total de respostas
   const npsQuery = await db.execute(sql`
@@ -245,7 +245,7 @@ export async function getAnalyticsKpis(): Promise<AnalyticsKpis> {
   const promoters = Number(npsStats?.promoters ?? 0);
   const detractors = Number(npsStats?.detractors ?? 0);
   const nps =
-    totalFb > 0 ? Math.round(((promoters - detractors) / totalFb) * 100) : 0;
+    totalFb > 0 ? Math.round(((promoters - detractors) / totalFb) * 100) : null;
 
   const revenue = Number(txMetrics?.revenue ?? 0);
   const expenses = Number(txMetrics?.expenses ?? 0);
@@ -256,9 +256,9 @@ export async function getAnalyticsKpis(): Promise<AnalyticsKpis> {
   return {
     totalRevenue12m: revenue,
     totalOrders12m: totalOrders,
-    avgTicket: totalOrders > 0 ? revenue / totalOrders : 0,
+    avgTicket: totalOrders > 0 ? revenue / totalOrders : null,
     netMargin:
-      revenue > 0 ? Math.round(((revenue - expenses) / revenue) * 100) : 0,
+      revenue > 0 ? Math.round(((revenue - expenses) / revenue) * 100) : null,
     nps,
     returnRate,
     activeCustomers,
