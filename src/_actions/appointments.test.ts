@@ -36,10 +36,14 @@ describe("Appointments Actions Wiring", () => {
     );
   });
 
-  it("updateAppointmentAction uses db.update and revalidates path", () => {
+  it("updateAppointmentStatusAction uses db.update and revalidates path", () => {
     expect(updateBlock?.body.includes("update(appointments)")).toBe(true);
     expect(updateBlock?.body.includes('revalidatePath("/appointments")')).toBe(
       true,
     );
+  });
+
+  it("updateAppointmentStatusAction returns { id, status }", () => {
+    expect(updateBlock?.body.includes("status: parsedInput.status")).toBe(true);
   });
 });

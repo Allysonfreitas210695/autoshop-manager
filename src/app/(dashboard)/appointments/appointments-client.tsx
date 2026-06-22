@@ -82,16 +82,7 @@ export function AppointmentsClient({
     onSuccess: ({ data }) => {
       if (!data) return;
       setAppointments((prev) =>
-        prev.map((a) =>
-          a.id === data.id
-            ? {
-                ...a,
-                status:
-                  appointments.find((x) => x.id === data.id)?.status ??
-                  a.status,
-              }
-            : a,
-        ),
+        prev.map((a) => (a.id === data.id ? { ...a, status: data.status } : a)),
       );
     },
     onError: ({ error }) => {

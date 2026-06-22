@@ -52,5 +52,5 @@ export const updateAppointmentStatusAction = authActionClient
       .where(eq(appointments.id, parsedInput.id));
 
     revalidatePath("/appointments");
-    return { id: parsedInput.id };
+    return { id: parsedInput.id, status: parsedInput.status };
   });

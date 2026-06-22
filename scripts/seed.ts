@@ -548,6 +548,17 @@ async function main() {
     "scheduled",
   ] as const;
   const apptOffsets = [-2, 0, 0, 1, 2, 3, 5, 7];
+  const apptServiceTypes = [
+    "preventiva",
+    "corretiva",
+    "revisao",
+    "garantia",
+    "eletrica",
+    "estetica",
+    "funilaria",
+    "corretiva",
+  ] as const;
+  const apptDurations = [60, 90, 45, 120, 60, 90, 60, 45];
   for (let i = 0; i < apptOffsets.length; i++) {
     const day = daysFromNow(apptOffsets[i]);
     day.setHours(8 + (i % 8), (i % 2) * 30, 0, 0);
@@ -558,6 +569,8 @@ async function main() {
       mechanicId: pick(mechanicIds, i),
       scheduledAt: day,
       status: apptOffsets[i] < 0 ? "completed" : pick([...apptStatuses], i),
+      serviceType: apptServiceTypes[i],
+      duration: apptDurations[i],
       notes: pick(
         [
           "Troca de óleo",

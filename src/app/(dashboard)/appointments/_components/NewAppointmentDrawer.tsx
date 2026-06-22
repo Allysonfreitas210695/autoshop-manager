@@ -199,7 +199,7 @@ export function NewAppointmentDrawer({
                     min="15"
                     step="15"
                     placeholder="Ex: 60"
-                    {...register("duration")}
+                    {...register("duration", { valueAsNumber: true })}
                   />
                 </div>
               </div>
