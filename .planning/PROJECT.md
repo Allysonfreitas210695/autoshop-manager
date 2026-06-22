@@ -114,4 +114,4 @@ This document evolves at phase transitions and milestone boundaries.
 
 ---
 
-_Last updated: 2026-06-20 — Milestone v1.1 DB Integration started_
+_Last updated: 2026-06-22 — Phase 9 complete: appointments module fully integrated with real DB (schema, CRUD actions, edit drawer, serviceType/duration display, timezone fix, IDOR guard)_
