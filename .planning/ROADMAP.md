@@ -146,25 +146,37 @@ Plans:
 2. Analytics dashboard displays all KPIs with real values; fields without a data source show "N/D" (not "-1%" or "-1")
 3. Dashboard page loads without N+1 query patterns; batch/JOIN queries replace per-row loops in `getUpcomingDeliveries` and similar functions
 4. All numeric values from `numeric(12,2)` Drizzle columns are converted to JS `number` before reaching UI components (no "R$ NaN" rendered anywhere)
-   **Plans**: TBD
-   **UI hint**: no
+
+**Plans**: 4 plans
+
+**Wave 1** _(paralelos — sem dependências entre si)_
+
+- [ ] 10-01-PLAN.md — Server actions CRUD (create/update/delete), getCategoryReport SQL GROUP BY, AnalyticsKpis null types
+- [ ] 10-02-PLAN.md — Auditar e ajustar seed de transações (volume, datas relativas, categorias)
+
+**Wave 2** _(bloqueados em 10-01)_
+
+- [ ] 10-03-PLAN.md — Transaction CRUD UI: use-transaction-form, NewTransactionDrawer, EditTransactionDrawer, TransactionsTableWithDrawer, wiring em finance/page.tsx + finance-actions.tsx
+- [ ] 10-04-PLAN.md — Analytics null-guards (AnalyticsClient N/D), reports ?periodo filter + getCategoryReport wiring
+
+**UI hint**: no
 
 ---
 
 ## Progress
 
-| Phase                                          | Milestone | Plans Complete | Status      | Completed  |
-| ---------------------------------------------- | --------- | -------------- | ----------- | ---------- |
-| 1. Segurança (Security)                        | v1.0      | 5/5            | Complete    | 2026-06-15 |
-| 2. Responsividade (Responsiveness)             | v1.0      | 4/4            | Complete    | 2026-06-12 |
-| 3. Usabilidade (Usability)                     | v1.0      | 5/5            | Complete    | 2026-06-14 |
-| 4. Aprimoramento de telas (Screen enhancement) | v1.0      | 5/5            | Complete    | 2026-06-15 |
-| 5. DB Foundation & Auth                        | v1.1      | 2/2            | Complete    | 2026-06-21 |
-| 6. Orders & Transactions                       | v1.1      | 1/1            | Complete    | 2026-06-21 |
-| 7. Customers & Vehicles                        | v1.1      | 1/1            | Complete    | 2026-06-21 |
-| 8. Inventory                                   | v1.1      | 0/1            | Planned     | -          |
-| 9. Appointments                                | v1.1      | 3/3            | Complete    | 2026-06-22 |
-| 10. Finance & Analytics                        | v1.1      | 0/?            | Not started | -          |
+| Phase                                          | Milestone | Plans Complete | Status   | Completed  |
+| ---------------------------------------------- | --------- | -------------- | -------- | ---------- |
+| 1. Segurança (Security)                        | v1.0      | 5/5            | Complete | 2026-06-15 |
+| 2. Responsividade (Responsiveness)             | v1.0      | 4/4            | Complete | 2026-06-12 |
+| 3. Usabilidade (Usability)                     | v1.0      | 5/5            | Complete | 2026-06-14 |
+| 4. Aprimoramento de telas (Screen enhancement) | v1.0      | 5/5            | Complete | 2026-06-15 |
+| 5. DB Foundation & Auth                        | v1.1      | 2/2            | Complete | 2026-06-21 |
+| 6. Orders & Transactions                       | v1.1      | 1/1            | Complete | 2026-06-21 |
+| 7. Customers & Vehicles                        | v1.1      | 1/1            | Complete | 2026-06-21 |
+| 8. Inventory                                   | v1.1      | 0/1            | Planned  | -          |
+| 9. Appointments                                | v1.1      | 3/3            | Complete | 2026-06-22 |
+| 10. Finance & Analytics                        | v1.1      | 0/4            | Planned  | -          |
 
 ---
 
