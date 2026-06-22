@@ -4,6 +4,7 @@ import {
   addDays,
   addMonths,
   eachDayOfInterval,
+  endOfDay,
   endOfMonth,
   endOfWeek,
   format,
@@ -449,7 +450,7 @@ export function AppointmentsClient({
                 value={format(listEnd, "yyyy-MM-dd")}
                 onChange={(e) =>
                   e.target.value &&
-                  setListEnd(new Date(e.target.value + "T23:59:59"))
+                  setListEnd(endOfDay(new Date(e.target.value)))
                 }
                 className="bg-surface border-outline-variant/50 text-label-sm text-on-surface focus:ring-secondary rounded-lg border px-2 py-1 font-mono focus:ring-1 focus:outline-none"
               />
@@ -538,6 +539,7 @@ export function AppointmentsClient({
       />
       {editingAppt && (
         <EditAppointmentDrawer
+          key={editingAppt.id}
           open={editDrawerOpen}
           onClose={() => {
             setEditDrawerOpen(false);
@@ -546,6 +548,11 @@ export function AppointmentsClient({
           mechanics={mechanics}
           customers={customers}
           appt={editingAppt}
+          onUpdated={(updated) =>
+            setAppointments((prev) =>
+              prev.map((a) => (a.id === updated.id ? { ...a, ...updated } : a)),
+            )
+          }
         />
       )}
     </div>

@@ -11,6 +11,7 @@ import {
   updateAppointmentAction,
 } from "@/_actions/appointments";
 import type {
+  AppointmentRow,
   CustomerOption,
   MechanicOption,
 } from "@/_data-access/appointments";
@@ -35,6 +36,7 @@ type Params = {
   mode?: "create" | "edit";
   initialValues?: Partial<AppointmentFormData>;
   appointmentId?: string;
+  onUpdated?: (updated: AppointmentRow) => void;
 };
 
 export function useAppointmentForm({
@@ -43,6 +45,7 @@ export function useAppointmentForm({
   mode = "create",
   initialValues,
   appointmentId,
+  onUpdated,
 }: Params) {
   const {
     control,
@@ -83,8 +86,26 @@ export function useAppointmentForm({
     status: updateStatus,
     result: updateResult,
   } = useAction(updateAppointmentAction, {
-    onSuccess: () => {
+    onSuccess: ({ data }) => {
       toast.success("Agendamento atualizado com sucesso.");
+      if (data) {
+        onUpdated?.({
+          id: data.id,
+          customerId: data.customerId ?? null,
+          vehicleId: data.vehicleId ?? null,
+          mechanicId: data.mechanicId ?? null,
+          scheduledAt: new Date(data.scheduledAt),
+          status: data.status ?? "scheduled",
+          serviceType: data.serviceType ?? null,
+          duration: data.duration ?? null,
+          notes: data.notes ?? null,
+          customer: null,
+          phone: null,
+          vehicle: null,
+          plate: null,
+          mechanic: null,
+        });
+      }
       onClose();
     },
     onError: ({ error }) => {
@@ -96,11 +117,17 @@ export function useAppointmentForm({
   const result = mode === "edit" ? updateResult : createResult;
 
   function onSubmit(data: AppointmentFormData) {
+    const tzOffset = -new Date().getTimezoneOffset();
+    const tzSign = tzOffset >= 0 ? "+" : "-";
+    const tzPad = (n: number) =>
+      String(Math.floor(Math.abs(n))).padStart(2, "0");
+    const tz = `${tzSign}${tzPad(tzOffset / 60)}:${tzPad(tzOffset % 60)}`;
+
     const payload = {
       customerId: data.customerId,
       vehicleId: data.vehicleId?.trim() || undefined,
       mechanicId: data.mechanicId || undefined,
-      scheduledAt: new Date(`${data.date}T${data.time}:00`).toISOString(),
+      scheduledAt: new Date(`${data.date}T${data.time}:00${tz}`).toISOString(),
       serviceType: data.serviceType || undefined,
       duration: data.duration || undefined,
       notes: data.notes || undefined,

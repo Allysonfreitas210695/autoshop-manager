@@ -29,6 +29,7 @@ type Props = {
   mechanics: MechanicOption[];
   customers: CustomerOption[];
   appt: AppointmentRow;
+  onUpdated?: (updated: AppointmentRow) => void;
 };
 
 export function EditAppointmentDrawer({
@@ -37,6 +38,7 @@ export function EditAppointmentDrawer({
   mechanics,
   customers,
   appt,
+  onUpdated,
 }: Props) {
   const initialValues = {
     customerId: appt.customerId ?? "",
@@ -64,6 +66,7 @@ export function EditAppointmentDrawer({
     mode: "edit",
     initialValues,
     appointmentId: appt.id,
+    onUpdated,
   });
 
   return (
