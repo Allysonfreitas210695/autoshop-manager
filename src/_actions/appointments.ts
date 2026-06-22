@@ -6,12 +6,12 @@ import { z } from "zod";
 
 import { db } from "@/_db";
 import { appointments } from "@/_db/schema";
-import { authActionClient } from "@/_lib/safe-action";
+import { ActionError, authActionClient } from "@/_lib/safe-action";
 
 export const createAppointmentAction = authActionClient
   .schema(
     z.object({
-      customerId: z.string().optional(),
+      customerId: z.uuid().optional(),
       vehicleId: z.uuid().optional(),
       mechanicId: z.string().optional(),
       scheduledAt: z.string().datetime(),
@@ -42,7 +42,7 @@ export const updateAppointmentAction = authActionClient
   .schema(
     z.object({
       id: z.uuid(),
-      customerId: z.string().optional(),
+      customerId: z.uuid().optional(),
       vehicleId: z.uuid().optional(),
       mechanicId: z.string().optional(),
       scheduledAt: z.string().datetime(),
@@ -54,19 +54,42 @@ export const updateAppointmentAction = authActionClient
         .optional(),
     }),
   )
-  .action(async ({ parsedInput }) => {
+  .action(async ({ parsedInput, ctx }) => {
     const { id, ...rest } = parsedInput;
-    await db
+
+    const existing = await db.query.appointments.findFirst({
+      where: eq(appointments.id, id),
+    });
+    if (!existing) throw new ActionError("Agendamento não encontrado.");
+    if (
+      ctx.user.role === "customer" &&
+      existing.customerId !== ctx.user.id
+    ) {
+      throw new ActionError("Não autorizado.");
+    }
+
+    const [updated] = await db
       .update(appointments)
       .set({
         ...rest,
         scheduledAt: new Date(rest.scheduledAt),
         updatedAt: new Date(),
       })
-      .where(eq(appointments.id, id));
+      .where(eq(appointments.id, id))
+      .returning();
 
     revalidatePath("/appointments");
-    return { id };
+    return {
+      id: updated.id,
+      customerId: updated.customerId,
+      vehicleId: updated.vehicleId,
+      mechanicId: updated.mechanicId,
+      scheduledAt: updated.scheduledAt,
+      status: updated.status,
+      serviceType: updated.serviceType,
+      duration: updated.duration,
+      notes: updated.notes,
+    };
   });
 
 export const updateAppointmentStatusAction = authActionClient
@@ -76,7 +99,18 @@ export const updateAppointmentStatusAction = authActionClient
       status: z.enum(["scheduled", "confirmed", "completed", "cancelled"]),
     }),
   )
-  .action(async ({ parsedInput }) => {
+  .action(async ({ parsedInput, ctx }) => {
+    const existing = await db.query.appointments.findFirst({
+      where: eq(appointments.id, parsedInput.id),
+    });
+    if (!existing) throw new ActionError("Agendamento não encontrado.");
+    if (
+      ctx.user.role === "customer" &&
+      existing.customerId !== ctx.user.id
+    ) {
+      throw new ActionError("Não autorizado.");
+    }
+
     await db
       .update(appointments)
       .set({ status: parsedInput.status, updatedAt: new Date() })
