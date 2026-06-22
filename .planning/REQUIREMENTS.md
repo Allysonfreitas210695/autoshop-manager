@@ -30,8 +30,8 @@
 
 ### Agendamentos
 
-- [ ] **APPT-01**: Operador pode criar, listar e cancelar agendamentos com dados persistidos no banco
-- [ ] **APPT-02**: Schema de agendamentos inclui `serviceType` e `duration` (sem perda de dados do formulário)
+- [x] **APPT-01**: Operador pode criar, listar e cancelar agendamentos com dados persistidos no banco
+- [x] **APPT-02**: Schema de agendamentos inclui `serviceType` e `duration` (sem perda de dados do formulário)
 
 ### Finance & Analytics
 
@@ -69,8 +69,8 @@
 | INV-01   | Phase 8  | Pending  |
 | INV-02   | Phase 8  | Pending  |
 | INV-03   | Phase 8  | Pending  |
-| APPT-01  | Phase 9  | Pending  |
-| APPT-02  | Phase 9  | Pending  |
+| APPT-01  | Phase 9  | Complete |
+| APPT-02  | Phase 9  | Complete |
 | FIN-01   | Phase 10 | Pending  |
 | FIN-02   | Phase 10 | Pending  |
 | FIN-03   | Phase 10 | Pending  |

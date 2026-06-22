@@ -25,7 +25,7 @@ See: `.planning/milestones/v1.0-ROADMAP.md` for full phase details.
 - [x] **Phase 6: Orders & Transactions** — O.S. CRUD on real DB, budget approval, auto-transaction insert on O.S. close, updatedAt audit (completed 2026-06-21)
 - [x] **Phase 7: Customers & Vehicles** — Customer/vehicle CRUD real, vehicle history, email uniqueness guard (completed 2026-06-21)
 - [x] **Phase 8: Inventory** — Parts list, low-stock alerts, purchase orders CRUD with correct enum, stock auto-decrement (completed 2026-06-22)
-- [ ] **Phase 9: Appointments** — Appointment CRUD on real DB, schema migration for serviceType + duration
+- [x] **Phase 9: Appointments** — Appointment CRUD on real DB, schema migration for serviceType + duration (completed 2026-06-22)
 - [ ] **Phase 10: Finance & Analytics** — Finance metrics from real transactions, analytics sentinel fix, N+1 dashboard refactor
 
 ---
@@ -123,15 +123,15 @@ Plans:
 Plans:
 **Wave 1**
 
-- [ ] 09-01-PLAN.md — Apply migration 0004, extend AppointmentRow with FKs, fix closure/valueAsNumber bugs, update seed + audit count
+- [x] 09-01-PLAN.md — Apply migration 0004, extend AppointmentRow with FKs, fix closure/valueAsNumber bugs, update seed + audit count
 
 **Wave 2** _(blocked on Wave 1)_
 
-- [ ] 09-02-PLAN.md — Add updateAppointmentAction, extend useAppointmentForm for edit mode, create EditAppointmentDrawer
+- [x] 09-02-PLAN.md — Add updateAppointmentAction, extend useAppointmentForm for edit mode, create EditAppointmentDrawer
 
 **Wave 3** _(blocked on Wave 2)_
 
-- [ ] 09-03-PLAN.md — AppointmentCard serviceType/duration display + Editar button, integrate EditAppointmentDrawer (human-verify checkpoint)
+- [x] 09-03-PLAN.md — AppointmentCard serviceType/duration display + Editar button, integrate EditAppointmentDrawer (human-verify checkpoint)
 
 **UI hint**: yes
 
@@ -163,7 +163,7 @@ Plans:
 | 6. Orders & Transactions                       | v1.1      | 1/1            | Complete    | 2026-06-21 |
 | 7. Customers & Vehicles                        | v1.1      | 1/1            | Complete    | 2026-06-21 |
 | 8. Inventory                                   | v1.1      | 0/1            | Planned     | -          |
-| 9. Appointments                                | v1.1      | 0/3            | Planned     | -          |
+| 9. Appointments                                | v1.1      | 3/3            | Complete    | 2026-06-22 |
 | 10. Finance & Analytics                        | v1.1      | 0/?            | Not started | -          |
 
 ---
