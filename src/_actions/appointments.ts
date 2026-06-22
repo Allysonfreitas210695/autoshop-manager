@@ -38,6 +38,37 @@ export const createAppointmentAction = authActionClient
     return { id: apt.id };
   });
 
+export const updateAppointmentAction = authActionClient
+  .schema(
+    z.object({
+      id: z.uuid(),
+      customerId: z.string().optional(),
+      vehicleId: z.uuid().optional(),
+      mechanicId: z.string().optional(),
+      scheduledAt: z.string().datetime(),
+      serviceType: z.string().optional(),
+      duration: z.number().int().min(1).optional(),
+      notes: z.string().optional(),
+      status: z
+        .enum(["scheduled", "confirmed", "completed", "cancelled"])
+        .optional(),
+    }),
+  )
+  .action(async ({ parsedInput }) => {
+    const { id, ...rest } = parsedInput;
+    await db
+      .update(appointments)
+      .set({
+        ...rest,
+        scheduledAt: new Date(rest.scheduledAt),
+        updatedAt: new Date(),
+      })
+      .where(eq(appointments.id, id));
+
+    revalidatePath("/appointments");
+    return { id };
+  });
+
 export const updateAppointmentStatusAction = authActionClient
   .schema(
     z.object({

@@ -46,4 +46,19 @@ describe("Appointments Actions Wiring", () => {
   it("updateAppointmentStatusAction returns { id, status }", () => {
     expect(updateBlock?.body.includes("status: parsedInput.status")).toBe(true);
   });
+
+  const updateFullBlock = blocks.find(
+    (b) => b.name === "updateAppointmentAction",
+  );
+
+  it("updateAppointmentAction uses db.update and revalidates path", () => {
+    expect(updateFullBlock?.body.includes("update(appointments)")).toBe(true);
+    expect(
+      updateFullBlock?.body.includes('revalidatePath("/appointments")'),
+    ).toBe(true);
+  });
+
+  it("updateAppointmentAction returns { id }", () => {
+    expect(updateFullBlock?.body.includes("return { id }")).toBe(true);
+  });
 });
