@@ -58,7 +58,7 @@ describe("Appointments Actions Wiring", () => {
     ).toBe(true);
   });
 
-  it("updateAppointmentAction returns { id }", () => {
-    expect(updateFullBlock?.body.includes("return { id }")).toBe(true);
+  it("updateAppointmentAction returns updated row", () => {
+    expect(updateFullBlock?.body.includes("returning()")).toBe(true);
   });
 });
