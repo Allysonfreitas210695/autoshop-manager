@@ -39,6 +39,7 @@ import type {
 
 import { AppointmentBadge } from "./_components/AppointmentBadge";
 import { AppointmentCard } from "./_components/AppointmentCard";
+import { EditAppointmentDrawer } from "./_components/EditAppointmentDrawer";
 import { NewAppointmentDrawer } from "./_components/NewAppointmentDrawer";
 
 type AppointmentStatus = AppointmentRow["status"];
@@ -73,6 +74,8 @@ export function AppointmentsClient({
   );
   const [view, setView] = useState<View>("calendar");
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [editDrawerOpen, setEditDrawerOpen] = useState(false);
+  const [editingAppt, setEditingAppt] = useState<AppointmentRow | null>(null);
 
   // M12 — list view date range state
   const [listStart, setListStart] = useState(subDays(today, 7));
@@ -89,6 +92,13 @@ export function AppointmentsClient({
       toast.error(error.serverError ?? "Erro ao atualizar status.");
     },
   });
+
+  function handleEdit(id: string) {
+    const appt = appointments.find((a) => a.id === id);
+    if (!appt) return;
+    setEditingAppt(appt);
+    setEditDrawerOpen(true);
+  }
 
   function handleStatusChange(id: string, status: AppointmentStatus) {
     setAppointments((prev) =>
@@ -334,6 +344,7 @@ export function AppointmentsClient({
                     key={appt.id}
                     appt={appt}
                     onStatusChange={handleStatusChange}
+                    onEdit={handleEdit}
                   />
                 ))}
               </div>
@@ -508,6 +519,7 @@ export function AppointmentsClient({
                         key={appt.id}
                         appt={appt}
                         onStatusChange={handleStatusChange}
+                        onEdit={handleEdit}
                       />
                     ))}
                   </div>
@@ -524,6 +536,18 @@ export function AppointmentsClient({
         mechanics={mechanics}
         customers={customers}
       />
+      {editingAppt && (
+        <EditAppointmentDrawer
+          open={editDrawerOpen}
+          onClose={() => {
+            setEditDrawerOpen(false);
+            setEditingAppt(null);
+          }}
+          mechanics={mechanics}
+          customers={customers}
+          appt={editingAppt}
+        />
+      )}
     </div>
   );
 }

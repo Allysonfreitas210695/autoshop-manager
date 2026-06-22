@@ -5,6 +5,16 @@ import { formatTime } from "@/_helpers/format";
 
 type AppointmentStatus = AppointmentRow["status"];
 
+const SERVICE_TYPE_LABELS: Record<string, string> = {
+  preventiva: "Preventiva",
+  corretiva: "Corretiva",
+  garantia: "Garantia",
+  estetica: "Estética",
+  revisao: "Revisão",
+  eletrica: "Elétrica",
+  funilaria: "Funilaria",
+};
+
 const statusLabels: Record<AppointmentStatus, string> = {
   scheduled: "Agendado",
   confirmed: "Confirmado",
@@ -24,9 +34,10 @@ const statusColor: Record<AppointmentStatus, string> = {
 type Props = {
   appt: AppointmentRow;
   onStatusChange: (id: string, status: AppointmentStatus) => void;
+  onEdit?: (id: string) => void;
 };
 
-export function AppointmentCard({ appt, onStatusChange }: Props) {
+export function AppointmentCard({ appt, onStatusChange, onEdit }: Props) {
   return (
     <div className="bg-surface-container border-outline-variant/30 hover:border-secondary/40 space-y-3 rounded-xl border p-4 transition-colors">
       <div className="flex items-start justify-between gap-2">
@@ -68,6 +79,20 @@ export function AppointmentCard({ appt, onStatusChange }: Props) {
           {appt.notes}
         </p>
       )}
+      {(appt.serviceType || appt.duration) && (
+        <div className="flex flex-wrap gap-x-4 gap-y-1">
+          {appt.serviceType && (
+            <span className="text-label-xs text-on-surface-variant font-mono">
+              {SERVICE_TYPE_LABELS[appt.serviceType] ?? appt.serviceType}
+            </span>
+          )}
+          {appt.duration && (
+            <span className="text-label-xs text-on-surface-variant font-mono">
+              {appt.duration} min
+            </span>
+          )}
+        </div>
+      )}
       {appt.status !== "cancelled" && appt.status !== "completed" && (
         <div className="border-outline-variant/20 flex gap-2 border-t pt-2">
           {appt.status === "scheduled" && (
@@ -92,6 +117,14 @@ export function AppointmentCard({ appt, onStatusChange }: Props) {
           >
             Cancelar
           </button>
+          {onEdit && (
+            <button
+              onClick={() => onEdit(appt.id)}
+              className="text-label-xs bg-secondary/10 text-secondary hover:bg-secondary/20 ml-auto rounded px-2 py-1 font-mono transition-colors"
+            >
+              Editar
+            </button>
+          )}
         </div>
       )}
     </div>
