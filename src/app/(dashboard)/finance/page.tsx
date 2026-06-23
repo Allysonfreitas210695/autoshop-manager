@@ -1,108 +1,20 @@
-import { formatCurrency, formatDate } from "@/_helpers/format";
+import { formatCurrency } from "@/_helpers/format";
 export const metadata = { title: "Financeiro — Precision Auto" };
 
-import {
-  ArrowDownRight,
-  ArrowUpRight,
-  DollarSign,
-  TrendingUp,
-  Wallet,
-} from "lucide-react";
+import { ArrowUpRight, DollarSign, TrendingUp, Wallet } from "lucide-react";
 import Link from "next/link";
 
 import { Card } from "@/_components/ui/card";
-import { DataTable, type DataTableColumn } from "@/_components/ui/data-table";
 import {
   getFinanceMetrics,
   getWeeklyCashFlow,
   listTransactions,
-  type Transaction,
 } from "@/_data-access/finance";
 
-import { FinanceActions } from "./finance-actions";
 import { CashFlowBarChart } from "./finance-charts";
-
-type TransactionStatus = Transaction["status"];
-
-const statusLabel: Record<TransactionStatus, string> = {
-  paid: "Pago",
-  pending: "Pendente",
-  overdue: "Vencido",
-};
-
-const statusClass: Record<TransactionStatus, string> = {
-  paid: "bg-status-completed/15 text-status-completed",
-  pending: "bg-tertiary/15 text-tertiary",
-  overdue: "bg-error/15 text-error",
-};
-
-const columns: DataTableColumn<Transaction>[] = [
-  {
-    id: "date",
-    header: "Data",
-    className: "hidden sm:table-cell",
-    cell: (row) => (
-      <span className="text-label-sm text-on-surface-variant font-mono">
-        {formatDate(row.date)}
-      </span>
-    ),
-  },
-  {
-    id: "description",
-    header: "Descrição",
-    cell: (row) => (
-      <div>
-        <p className="text-body-sm text-on-surface font-medium">
-          {row.description}
-        </p>
-        <p className="text-label-sm text-on-surface-variant font-mono">
-          {row.category}
-        </p>
-      </div>
-    ),
-  },
-  {
-    id: "type",
-    header: "Tipo",
-    className: "hidden md:table-cell",
-    cell: (row) => (
-      <div className="flex items-center gap-1.5">
-        {row.type === "income" ? (
-          <ArrowUpRight className="text-status-completed size-3.5" />
-        ) : (
-          <ArrowDownRight className="text-error size-3.5" />
-        )}
-        <span className="text-label-sm text-on-surface-variant font-mono">
-          {row.type === "income" ? "Receita" : "Despesa"}
-        </span>
-      </div>
-    ),
-  },
-  {
-    id: "status",
-    header: "Status",
-    cell: (row) => (
-      <span
-        className={`rounded-full px-2 py-0.5 font-mono text-[10px] font-bold tracking-wider uppercase ${statusClass[row.status]}`}
-      >
-        {statusLabel[row.status]}
-      </span>
-    ),
-  },
-  {
-    id: "amount",
-    header: "Valor",
-    align: "right",
-    cell: (row) => (
-      <span
-        className={`text-label-md font-mono font-bold ${row.type === "income" ? "text-status-completed" : "text-error"}`}
-      >
-        {row.type === "income" ? "+" : "-"}
-        {formatCurrency(row.amount)}
-      </span>
-    ),
-  },
-];
+import { FinanceActionsWithDrawer } from "./FinanceActionsWithDrawer";
+import { transactionColumns } from "./transaction-columns";
+import { TransactionsTableWithDrawer } from "./TransactionsTableWithDrawer";
 
 type Period = "mensal" | "trimestral" | "anual";
 
@@ -151,7 +63,7 @@ export default async function FinancePage({ searchParams }: Props) {
           >
             Ver Relatórios
           </Link>
-          <FinanceActions />
+          <FinanceActionsWithDrawer />
         </div>
       </div>
 
@@ -332,11 +244,9 @@ export default async function FinancePage({ searchParams }: Props) {
             Ver relatório
           </Link>
         </div>
-        <DataTable
-          columns={columns}
-          data={transactions}
-          getRowId={(row) => row.id}
-          emptyMessage="Nenhuma transação encontrada."
+        <TransactionsTableWithDrawer
+          transactions={transactions}
+          columns={transactionColumns}
         />
       </Card>
     </div>

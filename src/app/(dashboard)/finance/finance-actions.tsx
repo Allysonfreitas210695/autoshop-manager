@@ -1,10 +1,14 @@
 "use client";
 
-import { ChevronDown, FileText, PlusCircle } from "lucide-react";
+import { ChevronDown, FileText, Plus, PlusCircle } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 
-export function FinanceActions() {
+type Props = {
+  onNewTransaction?: () => void;
+};
+
+export function FinanceActions({ onNewTransaction }: Props) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -24,6 +28,16 @@ export function FinanceActions() {
           {/* backdrop */}
           <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
           <div className="border-outline-variant bg-surface-container absolute right-0 z-20 mt-1 w-52 rounded-md border shadow-lg">
+            <button
+              onClick={() => {
+                setOpen(false);
+                onNewTransaction?.();
+              }}
+              className="text-body-sm text-on-surface hover:bg-surface-container-highest flex w-full items-center gap-2.5 rounded-t-md px-4 py-3 font-mono transition-colors"
+            >
+              <Plus className="text-secondary size-4 shrink-0" />
+              Nova Transação
+            </button>
             <Link
               href="/finance/reports"
               onClick={() => setOpen(false)}
