@@ -14,6 +14,7 @@ const ACTION_FILES = [
   "appointments",
   "customers",
   "feedbacks",
+  "finance",
   "inventory",
   "orders",
 ];
@@ -54,11 +55,11 @@ describe("SEC-02 server-action coverage audit (D-09)", () => {
     });
   }
 
-  it("covers all 19 known server actions across the five files", () => {
+  it("covers all 22 known server actions across the six files", () => {
     const total = ACTION_FILES.reduce((sum, file) => {
       const source = readFileSync(join(ACTIONS_DIR, `${file}.ts`), "utf8");
       return sum + exportBlocks(source).length;
     }, 0);
-    expect(total).toBe(19);
+    expect(total).toBe(22);
   });
 });

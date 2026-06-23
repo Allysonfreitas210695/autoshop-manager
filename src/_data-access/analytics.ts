@@ -3,7 +3,7 @@ import "server-only";
 import { count, desc, sql } from "drizzle-orm";
 
 import { db } from "@/_db";
-import { feedbacks, serviceOrders, transactions, user } from "@/_db/schema";
+import { serviceOrders, transactions, user } from "@/_db/schema";
 
 const MONTH_ABBR = [
   "Jan",

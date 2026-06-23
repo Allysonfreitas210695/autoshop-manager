@@ -1,6 +1,6 @@
 "use client";
 
-import { CheckCircle2, MessageSquare, Star } from "lucide-react";
+import { CheckCircle2, MessageSquare } from "lucide-react";
 import { useAction } from "next-safe-action/hooks";
 import { useState } from "react";
 import { toast } from "sonner";
