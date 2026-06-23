@@ -19,7 +19,12 @@ export function useStep3Form({ defaultValues, parts, onNext }: Params) {
   const [laborDescription, setLaborDescription] = useState("");
   const [laborPrice, setLaborPrice] = useState<number>(0);
 
-  const { register, handleSubmit, control } = useForm<Step3Values>({
+  const {
+    register,
+    handleSubmit,
+    control,
+    formState: { errors },
+  } = useForm<Step3Values>({
     resolver: zodResolver(step3Schema),
     defaultValues: { parts: [], laborItems: [], ...defaultValues },
   });
@@ -54,6 +59,7 @@ export function useStep3Form({ defaultValues, parts, onNext }: Params) {
     register,
     handleSubmit: handleSubmit(onNext),
     control,
+    errors,
     partFields,
     appendPart,
     removePart,

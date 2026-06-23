@@ -54,6 +54,12 @@ export const createOrderAction = authActionClient
       0,
     );
 
+    if (totalAmount <= 0) {
+      throw new ActionError(
+        "Não é possível abrir uma O.S. com valor total R$ 0,00. Adicione ao menos uma peça ou mão de obra com valor.",
+      );
+    }
+
     const result = await db.transaction(async (tx) => {
       const [vehicle] = await tx
         .insert(vehicles)

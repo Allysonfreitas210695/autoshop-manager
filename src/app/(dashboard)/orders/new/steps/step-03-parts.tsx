@@ -39,6 +39,7 @@ export function Step03Parts({ defaultValues, parts, onNext }: Step3Props) {
     laborPrice,
     setLaborPrice,
     filteredParts,
+    errors,
   } = useStep3Form({ defaultValues, parts, onNext });
 
   const subtotalParts = partsValues.reduce(
@@ -321,6 +322,13 @@ export function Step03Parts({ defaultValues, parts, onNext }: Step3Props) {
           </span>
         </div>
       </div>
+
+      {errors.parts?.message && (
+        <div className="border-error/30 bg-error/5 flex items-start gap-3 rounded-md border px-4 py-3">
+          <AlertTriangle className="text-error mt-0.5 size-4 shrink-0" />
+          <p className="text-body-sm text-error">{errors.parts.message}</p>
+        </div>
+      )}
 
       <button type="submit" className="sr-only" aria-hidden="true" />
     </form>

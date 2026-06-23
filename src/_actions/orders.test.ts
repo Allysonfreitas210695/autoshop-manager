@@ -31,6 +31,20 @@ describe("Phase 6 orders actions wiring (D-01..D-06)", () => {
   const updateBlock = blocks.find((b) => b.name === "updateOrderStatusAction");
   const approveBlock = blocks.find((b) => b.name === "approveOrderItemAction");
   const addOrderItemBlock = blocks.find((b) => b.name === "addOrderItemAction");
+  const createBlock = blocks.find((b) => b.name === "createOrderAction");
+
+  // Guard: não permite abrir O.S. com total R$ 0,00
+  it("createOrderAction bloqueia O.S. com totalAmount <= 0 via ActionError", () => {
+    expect(
+      createBlock?.body.includes("totalAmount <= 0"),
+      "createOrderAction must guard totalAmount <= 0",
+    ).toBe(true);
+
+    expect(
+      createBlock?.body.includes("ActionError"),
+      "createOrderAction must throw ActionError when total is zero",
+    ).toBe(true);
+  });
 
   // D-01: transaction insert guarded by completed check
   it('D-01: updateOrderStatusAction inserts a transactions row guarded by status === "completed"', () => {

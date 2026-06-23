@@ -64,10 +64,22 @@ const laborItemSchema = z.object({
   price: z.number().min(0),
 });
 
-export const step3Schema = z.object({
-  parts: z.array(partItemSchema).default([]),
-  laborItems: z.array(laborItemSchema).default([]),
-});
+export const step3Schema = z
+  .object({
+    parts: z.array(partItemSchema).default([]),
+    laborItems: z.array(laborItemSchema).default([]),
+  })
+  .refine(
+    (v) =>
+      v.parts.reduce((s, p) => s + p.quantity * p.unitPrice, 0) +
+        v.laborItems.reduce((s, l) => s + l.price, 0) >
+      0,
+    {
+      message:
+        "Adicione ao menos uma peça ou mão de obra com valor. O total não pode ser R$ 0,00.",
+      path: ["parts"],
+    },
+  );
 
 export const step4Schema = z.object({
   hasSignature: z.boolean().default(false),
