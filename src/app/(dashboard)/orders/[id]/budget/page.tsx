@@ -1,4 +1,4 @@
-import { Download, FileText } from "lucide-react";
+import { FileText } from "lucide-react";
 import { notFound } from "next/navigation";
 
 import { Card } from "@/_components/ui/card";
@@ -53,10 +53,7 @@ export default async function BudgetPage({ params }: Props) {
                 </p>
               </div>
             </div>
-            <button className="border-outline-variant bg-surface text-label-sm text-on-surface-variant hover:bg-surface-container-highest flex items-center gap-2 rounded-md border px-3 py-2 font-mono transition-colors">
-              <Download className="size-4" />
-              <span className="hidden sm:inline">Baixar PDF</span>
-            </button>
+            <DownloadPdfButton orderId={id} />
           </div>
         </div>
       </div>
@@ -210,9 +207,7 @@ export default async function BudgetPage({ params }: Props) {
                 orderId={id}
                 itemIds={pendingItems.map((i) => i.id)}
               />
-              <button className="border-outline-variant bg-surface-container text-label-sm text-on-surface-variant hover:bg-surface-container-highest w-full rounded-md border px-4 py-2.5 font-mono transition-colors">
-                Baixar PDF do Orçamento
-              </button>
+              <DownloadPdfButtonFull orderId={id} />
             </div>
           </Card>
         </div>

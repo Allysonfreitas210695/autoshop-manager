@@ -31,16 +31,26 @@ const schema = z.object({
 
 type CustomerFormData = z.infer<typeof schema>;
 
+type CreatedCustomer = {
+  id: string;
+  name: string;
+  email: string;
+  cpf: string | null;
+  phone: string | null;
+};
+
 type Props = {
   open: boolean;
   onClose: () => void;
+  onSuccess?: (customer: CreatedCustomer) => void;
 };
 
-export function NewCustomerDrawer({ open, onClose }: Props) {
+export function NewCustomerDrawer({ open, onClose, onSuccess }: Props) {
   const {
     register,
     handleSubmit,
     reset,
+    getValues,
     formState: { errors },
   } = useForm<CustomerFormData>({
     resolver: zodResolver(schema),
@@ -54,8 +64,16 @@ export function NewCustomerDrawer({ open, onClose }: Props) {
   });
 
   const { execute, status } = useAction(createCustomerAction, {
-    onSuccess: () => {
+    onSuccess: ({ data }) => {
+      const values = getValues();
       toast.success("Cliente cadastrado com sucesso.");
+      onSuccess?.({
+        id: data!.id,
+        name: values.name,
+        email: values.email,
+        cpf: values.cpf || null,
+        phone: values.phone || null,
+      });
       reset();
       onClose();
     },

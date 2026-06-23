@@ -1,6 +1,7 @@
 "use client";
 
 import { Search, UserPlus, X } from "lucide-react";
+import { useState } from "react";
 import { Controller } from "react-hook-form";
 
 import { Input } from "@/_components/ui/input";
@@ -9,6 +10,7 @@ import { PlateInput } from "@/_components/ui/plate-input";
 import type { CustomerRow } from "@/_data-access/customers";
 import { useStep1Form } from "@/_hooks/use-step-1-form";
 import type { Step1Values } from "@/_schemas/order-wizard";
+import { NewCustomerDrawer } from "@/app/(dashboard)/customers/_components/NewCustomerDrawer";
 
 type Step1Props = {
   defaultValues: Partial<Step1Values>;
@@ -17,6 +19,8 @@ type Step1Props = {
 };
 
 export function Step01Client({ defaultValues, customers, onNext }: Step1Props) {
+  const [quickCreateOpen, setQuickCreateOpen] = useState(false);
+
   const {
     register,
     control,
@@ -95,6 +99,7 @@ export function Step01Client({ defaultValues, customers, onNext }: Step1Props) {
             </p>
             <button
               type="button"
+              onClick={() => setQuickCreateOpen(true)}
               className="text-label-sm text-secondary flex items-center gap-1.5 font-mono hover:underline"
             >
               <UserPlus className="size-4" />
@@ -231,6 +236,24 @@ export function Step01Client({ defaultValues, customers, onNext }: Step1Props) {
 
       {/* Botão de submit oculto — acionado pelo footer do wizard */}
       <button type="submit" className="sr-only" aria-hidden="true" />
+
+      <NewCustomerDrawer
+        open={quickCreateOpen}
+        onClose={() => setQuickCreateOpen(false)}
+        onSuccess={(customer) => {
+          const asRow: CustomerRow = {
+            ...customer,
+            address: null,
+            totalSpent: 0,
+            visits: 0,
+            lastVisit: null,
+            lastVehicle: null,
+            lastPlate: null,
+          };
+          selectCustomer(asRow);
+          setQuickCreateOpen(false);
+        }}
+      />
     </form>
   );
 }
