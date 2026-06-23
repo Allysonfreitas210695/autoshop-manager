@@ -1,12 +1,12 @@
 "use server";
 
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
 import { db } from "@/_db";
 import { purchaseOrderItems, purchaseOrders, services } from "@/_db/schema";
-import { authActionClient } from "@/_lib/safe-action";
+import { ActionError, authActionClient } from "@/_lib/safe-action";
 
 export const searchPartsAction = authActionClient
   .schema(z.object({ query: z.string() }))
@@ -142,10 +142,44 @@ export const updatePurchaseOrderStatusAction = authActionClient
     }),
   )
   .action(async ({ parsedInput }) => {
-    await db
-      .update(purchaseOrders)
-      .set({ status: parsedInput.status, updatedAt: new Date() })
-      .where(eq(purchaseOrders.id, parsedInput.id));
+    await db.transaction(async (tx) => {
+      const [po] = await tx
+        .select({ status: purchaseOrders.status })
+        .from(purchaseOrders)
+        .where(eq(purchaseOrders.id, parsedInput.id));
+
+      if (!po) throw new ActionError("Ordem de compra não encontrada.");
+
+      await tx
+        .update(purchaseOrders)
+        .set({ status: parsedInput.status, updatedAt: new Date() })
+        .where(eq(purchaseOrders.id, parsedInput.id));
+
+      // Dá entrada no estoque ao receber — idempotente: só soma na transição
+      // para "received" (não re-soma se já estava recebida).
+      if (parsedInput.status === "received" && po.status !== "received") {
+        const items = await tx
+          .select({
+            serviceId: purchaseOrderItems.serviceId,
+            quantity: purchaseOrderItems.quantity,
+          })
+          .from(purchaseOrderItems)
+          .where(eq(purchaseOrderItems.purchaseOrderId, parsedInput.id));
+
+        for (const item of items) {
+          if (item.serviceId == null) continue;
+          await tx
+            .update(services)
+            .set({
+              stockQuantity: sql`${services.stockQuantity} + ${item.quantity}`,
+              updatedAt: new Date(),
+            })
+            .where(eq(services.id, item.serviceId));
+        }
+      }
+    });
 
     revalidatePath("/inventory/purchase-orders");
+    revalidatePath("/inventory");
+    revalidatePath("/inventory/alerts");
   });
