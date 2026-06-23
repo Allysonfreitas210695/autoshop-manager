@@ -26,7 +26,7 @@ See: `.planning/milestones/v1.0-ROADMAP.md` for full phase details.
 - [x] **Phase 7: Customers & Vehicles** — Customer/vehicle CRUD real, vehicle history, email uniqueness guard (completed 2026-06-21)
 - [x] **Phase 8: Inventory** — Parts list, low-stock alerts, purchase orders CRUD with correct enum, stock auto-decrement (completed 2026-06-22)
 - [x] **Phase 9: Appointments** — Appointment CRUD on real DB, schema migration for serviceType + duration (completed 2026-06-22)
-- [ ] **Phase 10: Finance & Analytics** — Finance metrics from real transactions, analytics sentinel fix, N+1 dashboard refactor
+- [x] **Phase 10: Finance & Analytics** — Finance metrics from real transactions, analytics sentinel fix, N+1 dashboard refactor (completed 2026-06-23)
 
 ---
 
@@ -156,7 +156,7 @@ Plans:
 
 **Wave 2** _(bloqueados em 10-01)_
 
-- [ ] 10-03-PLAN.md — Transaction CRUD UI: use-transaction-form, NewTransactionDrawer, EditTransactionDrawer, TransactionsTableWithDrawer, wiring em finance/page.tsx + finance-actions.tsx
+- [x] 10-03-PLAN.md — Transaction CRUD UI: use-transaction-form, NewTransactionDrawer, EditTransactionDrawer, TransactionsTableWithDrawer, wiring em finance/page.tsx + finance-actions.tsx
 - [x] 10-04-PLAN.md — Analytics null-guards (AnalyticsClient N/D), reports ?periodo filter + getCategoryReport wiring
 
 **UI hint**: no
@@ -165,18 +165,18 @@ Plans:
 
 ## Progress
 
-| Phase                                          | Milestone | Plans Complete | Status      | Completed  |
-| ---------------------------------------------- | --------- | -------------- | ----------- | ---------- |
-| 1. Segurança (Security)                        | v1.0      | 5/5            | Complete    | 2026-06-15 |
-| 2. Responsividade (Responsiveness)             | v1.0      | 4/4            | Complete    | 2026-06-12 |
-| 3. Usabilidade (Usability)                     | v1.0      | 5/5            | Complete    | 2026-06-14 |
-| 4. Aprimoramento de telas (Screen enhancement) | v1.0      | 5/5            | Complete    | 2026-06-15 |
-| 5. DB Foundation & Auth                        | v1.1      | 2/2            | Complete    | 2026-06-21 |
-| 6. Orders & Transactions                       | v1.1      | 1/1            | Complete    | 2026-06-21 |
-| 7. Customers & Vehicles                        | v1.1      | 1/1            | Complete    | 2026-06-21 |
-| 8. Inventory                                   | v1.1      | 0/1            | Planned     | -          |
-| 9. Appointments                                | v1.1      | 3/3            | Complete    | 2026-06-22 |
-| 10. Finance & Analytics                        | v1.1      | 3/4            | In Progress |            |
+| Phase                                          | Milestone | Plans Complete | Status   | Completed  |
+| ---------------------------------------------- | --------- | -------------- | -------- | ---------- |
+| 1. Segurança (Security)                        | v1.0      | 5/5            | Complete | 2026-06-15 |
+| 2. Responsividade (Responsiveness)             | v1.0      | 4/4            | Complete | 2026-06-12 |
+| 3. Usabilidade (Usability)                     | v1.0      | 5/5            | Complete | 2026-06-14 |
+| 4. Aprimoramento de telas (Screen enhancement) | v1.0      | 5/5            | Complete | 2026-06-15 |
+| 5. DB Foundation & Auth                        | v1.1      | 2/2            | Complete | 2026-06-21 |
+| 6. Orders & Transactions                       | v1.1      | 1/1            | Complete | 2026-06-21 |
+| 7. Customers & Vehicles                        | v1.1      | 1/1            | Complete | 2026-06-21 |
+| 8. Inventory                                   | v1.1      | 0/1            | Planned  | -          |
+| 9. Appointments                                | v1.1      | 3/3            | Complete | 2026-06-22 |
+| 10. Finance & Analytics                        | v1.1      | 4/4            | Complete | 2026-06-23 |
 
 ---
 
