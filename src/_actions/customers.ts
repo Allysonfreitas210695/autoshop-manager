@@ -78,19 +78,28 @@ export const createVehicleAction = authActionClient
       throw new ActionError("Cliente não encontrado.");
     }
 
-    const [vehicle] = await db
-      .insert(vehicles)
-      .values({
-        ownerId: parsedInput.ownerId,
-        plate: parsedInput.plate.toUpperCase(),
-        make: parsedInput.make,
-        model: parsedInput.model,
-        year: parsedInput.year ?? null,
-        color: parsedInput.color ?? null,
-        mileage: parsedInput.mileage ?? null,
-        vin: parsedInput.vin ?? null,
-      })
-      .returning({ id: vehicles.id });
+    let vehicle: { id: string } | undefined;
+    try {
+      [vehicle] = await db
+        .insert(vehicles)
+        .values({
+          ownerId: parsedInput.ownerId,
+          plate: parsedInput.plate.toUpperCase(),
+          make: parsedInput.make,
+          model: parsedInput.model,
+          year: parsedInput.year ?? null,
+          color: parsedInput.color ?? null,
+          mileage: parsedInput.mileage ?? null,
+          vin: parsedInput.vin ?? null,
+        })
+        .returning({ id: vehicles.id });
+    } catch (e: unknown) {
+      if (isUniqueConstraintError(e, "plate")) {
+        throw new ActionError("Placa já cadastrada para outro veículo.");
+      }
+      throw e;
+    }
+    if (!vehicle) throw new ActionError("Falha ao cadastrar veículo.");
 
     revalidatePath("/customers");
     revalidatePath(`/customers/${parsedInput.ownerId}`);

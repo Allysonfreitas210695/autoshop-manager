@@ -159,16 +159,28 @@ export const updateOrderStatusAction = authActionClient
         totalAmount: serviceOrders.totalAmount,
       });
 
+    if (!order) throw new ActionError("O.S. não encontrada.");
+
     if (parsedInput.status === "completed") {
-      await db.insert(transactions).values({
-        date: new Date(),
-        description: `O.S. #${order.orderNumber}`,
-        category: "Serviço",
-        type: "income",
-        amount: order.totalAmount,
-        status: "paid",
-        serviceOrderId: order.id,
-      });
+      // Idempotente: não duplica a receita se a O.S. já gerou transação
+      // (ex.: completed → in_progress → completed novamente).
+      const [existing] = await db
+        .select({ id: transactions.id })
+        .from(transactions)
+        .where(eq(transactions.serviceOrderId, order.id))
+        .limit(1);
+
+      if (!existing) {
+        await db.insert(transactions).values({
+          date: new Date(),
+          description: `O.S. #${order.orderNumber}`,
+          category: "Serviço",
+          type: "income",
+          amount: order.totalAmount,
+          status: "paid",
+          serviceOrderId: order.id,
+        });
+      }
     }
 
     revalidatePath("/orders");
