@@ -47,14 +47,17 @@ export function AnalyticsClient({
     {
       label: "Total de O.S.",
       value: analyticsKpis.totalOrders12m.toString(),
-      sub: `Ticket médio ${formatCurrency(analyticsKpis.avgTicket)}`,
+      sub: `Ticket médio ${analyticsKpis.avgTicket !== null ? formatCurrency(analyticsKpis.avgTicket) : "N/D"}`,
       icon: BarChart3,
       color: "text-tertiary",
       bg: "bg-tertiary/10",
     },
     {
       label: "Margem Líquida",
-      value: `${analyticsKpis.netMargin}%`,
+      value:
+        analyticsKpis.netMargin !== null
+          ? `${analyticsKpis.netMargin}%`
+          : "N/D",
       sub: "Sobre o faturamento bruto",
       icon: TrendingUp,
       color: "text-status-completed",
@@ -62,8 +65,11 @@ export function AnalyticsClient({
     },
     {
       label: "NPS",
-      value: analyticsKpis.nps.toString(),
-      sub: `${analyticsKpis.returnRate}% taxa de retorno`,
+      value: analyticsKpis.nps !== null ? analyticsKpis.nps.toString() : "N/D",
+      sub:
+        analyticsKpis.returnRate !== null
+          ? `${analyticsKpis.returnRate}% taxa de retorno`
+          : "Taxa de retorno N/D",
       icon: TrendingUp,
       color: "text-secondary",
       bg: "bg-secondary/10",

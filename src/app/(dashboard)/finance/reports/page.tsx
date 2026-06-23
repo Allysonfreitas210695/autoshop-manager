@@ -7,11 +7,11 @@ import Link from "next/link";
 import { Card } from "@/_components/ui/card";
 import { DataTable, type DataTableColumn } from "@/_components/ui/data-table";
 import {
+  type CategoryReport,
+  getCategoryReport,
   getCostBreakdown,
   getFinanceMetrics,
   getMonthlyCashFlow,
-  listTransactions,
-  type Transaction,
 } from "@/_data-access/finance";
 import { getReportOrderCount } from "@/_data-access/finance";
 
@@ -32,14 +32,7 @@ const statusLabel: Record<StatusKey, string> = {
   negative: "Deficitário",
 };
 
-type CategoryRow = {
-  id: string;
-  category: string;
-  grossRevenue: number;
-  totalExpenses: number;
-  netProfit: number;
-  status: StatusKey;
-};
+type CategoryRow = CategoryReport & { id: string };
 
 const columns: DataTableColumn<CategoryRow>[] = [
   {
@@ -98,44 +91,42 @@ const columns: DataTableColumn<CategoryRow>[] = [
   },
 ];
 
-function buildCategoryRows(transactions: Transaction[]): CategoryRow[] {
-  const map = new Map<string, { income: number; expense: number }>();
-  for (const t of transactions) {
-    if (!map.has(t.category)) map.set(t.category, { income: 0, expense: 0 });
-    const e = map.get(t.category)!;
-    if (t.type === "income" && t.status === "paid") e.income += t.amount;
-    else if (t.type === "expense" && t.status === "paid") e.expense += t.amount;
-  }
-  return [...map.entries()]
-    .map(([cat, { income, expense }], i) => {
-      const netProfit = income - expense;
-      return {
-        id: String(i),
-        category: cat,
-        grossRevenue: income,
-        totalExpenses: expense,
-        netProfit,
-        status: (netProfit > 0
-          ? "positive"
-          : netProfit === 0
-            ? "neutral"
-            : "negative") as StatusKey,
-      };
-    })
-    .sort((a, b) => b.grossRevenue - a.grossRevenue);
+type Period = "mensal" | "trimestral" | "anual";
+
+function getPeriodDays(period: Period): number {
+  if (period === "trimestral") return 90;
+  if (period === "anual") return 365;
+  return 30;
 }
 
-export default async function FinanceReportsPage() {
-  const [monthlyCashFlow, costBreakdown, metrics, allTransactions, orderCount] =
+const PERIODS: { key: Period; label: string }[] = [
+  { key: "mensal", label: "Mensal" },
+  { key: "trimestral", label: "Trimestral" },
+  { key: "anual", label: "Anual" },
+];
+
+type Props = { searchParams: Promise<{ periodo?: string }> };
+
+export default async function FinanceReportsPage({ searchParams }: Props) {
+  const { periodo } = await searchParams;
+  const activePeriod: Period =
+    periodo === "trimestral" || periodo === "anual" ? periodo : "mensal";
+  const days = getPeriodDays(activePeriod);
+
+  const [monthlyCashFlow, costBreakdown, metrics, categoryRows, orderCount] =
     await Promise.all([
       getMonthlyCashFlow(6),
       getCostBreakdown(),
-      getFinanceMetrics(),
-      listTransactions(500),
+      getFinanceMetrics(days),
+      getCategoryReport(days),
       getReportOrderCount(6),
     ]);
 
-  const categoryRows = buildCategoryRows(allTransactions);
+  const categoryRowsWithId: CategoryRow[] = categoryRows.map((r, i) => ({
+    ...r,
+    id: String(i),
+  }));
+
   const lastMonth = monthlyCashFlow[monthlyCashFlow.length - 1];
   const totalRevenue = lastMonth?.receitas ?? metrics.monthlyRevenue;
   const totalExpenses = lastMonth?.despesas ?? 0;
@@ -285,16 +276,36 @@ export default async function FinanceReportsPage() {
       {/* Tabela por categoria */}
       <Card>
         <div className="border-outline-variant border-b p-4">
-          <h2 className="text-label-lg text-on-surface font-mono font-semibold tracking-wider uppercase">
-            Detalhamento por Categoria
-          </h2>
-          <p className="text-label-sm text-on-surface-variant font-mono">
-            Lucratividade por tipo de transação
-          </p>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h2 className="text-label-lg text-on-surface font-mono font-semibold tracking-wider uppercase">
+                Detalhamento por Categoria
+              </h2>
+              <p className="text-label-sm text-on-surface-variant font-mono">
+                Lucratividade por tipo de transação
+              </p>
+            </div>
+            {/* Filtros de período */}
+            <div className="flex gap-2">
+              {PERIODS.map(({ key, label }) => (
+                <Link
+                  key={key}
+                  href={`/finance/reports?periodo=${key}`}
+                  className={`text-label-sm shrink-0 rounded-full border px-4 py-1.5 font-mono transition-colors ${
+                    activePeriod === key
+                      ? "border-secondary bg-secondary/10 text-secondary"
+                      : "border-outline-variant text-on-surface-variant hover:bg-surface-container"
+                  }`}
+                >
+                  {label}
+                </Link>
+              ))}
+            </div>
+          </div>
         </div>
         <DataTable
           columns={columns}
-          data={categoryRows}
+          data={categoryRowsWithId}
           getRowId={(row) => row.id}
           emptyMessage="Nenhum dado disponível."
         />
